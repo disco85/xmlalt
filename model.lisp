@@ -33,4 +33,4 @@
   ((path :type path
          :documentation "A construct is located at some PATH reflecting it nesting")
    (children :initform nil :type list
-             :documentation "Refers children CONSTRUCT")))
+             :documentation "Refers zero or more children of its own type CONSTRUCT")))
