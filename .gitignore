@@ -17,3 +17,6 @@
 *.wx32fsl
 .qlot/
 .TMP/
+*~
+*.log
+*.bkp
