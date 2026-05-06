@@ -1,0 +1,50 @@
+digraph model_graph {
+  graph [splines=true, nodesep=0.7, ranksep=0.8]
+  fontname="Helvetica,Arial,sans-serif"
+  node [fontname="Helvetica,Arial,sans-serif"]
+  edge [fontname="Helvetica,Arial,sans-serif"]
+  node [shape=box]
+
+  Name -> LocalName [xlabel = "1"]
+  Name -> Prefix [xlabel = "0/1"]
+  Prefix -> NS [xlabel = "refers 0/1"]
+
+  Dir -> Name [xlabel = "1..N"]
+  Dir -> Depth [xlabel = 1]
+
+  Attribute -> Name [xlabel = 1]
+  Attribute -> Value [xlabel = 1]
+  Value -> Content [xlabel = is]
+
+  Construct -> Dir [xlabel = "in 1"]
+
+  Contentful -> Construct [xlabel = is]
+  Contentful -> Content [xlabel = 1]
+  
+  CDATA -> Contentful [xlabel = is]
+  Comment -> Contentful [xlabel = is]
+  Text -> Contentful [xlabel = is]
+  PI -> Contentful [xlabel = is]
+  Declaration -> Contentful [xlabel = is]
+  DOCTYPE -> Contentful [xlabel = is]
+  
+  {rank=min; CDATA; Comment; }
+  {rank=same; Text; PI; }
+  {rank=max; Declaration; DOCTYPE; }
+  {rank=same; Name; Dir; }
+  
+  Contentless -> Construct [xlabel = is]
+  Entity -> Contentless [xlabel = is]
+  Entity -> EntityCode [xlabel = "[has] 1"]
+  EmptyTag -> Contentless [xlabel = is]
+  EmptyTag -> Attribute [xlabel = "1..A"]
+
+  Tag -> Contentless [xlabel = is]
+  Tag -> Attribute [xlabel = "1..A"]
+  Tag -> Name [xlabel = 1]
+  Tag -> Tag:n [xlabel = "0..C"]
+
+  Internal -> Construct [xlabel = is]
+  CloseTag -> Internal [xlabel = is]
+  CloseTag -> Tag [xlabel = for]
+}
