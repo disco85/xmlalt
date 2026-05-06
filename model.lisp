@@ -59,4 +59,39 @@
    (content :type content)))
 
 
+(defclass cdata (node)
+  ((open-by :initform "<![CDATA[")
+   (close-by :initform "]]>")
+   (content :type content :initform nil)))
+
+
+(defclass comment (node)
+  ((open-by :initform "<!--")
+   (close-by :initform "-->")
+   (content :type content :initform nil)))
+
+
+(defclass empty (node)
+  ((attributes :type list :initform :nil)
+   (name :type name)))
+
+
+(defclass tag (node)
+  ((attributes :type list :initform nil)
+   (name :type name)))
+
+
+(defclass entity (node)
+  ((open-by :initform "&")
+   (close-by :initform ";")
+   (entity-code :type content)))
+
+
+(defclass doctype ()
+  ((content :type content)))
+
+
+(defclass xml-decl ()
+  ((content :type content)))
+
 ;; TODO

@@ -1,5 +1,5 @@
 digraph model_graph {
-  graph [splines=ortho, nodesep=0.5, ranksep=1.0, rankdir=TB ]
+  graph [splines=ortho, nodesep=0.6, ranksep=0.5, rankdir=TB ]
   fontname="Helvetica,Arial,sans-serif"
   node [fontname="Helvetica,Arial,sans-serif"]
   edge [fontname="Helvetica,Arial,sans-serif"]
@@ -45,4 +45,5 @@ digraph model_graph {
 
   EmptyTag -> "Node" [xlabel = is]
   EmptyTag -> Attribute [xlabel = "0..A"]
+  EmptyTag -> Name [xlabel = 1]  
 }
