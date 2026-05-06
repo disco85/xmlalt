@@ -1,5 +1,5 @@
 digraph model_graph {
-  graph [splines=true, nodesep=0.7, ranksep=0.8]
+  graph [splines=ortho, nodesep=0.5, ranksep=1.0, rankdir=TB ]
   fontname="Helvetica,Arial,sans-serif"
   node [fontname="Helvetica,Arial,sans-serif"]
   edge [fontname="Helvetica,Arial,sans-serif"]
@@ -13,38 +13,38 @@ digraph model_graph {
   Dir -> Depth [xlabel = 1]
 
   Attribute -> Name [xlabel = 1]
-  Attribute -> Value [xlabel = 1]
-  Value -> Content [xlabel = is]
+  Attribute -> Content [xlabel = 1]
 
   "Node" -> Dir [xlabel = "in 1"]
 
-  Contentful -> "Node" [xlabel = is]
-  Contentful -> Content [xlabel = 1]
+  CDATA -> "Node" [xlabel = is]
+  Comment -> "Node" [xlabel = is]
+  Text -> "Node" [xlabel = is]
+  PI -> "Node" [xlabel = is]
 
-  CDATA -> Contentful [xlabel = is]
-  Comment -> Contentful [xlabel = is]
-  Text -> Contentful [xlabel = is]
-  PI -> Contentful [xlabel = is]
-  Declaration -> Contentful [xlabel = is]
-  DOCTYPE -> Contentful [xlabel = is]
-
-  { rank=min; CDATA; Comment; }
   { rank=same; Text; PI; }
-  { rank=max; Declaration; DOCTYPE; }
-  { rank=same; Name; Dir; }
+  { rank=max; Declaration; DOCTYPE; Entity; }
 
-  Contentless -> "Node" [xlabel = is]
-  Entity -> Contentless [xlabel = is]
-  Entity -> EntityCode [xlabel = "[has] 1"]
-  EmptyTag -> Contentless [xlabel = is]
-  EmptyTag -> Attribute [xlabel = "0..A"]
+  CDATA -> Content [xlabel = "0/1"]
+  Comment -> Content [xlabel = "0/1"]
+  Text -> Content [xlabel = 1]
+  PI -> Content [xlabel = 1]
 
-  Tag -> Contentless [xlabel = is]
-  Tag -> Attribute [xlabel = "0..A"]
-  Tag -> Name [xlabel = 1]
-  Tag -> Tag:n [xlabel = "0..C"]
+  Declaration -> Content [xlabel = "[has] 1"]
+  DOCTYPE -> Content [xlabel = 1]
 
   Internal -> "Node" [xlabel = is]
-  CloseTag -> Internal [xlabel = is]
-  CloseTag -> Tag [xlabel = for]
+
+  //{ rank=min; Entity; EntityCode; }
+
+  Entity -> EntityCode [xlabel = "1"]
+  Entity -> "Node" [xlabel = is]
+
+  Tag -> "Node" [xlabel = is]
+  Tag -> Attribute [xlabel = "0..A"]
+  Tag -> Name [xlabel = 1]
+  Tag -> "Node" [xlabel = "0..C"]
+
+  EmptyTag -> "Node" [xlabel = is]
+  EmptyTag -> Attribute [xlabel = "0..A"]
 }
