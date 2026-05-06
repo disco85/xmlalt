@@ -20,20 +20,18 @@ digraph model_graph {
   CDATA -> "Node" [xlabel = is]
   Comment -> "Node" [xlabel = is]
   Text -> "Node" [xlabel = is]
-  PI -> "Node" [xlabel = is]
+  ProcessingInstruction -> "Node" [xlabel = is]
 
-  { rank=same; Text; PI; }
+  { rank=same; Text; ProcessingInstruction; }
   { rank=max; Declaration; DOCTYPE; Entity; }
 
   CDATA -> Content [xlabel = "0/1"]
   Comment -> Content [xlabel = "0/1"]
   Text -> Content [xlabel = 1]
-  PI -> Content [xlabel = 1]
+  ProcessingInstruction -> Content [xlabel = 1]
 
   Declaration -> Content [xlabel = "[has] 1"]
   DOCTYPE -> Content [xlabel = 1]
-
-  Internal -> "Node" [xlabel = is]
 
   //{ rank=min; Entity; EntityCode; }
 
@@ -42,8 +40,8 @@ digraph model_graph {
 
   Tag -> "Node" [xlabel = is]
   Tag -> Attribute [xlabel = "0..A"]
-  Tag -> Name [xlabel = 1]
   Tag -> "Node" [xlabel = "0..C"]
+  Tag -> Name [xlabel = 1]
 
   EmptyTag -> "Node" [xlabel = is]
   EmptyTag -> Attribute [xlabel = "0..A"]
