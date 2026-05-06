@@ -12,73 +12,73 @@
 <!-- Name -->
 <g id="node1" class="node">
 <title>Name</title>
-<polygon fill="none" stroke="black" points="349,-224 295,-224 295,-188 349,-188 349,-224"/>
-<text text-anchor="middle" x="322" y="-202.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Name</text>
+<polygon fill="none" stroke="black" points="350,-224 296,-224 296,-188 350,-188 350,-224"/>
+<text text-anchor="middle" x="323" y="-202.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Name</text>
 </g>
 <!-- LocalName -->
 <g id="node2" class="node">
 <title>LocalName</title>
-<polygon fill="none" stroke="black" points="483,-130 397,-130 397,-94 483,-94 483,-130"/>
-<text text-anchor="middle" x="440" y="-108.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">LocalName</text>
+<polygon fill="none" stroke="black" points="486,-130 400,-130 400,-94 486,-94 486,-130"/>
+<text text-anchor="middle" x="443" y="-108.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">LocalName</text>
 </g>
 <!-- Name&#45;&gt;LocalName -->
 <g id="edge1" class="edge">
 <title>Name&#45;&gt;LocalName</title>
-<path fill="none" stroke="black" d="M343.92,-187.91C362.43,-173.48 389.13,-152.66 409.69,-136.63"/>
-<polygon fill="black" stroke="black" points="412.06,-139.22 417.8,-130.31 407.76,-133.7 412.06,-139.22"/>
-<text text-anchor="middle" x="376.92" y="-162.86" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
+<path fill="none" stroke="black" d="M345.29,-187.91C364.2,-173.41 391.51,-152.48 412.45,-136.42"/>
+<polygon fill="black" stroke="black" points="414.62,-139.17 420.42,-130.31 410.36,-133.62 414.62,-139.17"/>
+<text text-anchor="middle" x="379.1" y="-162.72" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
 </g>
 <!-- Prefix -->
 <g id="node3" class="node">
 <title>Prefix</title>
-<polygon fill="none" stroke="black" points="347,-130 293,-130 293,-94 347,-94 347,-130"/>
-<text text-anchor="middle" x="320" y="-108.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Prefix</text>
+<polygon fill="none" stroke="black" points="350,-130 296,-130 296,-94 350,-94 350,-130"/>
+<text text-anchor="middle" x="323" y="-108.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Prefix</text>
 </g>
 <!-- Name&#45;&gt;Prefix -->
 <g id="edge2" class="edge">
 <title>Name&#45;&gt;Prefix</title>
-<path fill="none" stroke="black" d="M321.62,-187.7C321.34,-174.46 320.93,-155.95 320.6,-140.66"/>
-<polygon fill="black" stroke="black" points="324.09,-140.15 320.37,-130.23 317.09,-140.3 324.09,-140.15"/>
-<text text-anchor="middle" x="311.5" y="-162.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">0/1</text>
+<path fill="none" stroke="black" d="M323,-187.7C323,-174.46 323,-155.95 323,-140.66"/>
+<polygon fill="black" stroke="black" points="326.5,-140.23 323,-130.23 319.5,-140.23 326.5,-140.23"/>
+<text text-anchor="middle" x="313.5" y="-162.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">0/1</text>
 </g>
 <!-- NS -->
 <g id="node4" class="node">
 <title>NS</title>
-<polygon fill="none" stroke="black" points="347,-36 293,-36 293,0 347,0 347,-36"/>
-<text text-anchor="middle" x="320" y="-14.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">NS</text>
+<polygon fill="none" stroke="black" points="350,-36 296,-36 296,0 350,0 350,-36"/>
+<text text-anchor="middle" x="323" y="-14.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">NS</text>
 </g>
 <!-- Prefix&#45;&gt;NS -->
 <g id="edge3" class="edge">
 <title>Prefix&#45;&gt;NS</title>
-<path fill="none" stroke="black" d="M320,-93.7C320,-80.46 320,-61.95 320,-46.66"/>
-<polygon fill="black" stroke="black" points="323.5,-46.23 320,-36.23 316.5,-46.23 323.5,-46.23"/>
-<text text-anchor="middle" x="291" y="-68.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">refers 0/1</text>
+<path fill="none" stroke="black" d="M323,-93.7C323,-80.46 323,-61.95 323,-46.66"/>
+<polygon fill="black" stroke="black" points="326.5,-46.23 323,-36.23 319.5,-46.23 326.5,-46.23"/>
+<text text-anchor="middle" x="294" y="-68.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">refers 0/1</text>
 </g>
 <!-- Dir -->
 <g id="node5" class="node">
 <title>Dir</title>
-<polygon fill="none" stroke="black" points="241,-224 187,-224 187,-188 241,-188 241,-224"/>
-<text text-anchor="middle" x="214" y="-202.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Dir</text>
+<polygon fill="none" stroke="black" points="246,-224 192,-224 192,-188 246,-188 246,-224"/>
+<text text-anchor="middle" x="219" y="-202.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Dir</text>
 </g>
 <!-- Dir&#45;&gt;Name -->
 <g id="edge4" class="edge">
 <title>Dir&#45;&gt;Name</title>
-<path fill="none" stroke="black" d="M241.42,-206C255.91,-206 270.41,-206 284.9,-206"/>
-<polygon fill="black" stroke="black" points="284.93,-209.5 294.93,-206 284.93,-202.5 284.93,-209.5"/>
-<text text-anchor="middle" x="255.42" y="-209.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1..N</text>
+<path fill="none" stroke="black" d="M246.22,-206C259.36,-206 272.51,-206 285.65,-206"/>
+<polygon fill="black" stroke="black" points="285.71,-209.5 295.71,-206 285.71,-202.5 285.71,-209.5"/>
+<text text-anchor="middle" x="258.67" y="-209.8" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1..N</text>
 </g>
 <!-- Depth -->
 <g id="node6" class="node">
 <title>Depth</title>
-<polygon fill="none" stroke="black" points="241,-130 187,-130 187,-94 241,-94 241,-130"/>
-<text text-anchor="middle" x="214" y="-108.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Depth</text>
+<polygon fill="none" stroke="black" points="246,-130 192,-130 192,-94 246,-94 246,-130"/>
+<text text-anchor="middle" x="219" y="-108.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Depth</text>
 </g>
 <!-- Dir&#45;&gt;Depth -->
 <g id="edge5" class="edge">
 <title>Dir&#45;&gt;Depth</title>
-<path fill="none" stroke="black" d="M214,-187.7C214,-174.46 214,-155.95 214,-140.66"/>
-<polygon fill="black" stroke="black" points="217.5,-140.23 214,-130.23 210.5,-140.23 217.5,-140.23"/>
-<text text-anchor="middle" x="210" y="-162.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
+<path fill="none" stroke="black" d="M219,-187.7C219,-174.46 219,-155.95 219,-140.66"/>
+<polygon fill="black" stroke="black" points="222.5,-140.23 219,-130.23 215.5,-140.23 222.5,-140.23"/>
+<text text-anchor="middle" x="215" y="-162.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
 </g>
 <!-- Attribute -->
 <g id="node7" class="node">
@@ -89,9 +89,9 @@
 <!-- Attribute&#45;&gt;Name -->
 <g id="edge6" class="edge">
 <title>Attribute&#45;&gt;Name</title>
-<path fill="none" stroke="black" d="M406.9,-375.73C397.43,-360.73 383.7,-338.28 373,-318 358.08,-289.73 343.06,-256.28 333.22,-233.54"/>
-<polygon fill="black" stroke="black" points="336.37,-232.01 329.21,-224.21 329.94,-234.78 336.37,-232.01"/>
-<text text-anchor="middle" x="360.63" y="-305.46" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
+<path fill="none" stroke="black" d="M406.86,-375.75C397.37,-360.76 383.63,-338.32 373,-318 358.24,-289.77 343.53,-256.32 333.93,-233.56"/>
+<polygon fill="black" stroke="black" points="337.11,-232.09 330.02,-224.22 330.65,-234.8 337.11,-232.09"/>
+<text text-anchor="middle" x="360.91" y="-305.82" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
 </g>
 <!-- Value -->
 <g id="node8" class="node">
@@ -119,18 +119,18 @@
 <polygon fill="black" stroke="black" points="503.59,-233.5 508.71,-224.23 498.92,-228.28 503.59,-233.5"/>
 <text text-anchor="middle" x="471.65" y="-256.67" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
 </g>
-<!-- Construct -->
+<!-- Node -->
 <g id="node10" class="node">
-<title>Construct</title>
-<polygon fill="none" stroke="black" points="246,-318 172,-318 172,-282 246,-282 246,-318"/>
-<text text-anchor="middle" x="209" y="-296.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Construct</text>
+<title>Node</title>
+<polygon fill="none" stroke="black" points="246,-318 192,-318 192,-282 246,-282 246,-318"/>
+<text text-anchor="middle" x="219" y="-296.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Node</text>
 </g>
-<!-- Construct&#45;&gt;Dir -->
+<!-- Node&#45;&gt;Dir -->
 <g id="edge9" class="edge">
-<title>Construct&#45;&gt;Dir</title>
-<path fill="none" stroke="black" d="M209.94,-281.7C210.67,-268.33 211.69,-249.59 212.52,-234.22"/>
-<polygon fill="black" stroke="black" points="216.02,-234.4 213.06,-224.23 209.03,-234.02 216.02,-234.4"/>
-<text text-anchor="middle" x="200.49" y="-257.05" font-family="Helvetica,Arial,sans-serif" font-size="14.00">in 1</text>
+<title>Node&#45;&gt;Dir</title>
+<path fill="none" stroke="black" d="M219,-281.7C219,-268.46 219,-249.95 219,-234.66"/>
+<polygon fill="black" stroke="black" points="222.5,-234.23 219,-224.23 215.5,-234.23 222.5,-234.23"/>
+<text text-anchor="middle" x="208" y="-256.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">in 1</text>
 </g>
 <!-- Contentful -->
 <g id="node11" class="node">
@@ -145,12 +145,12 @@
 <polygon fill="black" stroke="black" points="554.46,-228.77 544.94,-224.12 549.48,-233.69 554.46,-228.77"/>
 <text text-anchor="middle" x="615.99" y="-303.79" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
 </g>
-<!-- Contentful&#45;&gt;Construct -->
+<!-- Contentful&#45;&gt;Node -->
 <g id="edge10" class="edge">
-<title>Contentful&#45;&gt;Construct</title>
-<path fill="none" stroke="black" d="M672.95,-385.86C581.77,-369.18 355.12,-327.73 256.31,-309.65"/>
-<polygon fill="black" stroke="black" points="256.78,-306.18 246.31,-307.82 255.52,-313.07 256.78,-306.18"/>
-<text text-anchor="middle" x="454.48" y="-350.61" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
+<title>Contentful&#45;&gt;Node</title>
+<path fill="none" stroke="black" d="M672.9,-385.7C579.92,-368.35 346.62,-324.82 255.9,-307.89"/>
+<polygon fill="black" stroke="black" points="256.53,-304.44 246.06,-306.05 255.25,-311.32 256.53,-304.44"/>
+<text text-anchor="middle" x="454.27" y="-349.64" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
 </g>
 <!-- CDATA -->
 <g id="node12" class="node">
@@ -236,12 +236,12 @@
 <polygon fill="none" stroke="black" points="334,-412 246,-412 246,-376 334,-376 334,-412"/>
 <text text-anchor="middle" x="290" y="-390.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Contentless</text>
 </g>
-<!-- Contentless&#45;&gt;Construct -->
+<!-- Contentless&#45;&gt;Node -->
 <g id="edge18" class="edge">
-<title>Contentless&#45;&gt;Construct</title>
-<path fill="none" stroke="black" d="M274.76,-375.7C262.43,-361.69 244.9,-341.77 231.03,-326.03"/>
-<polygon fill="black" stroke="black" points="233.4,-323.42 224.17,-318.23 228.15,-328.05 233.4,-323.42"/>
-<text text-anchor="middle" x="244.51" y="-350.82" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
+<title>Contentless&#45;&gt;Node</title>
+<path fill="none" stroke="black" d="M276.65,-375.7C265.94,-361.82 250.75,-342.14 238.65,-326.46"/>
+<polygon fill="black" stroke="black" points="241.18,-324.01 232.29,-318.23 235.63,-328.28 241.18,-324.01"/>
+<text text-anchor="middle" x="249.42" y="-350.69" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
 </g>
 <!-- Entity -->
 <g id="node19" class="node">
@@ -280,7 +280,7 @@
 <title>EmptyTag&#45;&gt;Attribute</title>
 <path fill="none" stroke="black" d="M316.22,-469.91C335.91,-455.41 364.36,-434.48 386.18,-418.42"/>
 <polygon fill="black" stroke="black" points="388.5,-421.06 394.48,-412.31 384.35,-415.42 388.5,-421.06"/>
-<text text-anchor="middle" x="343.1" y="-444.72" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1..A</text>
+<text text-anchor="middle" x="343.1" y="-444.72" font-family="Helvetica,Arial,sans-serif" font-size="14.00">0..A</text>
 </g>
 <!-- EmptyTag&#45;&gt;Contentless -->
 <g id="edge21" class="edge">
@@ -298,8 +298,8 @@
 <!-- Tag&#45;&gt;Name -->
 <g id="edge25" class="edge">
 <title>Tag&#45;&gt;Name</title>
-<path fill="none" stroke="black" d="M435.18,-469.93C449.92,-456.05 468.71,-435.05 477,-412 496.56,-357.63 507.69,-330.95 477,-282 451.31,-241.02 396.18,-221.88 359.09,-213.35"/>
-<polygon fill="black" stroke="black" points="359.65,-209.89 349.14,-211.21 358.18,-216.73 359.65,-209.89"/>
+<path fill="none" stroke="black" d="M435.18,-469.93C449.92,-456.05 468.71,-435.05 477,-412 496.56,-357.63 507.63,-330.99 477,-282 451.56,-241.32 397.03,-222.13 360.17,-213.49"/>
+<polygon fill="black" stroke="black" points="360.8,-210.05 350.28,-211.33 359.3,-216.89 360.8,-210.05"/>
 <text text-anchor="middle" x="472.98" y="-285.77" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1</text>
 </g>
 <!-- Tag&#45;&gt;Attribute -->
@@ -307,7 +307,7 @@
 <title>Tag&#45;&gt;Attribute</title>
 <path fill="none" stroke="black" d="M415.56,-469.7C416,-456.46 416.6,-437.95 417.1,-422.66"/>
 <polygon fill="black" stroke="black" points="420.61,-422.34 417.44,-412.23 413.61,-422.11 420.61,-422.34"/>
-<text text-anchor="middle" x="403.99" y="-444.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">1..A</text>
+<text text-anchor="middle" x="403.99" y="-444.96" font-family="Helvetica,Arial,sans-serif" font-size="14.00">0..A</text>
 </g>
 <!-- Tag&#45;&gt;Contentless -->
 <g id="edge23" class="edge">
@@ -329,12 +329,12 @@
 <polygon fill="none" stroke="black" points="62,-412 0,-412 0,-376 62,-376 62,-412"/>
 <text text-anchor="middle" x="31" y="-390.3" font-family="Helvetica,Arial,sans-serif" font-size="14.00">Internal</text>
 </g>
-<!-- Internal&#45;&gt;Construct -->
+<!-- Internal&#45;&gt;Node -->
 <g id="edge27" class="edge">
-<title>Internal&#45;&gt;Construct</title>
-<path fill="none" stroke="black" d="M62.01,-376.97C91.02,-361.98 134.59,-339.46 166.77,-322.83"/>
-<polygon fill="black" stroke="black" points="168.66,-325.79 175.94,-318.09 165.45,-319.57 168.66,-325.79"/>
-<text text-anchor="middle" x="113.86" y="-351.39" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
+<title>Internal&#45;&gt;Node</title>
+<path fill="none" stroke="black" d="M62.04,-377.81C95.12,-361.62 147.45,-336.01 182.49,-318.87"/>
+<polygon fill="black" stroke="black" points="184.44,-321.81 191.88,-314.27 181.36,-315.52 184.44,-321.81"/>
+<text text-anchor="middle" x="122.1" y="-349.77" font-family="Helvetica,Arial,sans-serif" font-size="14.00">is</text>
 </g>
 <!-- CloseTag -->
 <g id="node24" class="node">

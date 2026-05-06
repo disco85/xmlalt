@@ -16,35 +16,35 @@ digraph model_graph {
   Attribute -> Value [xlabel = 1]
   Value -> Content [xlabel = is]
 
-  Construct -> Dir [xlabel = "in 1"]
+  "Node" -> Dir [xlabel = "in 1"]
 
-  Contentful -> Construct [xlabel = is]
+  Contentful -> "Node" [xlabel = is]
   Contentful -> Content [xlabel = 1]
-  
+
   CDATA -> Contentful [xlabel = is]
   Comment -> Contentful [xlabel = is]
   Text -> Contentful [xlabel = is]
   PI -> Contentful [xlabel = is]
   Declaration -> Contentful [xlabel = is]
   DOCTYPE -> Contentful [xlabel = is]
-  
-  {rank=min; CDATA; Comment; }
-  {rank=same; Text; PI; }
-  {rank=max; Declaration; DOCTYPE; }
-  {rank=same; Name; Dir; }
-  
-  Contentless -> Construct [xlabel = is]
+
+  { rank=min; CDATA; Comment; }
+  { rank=same; Text; PI; }
+  { rank=max; Declaration; DOCTYPE; }
+  { rank=same; Name; Dir; }
+
+  Contentless -> "Node" [xlabel = is]
   Entity -> Contentless [xlabel = is]
   Entity -> EntityCode [xlabel = "[has] 1"]
   EmptyTag -> Contentless [xlabel = is]
-  EmptyTag -> Attribute [xlabel = "1..A"]
+  EmptyTag -> Attribute [xlabel = "0..A"]
 
   Tag -> Contentless [xlabel = is]
-  Tag -> Attribute [xlabel = "1..A"]
+  Tag -> Attribute [xlabel = "0..A"]
   Tag -> Name [xlabel = 1]
   Tag -> Tag:n [xlabel = "0..C"]
 
-  Internal -> Construct [xlabel = is]
+  Internal -> "Node" [xlabel = is]
   CloseTag -> Internal [xlabel = is]
   CloseTag -> Tag [xlabel = for]
 }
