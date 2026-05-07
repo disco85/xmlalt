@@ -4,10 +4,15 @@
   :license "GPL-3.0-or-later"
   :version "0.0.1"
   :serial t
-  :depends-on (:clingon)
+  :depends-on (:clingon :cxml)
   :components ((:file "package")
                (:file "utils")
                (:file "model")
+               (:file "blkfmt")
+               (:file "cmdfmt")
+               (:file "mrkfmt")
+               (:file "regfmt")
+               (:file "xmlfmt")
                (:file "xmlalt"))
   :build-operation "program-op"
   :build-pathname "xmlalt"
