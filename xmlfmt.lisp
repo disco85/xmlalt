@@ -51,7 +51,7 @@
   (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id))
 
 (defmethod sax::dtd ((handler myclass) dtd)
-  (format t "START-DTD! DTD: ~A~%~%" dtd))
+  (format t "DTD! DTD: ~A~%~%" dtd))
 
 (defmethod sax:start-internal-subset ((handler myclass))
   (format t "START-INTERNAL-SUBSET!~%~%"))
