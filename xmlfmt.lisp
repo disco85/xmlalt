@@ -1,41 +1,5 @@
 (in-package :xmlfmt)
 
-;; (defclass event-collecting-handler ()
-;;   ((event-list :initform '() :accessor event-list)))
-
-;; (defmethod start-document ((handler event-collecting-handler))
-;;   (push (list :start-document) (event-list handler)))
-
-;; (defmethod start-element ((handler event-collecting-handler) ns-uri local-name qname attrs)
-;;   (push (list :start-element ns-uri local-name qname attrs)
-;; 	(event-list handler)))
-
-;; (defmethod start-prefix-mapping ((handler event-collecting-handler) prefix uri)
-;;   (push (list :start-prefix-mapping prefix uri)
-;; 	(event-list handler)))
-
-;; (defmethod characters ((handler event-collecting-handler) data)
-;;   (push (list :characters data)
-;; 	(event-list handler)))
-
-;; (defmethod processing-instruction ((handler event-collecting-handler) target data)
-;;   (push (list :processing-instruction target data)
-;; 	(event-list handler)))
-
-;; (defmethod end-prefix-mapping ((handler event-collecting-handler) prefix)
-;;   (push (list :end-prefix-mapping prefix)
-;; 	(event-list handler)))
-
-;; (defmethod end-element ((handler event-collecting-handler) namespace-uri local-name qname)
-;;   (push (list :end-element namespace-uri local-name qname)
-;; 	(event-list handler)))
-
-;; (defmethod end-document ((handler event-collecting-handler))
-;;   (push (list :end-document)
-;; 	(event-list handler))
-;;   (nreverse (event-list handler)))
-
-
 
 (defclass myclass (sax:abstract-handler)
   ((event-list :initform '() :accessor event-list)))
@@ -128,7 +92,16 @@
 
 (defun parse-xml (path)
   (let ((handler (make-instance 'myclass)))
-    (cxml:parse path handler)))
+    (handler-case
+        (call-with-input-stream
+         (path (lambda (f) (cxml:parse f handler))))
+      (error (x) (:fail (format nil "Parsing of XML '~A' failed: ~A" path x)))))) ; TODO and (:ok ...)
+
+;; (defun parse-xml (path)
+;;   (let ((handler (make-instance 'myclass)))
+;;     (handler-case
+;;         (cxml:parse path handler)
+;;         (error (x) (:fail (format nil "Parsing of XML '~A' failed: ~A" path x)))))) ; TODO and (:ok ...)
 
   ;; (with-open-file (in path :direction :input)
   ;;   (let ((handler (make-instance 'myclass))

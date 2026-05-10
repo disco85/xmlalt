@@ -90,7 +90,8 @@
    (close-by :initform "?>")
    (content :type content
             :documentation ""
-            :accessor pinstr-content)))
+            :accessor pinstr-content))
+  (:documentation "Processing instruction"))
 
 
 (defclass cdata (node)
@@ -142,12 +143,19 @@
 (defclass doctype ()
   ((content :type content
             :documentation ""
-            :accessor doctype-content)))
+            :accessor doctype-content
+            :initarg :content)))
 
 
 (defclass xml-decl ()
   ((content :type content
             :documentation ""
-            :accessor xml-decl-content)))
+            :accessor xml-decl-content
+            :initarg :content)))
 
-;; TODO
+
+(defclass doc ()
+  ((xml-decl :accessor doc-xml-decl
+             :initform nil
+             :initarg :xml-decl)
+   (doctype )))

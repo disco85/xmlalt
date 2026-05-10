@@ -23,14 +23,14 @@ digraph model_graph {
   ProcessingInstruction -> "Node" [xlabel = is]
 
   { rank=same; Text; ProcessingInstruction; }
-  { rank=max; Declaration; DOCTYPE; Entity; }
+  { rank=max; XmlDecl; DOCTYPE; Entity; }
 
   CDATA -> Content [xlabel = "0/1"]
   Comment -> Content [xlabel = "0/1"]
   Text -> Content [xlabel = 1]
   ProcessingInstruction -> Content [xlabel = 1]
 
-  Declaration -> Content [xlabel = "[has] 1"]
+  XmlDecl -> Content [xlabel = "[has] 1"]
   DOCTYPE -> Content [xlabel = 1]
 
   //{ rank=min; Entity; EntityCode; }
