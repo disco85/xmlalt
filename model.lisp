@@ -78,16 +78,16 @@
 
 
 (defclass text (node)
-  ((open-by :initform "")
-   (close-by :initform "")
+  ((open-by :initform "" :reader text-open-by)
+   (close-by :initform "" :reader text-close-by)
    (conent :type content
            :documentation ""
            :accessor text-conent)))
 
 
 (defclass pinstr (node)
-  ((open-by :initform "<?")
-   (close-by :initform "?>")
+  ((open-by :initform "<?" :reader pinstr-open-by)
+   (close-by :initform "?>" :reader pinstr-close-by)
    (content :type content
             :documentation ""
             :accessor pinstr-content))
@@ -95,8 +95,8 @@
 
 
 (defclass cdata (node)
-  ((open-by :initform "<![CDATA[")
-   (close-by :initform "]]>")
+  ((open-by :initform "<![CDATA[" :reader cdata-open-by)
+   (close-by :initform "]]>" :reader cdata-close-by)
    (content :type content
             :initform nil
             :documentation ""
@@ -122,19 +122,19 @@
          :accessor empty-name)))
 
 
-(defclass tag (node)
+(defclass elem (node)
   ((attributes :type list
                :initform nil
                :documentation ""
-               :accessor tag-attributes)
+               :accessor elem-attributes)
    (name :type name
          :documentation ""
-         :accessor tag-name)))
+         :accessor elem-name)))
 
 
 (defclass entity (node)
-  ((open-by :initform "&")
-   (close-by :initform ";")
+  ((open-by :initform "&" :reader entity-open-by)
+   (close-by :initform ";" :reader entity-close-by)
    (entity-code :type content
                 :documentation ""
                 :accessor entity-entity-code)))
@@ -153,9 +153,48 @@
             :accessor xml-decl-content
             :initarg :content)))
 
+(defclass elem-decl ()
+  ((content :type content
+            :documentation ""
+            :accessor elem-decl-content
+            :initarg :content)))
+
+(defclass attr-decl ()
+  ((content :type content
+            :documentation ""
+            :accessor attr-decl-content
+            :initarg :content)))
+
+(defclass not-decl ()
+  ((content :type content
+            :documentation ""
+            :accessor not-decl-content
+            :initarg :content)))
+
+(deftype entity-decl-kind-type ()
+  '(member :internal :external :unparsed))
+
+(defclass entity-decl ()
+  ((content :type content
+            :documentation ""
+            :accessor entity-decl-content
+            :initarg :content)
+   (kind :type entity-decl-kind-type
+         :documentation ""
+         :accessor entity-decl-kind
+         :initarg :kind)))
+
+(defclass dtd ()
+  ((items :type list  ;; items as attr-decl, elem-decl...
+          :documentation ""
+          :accessor dtd-items
+          :initform nil
+          :initarg :items)))
 
 (defclass doc ()
   ((xml-decl :accessor doc-xml-decl
              :initform nil
              :initarg :xml-decl)
-   (doctype )))
+   (dtd :accessor dtd
+        :documentation ""
+        :initform nil)))
