@@ -195,6 +195,10 @@
   ((xml-decl :accessor doc-xml-decl
              :initform nil
              :initarg :xml-decl)
-   (dtd :accessor dtd
+   (dtd :accessor doc-dtd
         :documentation ""
-        :initform nil)))
+        :initform nil)
+   (elems :type list
+          :documentation ""
+          :initform nil
+          :accessor doc-elems)))
