@@ -160,10 +160,22 @@
             :initarg :content)))
 
 (defclass attr-decl ()
-  ((content :type content
+  ((element-name :type string
+                 :documentation ""
+                 :accessor attr-decl-element-name
+                 :initarg :element-name)
+   (attribute-name :type string
+                   :documentation ""
+                   :accessor attr-decl-attribute-name
+                   :initarg :attribute-name)
+   (type :type string
+         :documentation ""
+         :accessor attr-decl-type
+         :initarg :attribute-type)
+   (default :type string
             :documentation ""
-            :accessor attr-decl-content
-            :initarg :content)))
+            :accessor attr-decl-default
+            :initarg :default)))
 
 (defclass not-decl ()
   ((content :type content
@@ -210,7 +222,8 @@
   ((xml-decl :accessor doc-xml-decl
              :initform nil
              :initarg :xml-decl)
-   (dtd :accessor doc-dtd
+   (dtd :type dtd
+        :accessor doc-dtd
         :documentation ""
         :initform nil)
    (elems :type list

@@ -5,8 +5,13 @@
   ((doc :initform (make-instance 'model:doc) :accessor mysax-doc)))
 
 (defmethod sax:attribute-declaration ((handler mysax) element-name attribute-name type default)
-  (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
-          element-name attribute-name type default))
+  (let ((attr-decl (make-instance 'model:attr-decl :element-name element-name
+                                                   :attribute-name attribute-name
+                                                   :type type
+                                                   :default default)))
+    (push attr-decl (model:dtd-items (model:doc-dtd (mysax-doc handler))))
+    (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
+            element-name attribute-name type default)))
 
 (defmethod sax:start-document ((handler mysax))
   (format t "START-DOCUMENT!~%~%"))

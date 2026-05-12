@@ -6,9 +6,24 @@
   (:use #:cl)
   (:export #:main
    #:uri
+
    #:doc
+   #:doc-xml-decl
    #:doc-dtd
-   #:dtd))
+   #:doc-elems
+
+   #:dtd
+   #:dtd-items
+   #:dtd-name
+   #:dtd-public-id
+   #:dtd-system-id
+
+   #:attr-decl
+   #:attr-decl-element-name
+   #:attr-decl-attribute-name
+   #:attr-decl-type
+   #:attr-decl-default
+   ))
 
 (defpackage #:utils
   (:use #:cl)
