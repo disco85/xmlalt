@@ -2,7 +2,7 @@
 
 
 (defclass mysax (sax:abstract-handler)
-  ((doc :initform '(make-instance model:doc) :accessor doc)))
+  ((doc :initform (make-instance 'model:doc) :accessor mysax-doc)))
 
 (defmethod sax:attribute-declaration ((handler mysax) element-name attribute-name type default)
   (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
@@ -12,6 +12,7 @@
   (format t "START-DOCUMENT!~%~%"))
 
 (defmethod sax:start-dtd ((handler mysax) name public-id system-id)
+  (setf (model:doc-dtd (mysax-doc handler)) (make-instance 'model:dtd))
   (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id))
 
 (defmethod sax::dtd ((handler mysax) dtd)  ;; dtd is internal and must be defined
@@ -93,7 +94,7 @@
 (defun parse-xml (path)
   (let ((mysax (make-instance 'mysax)))
     (handler-case
-        (progn (call-with-input-stream
+        (progn (utils:call-with-input-stream
                 path
                 (lambda (f) (cxml:parse f mysax)))
                (cons :ok (mysax-doc mysax)))

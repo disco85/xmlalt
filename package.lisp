@@ -6,7 +6,13 @@
   (:use #:cl)
   (:export #:main
    #:uri
-   #:doc))
+   #:doc
+   #:doc-dtd
+   #:dtd))
+
+(defpackage #:utils
+  (:use #:cl)
+  (:export #:call-with-input-stream))
 
 (defpackage #:blkfmt
   (:use #:cl))

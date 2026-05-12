@@ -4,4 +4,5 @@
 
 
 (defun main ()
-  (xmlfmt::parse-xml #P"./t1.xml"))
+  (let ((parsed (xmlfmt::parse-xml #P"./t1.xml")))
+    (format t "~A~%" parsed)))
