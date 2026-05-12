@@ -189,7 +189,22 @@
           :documentation ""
           :accessor dtd-items
           :initform nil
-          :initarg :items)))
+          :initarg :items)
+   (name :type string
+         :documentation ""
+         :accessor dtd-name
+         :initform ""
+         :initarg :name)
+   (public-id :type string
+              :documentation ""
+              :accessor dtd-public-id
+              :initform ""
+              :initarg :public-id)
+   (system-id :type string
+              :documentation ""
+              :accessor dtd-system-id
+              :initform ""
+              :initarg :system-id)))
 
 (defclass doc ()
   ((xml-decl :accessor doc-xml-decl

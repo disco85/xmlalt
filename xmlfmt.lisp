@@ -12,7 +12,8 @@
   (format t "START-DOCUMENT!~%~%"))
 
 (defmethod sax:start-dtd ((handler mysax) name public-id system-id)
-  (setf (model:doc-dtd (mysax-doc handler)) (make-instance 'model:dtd))
+  (setf (model:doc-dtd (mysax-doc handler))
+        (make-instance 'model:dtd :name name :public-id public-id :system-id system-id))
   (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id))
 
 (defmethod sax::dtd ((handler mysax) dtd)  ;; dtd is internal and must be defined
