@@ -154,10 +154,14 @@
             :initarg :content)))
 
 (defclass elem-decl ()
-  ((content :type content
-            :documentation ""
-            :accessor elem-decl-content
-            :initarg :content)))
+  ((name :type string
+         :documentation ""
+         :accessor elem-decl-name
+         :initarg :name)
+   (model :type string
+          :documentation ""
+          :accessor elem-decl-model
+          :initarg :model)))
 
 (defclass attr-decl ()
   ((element-name :type string
@@ -177,10 +181,10 @@
             :accessor attr-decl-default
             :initarg :default)))
 
-(defclass not-decl ()
+(defclass nota-decl ()
   ((content :type content
             :documentation ""
-            :accessor not-decl-content
+            :accessor nota-decl-content
             :initarg :content)))
 
 (deftype entity-decl-kind-type ()

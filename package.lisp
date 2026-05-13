@@ -23,6 +23,10 @@
    #:attr-decl-attribute-name
    #:attr-decl-type
    #:attr-decl-default
+
+   #:elem-decl
+   #:elem-decl-name
+   #:elem-decl-model
    ))
 
 (defpackage #:utils

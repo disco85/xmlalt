@@ -4,96 +4,99 @@
 (defclass mysax (sax:abstract-handler)
   ((doc :initform (make-instance 'model:doc) :accessor mysax-doc)))
 
-(defmethod sax:attribute-declaration ((handler mysax) element-name attribute-name type default)
+(defmethod sax:attribute-declaration ((mysax mysax) element-name attribute-name type default)
   (let ((attr-decl (make-instance 'model:attr-decl :element-name element-name
                                                    :attribute-name attribute-name
                                                    :type type
                                                    :default default)))
-    (push attr-decl (model:dtd-items (model:doc-dtd (mysax-doc handler))))
+    (push attr-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
     (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
             element-name attribute-name type default)))
 
-(defmethod sax:start-document ((handler mysax))
+(defmethod sax:start-document ((mysax mysax))
   (format t "START-DOCUMENT!~%~%"))
 
-(defmethod sax:start-dtd ((handler mysax) name public-id system-id)
-  (setf (model:doc-dtd (mysax-doc handler))
+(defmethod sax:start-dtd ((mysax mysax) name public-id system-id)
+  (setf (model:doc-dtd (mysax-doc mysax))
         (make-instance 'model:dtd :name name :public-id public-id :system-id system-id))
   (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id))
 
-(defmethod sax::dtd ((handler mysax) dtd)  ;; dtd is internal and must be defined
+(defmethod sax::dtd ((mysax mysax) dtd)  ;; dtd is internal and must be defined
   (format t "DTD! DTD: ~A~%~%" dtd))
 
-(defmethod sax:start-internal-subset ((handler mysax))
+(defmethod sax:start-internal-subset ((mysax mysax))
   (format t "START-INTERNAL-SUBSET!~%~%"))
 
-(defmethod sax:element-declaration ((handler mysax) name model)
-  (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~A~%~%" name model))
+(defmethod sax:element-declaration ((mysax mysax) name model)
+  (let ((elem-decl (make-instance 'model:elem-decl :name name
+                                                   :model model)))
+    (push elem-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+    (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~A~%~%" name model)))
 
-(defmethod sax:attribute-declaration ((handler mysax) element-name attribute-name type default)
+(defmethod sax:attribute-declaration ((mysax mysax) element-name attribute-name type default)
   (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
           element-name attribute-name type default))
 
-(defmethod sax:notation-declaration ((handler mysax) name public-id system-id)
+(defmethod sax:notation-declaration ((mysax mysax) name public-id system-id)
   (format t "NOTATION-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
           name public-id system-id))
 
-(defmethod sax:internal-entity-declaration ((handler mysax) kind name value)
+(defmethod sax:internal-entity-declaration ((mysax mysax) kind name value)
   (format t "INTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A VALUE: ~A~%~%" kind name value))
 
-(defmethod sax:external-entity-declaration ((handler mysax) kind name public-id system-id)
+(defmethod sax:external-entity-declaration ((mysax mysax) kind name public-id system-id)
   (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
           kind name public-id system-id))
 
-(defmethod sax:unparsed-entity-declaration ((handler mysax) name public-id system-id notation-name)
+(defmethod sax:unparsed-entity-declaration ((mysax mysax) name public-id system-id notation-name)
   (format t "UNPARSED-ENTITY-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A NOTATION-NAME: ~A~%~%"
           name public-id system-id notation-name))
 
-(defmethod sax:unparsed-internal-subset ((handler mysax) str)
+(defmethod sax:unparsed-internal-subset ((mysax mysax) str)
   (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str))
 
-(defmethod sax:end-internal-subset ((handler mysax))
+(defmethod sax:end-internal-subset ((mysax mysax))
   (format t "END-INTERNAL-SUBSET!~%~%"))
 
-(defmethod sax:end-dtd ((handler mysax))
+(defmethod sax:end-dtd ((mysax mysax))
   (format t "END-DTD!~%~%"))
 
-(defmethod sax:start-prefix-mapping ((handler mysax) prefix uri)
+(defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri)
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
 
-(defmethod sax:start-element ((handler mysax) namespace-uri local-name qname attributes)
+(defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
   (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
           namespace-uri local-name qname attributes))
 
-(defmethod sax:comment ((handler mysax) data)
+(defmethod sax:comment ((mysax mysax) data)
   (format t "COMMENT! DATA: ~A~%~%" data))
 
-(defmethod sax:start-cdata ((handler mysax))
+(defmethod sax:start-cdata ((mysax mysax))
   (format t "START-CDATA!~%~%"))
 
-(defmethod sax:characters ((handler mysax) data)
+(defmethod sax:characters ((mysax mysax) data)
   (format t "CHARACTERS! DATA: ~A~%~%" data))
 
-(defmethod sax:end-cdata ((handler mysax))
+(defmethod sax:end-cdata ((mysax mysax))
   (format t "END-CDATA!~%~%"))
 
-(defmethod sax:processing-instruction ((handler mysax) target data)
+(defmethod sax:processing-instruction ((mysax mysax) target data)
   (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data))
 
-(defmethod sax:end-element ((handler mysax) namespace-uri local-name qname)
+(defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
           namespace-uri local-name qname))
 
-(defmethod sax:end-prefix-mapping ((handler mysax) prefix)
+(defmethod sax:end-prefix-mapping ((mysax mysax) prefix)
   (format t "END-PREFIX-MAPPING! PREFIX: ~A~%~%" prefix))
 
-(defmethod sax:end-document ((handler mysax))
+(defmethod sax:end-document ((mysax mysax))
   (format t "END-DOCUMENT!~%~%"))
 
-(defmethod sax:entity-resolver ((handler mysax) resolver)
+(defmethod sax:entity-resolver ((mysax mysax) resolver)
   (format t "ENTITY-RESOLVER! RESOLVER: ~A~%~%" resolver))
 
-(defmethod sax:unescaped ((handler mysax) data)
+(defmethod sax:unescaped ((mysax mysax) data)
   (format t "UNESCAPED! DATA: ~A~%~%" data))
 
 
