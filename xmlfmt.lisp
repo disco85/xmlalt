@@ -42,15 +42,29 @@
             name public-id system-id)))
 
 (defmethod sax:internal-entity-declaration ((mysax mysax) kind name value)
-  (format t "INTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A VALUE: ~A~%~%" kind name value))
+  (let ((int-ent-decl (make-instance 'model:int-ent-decl :kind kind
+                                                         :name name
+                                                         :value value)))
+    (push int-ent-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+    (format t "INTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A VALUE: ~A~%~%" kind name value)))
 
 (defmethod sax:external-entity-declaration ((mysax mysax) kind name public-id system-id)
-  (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
-          kind name public-id system-id))
+  (let ((ext-ent-decl (make-instance 'model:ext-ent-decl :kind kind
+                                                         :name name
+                                                         :public-id public-id
+                                                         :system-id system-id)))
+    (push ext-ent-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+    (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
+            kind name public-id system-id)))
 
 (defmethod sax:unparsed-entity-declaration ((mysax mysax) name public-id system-id notation-name)
-  (format t "UNPARSED-ENTITY-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A NOTATION-NAME: ~A~%~%"
-          name public-id system-id notation-name))
+  (let ((unp-ent-decl (make-instance 'model:unp-ent-decl :name name
+                                                         :public-id public-id
+                                                         :system-id system-id
+                                                         :nota-name notation-name)))
+    (push unp-ent-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+    (format t "UNPARSED-ENTITY-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A NOTATION-NAME: ~A~%~%"
+            name public-id system-id notation-name)))
 
 (defmethod sax:unparsed-internal-subset ((mysax mysax) str)
   (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str))

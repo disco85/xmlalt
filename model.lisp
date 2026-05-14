@@ -198,18 +198,66 @@
               :initform ""
               :initarg :system-id)))
 
-(deftype entity-decl-kind-type ()
-  '(member :internal :external :unparsed))
-
-(defclass entity-decl ()
-  ((content :type content
-            :documentation ""
-            :accessor entity-decl-content
-            :initarg :content)
-   (kind :type entity-decl-kind-type
+(defclass int-ent-decl ()
+  ((kind :type string
          :documentation ""
-         :accessor entity-decl-kind
-         :initarg :kind)))
+         :accessor int-ent-decl-kind
+         :initform ""
+         :initarg :kind)
+   (name :type string
+         :documentation ""
+         :accessor int-ent-decl-name
+         :initform ""
+         :initarg :name)
+   (value :type string
+          :documentation ""
+          :accessor int-ent-decl-value
+          :initform ""
+          :initarg :value)))
+
+(defclass ext-ent-decl ()
+  ((kind :type string
+         :documentation ""
+         :accessor ext-ent-decl-kind
+         :initform ""
+         :initarg :kind)
+   (name :type string
+         :documentation ""
+         :accessor ext-ent-decl-name
+         :initform ""
+         :initarg :name)
+   (public-id :type string
+              :documentation ""
+              :accessor ext-ent-decl-public-id
+              :initform ""
+              :initarg :public-id)
+   (system-id :type string
+              :documentation ""
+              :accessor ext-ent-decl-system-id
+              :initform ""
+              :initarg :system-id)))
+
+(defclass unp-ent-decl ()
+  ((name :type string
+         :documentation ""
+         :accessor unp-ent-decl-name
+         :initform ""
+         :initarg :name)
+   (public-id :type string
+              :documentation ""
+              :accessor unp-ent-decl-public-id
+              :initform ""
+              :initarg :public-id)
+   (system-id :type string
+              :documentation ""
+              :accessor unp-ent-decl-system-id
+              :initform ""
+              :initarg :system-id)
+   (nota-name :type string
+              :documentation ""
+              :accessor unp-ent-decl-nota-name
+              :initform ""
+              :initarg :nota-name)))
 
 (defclass dtd ()
   ((items :type list  ;; items as attr-decl, elem-decl...

@@ -32,6 +32,23 @@
    #:nota-decl-name
    #:nota-decl-public-id
    #:nota-decl-system-id
+
+   #:int-ent-decl
+   #:int-ent-decl-kind
+   #:int-ent-decl-name
+   #:int-ent-decl-value
+
+   #:ext-ent-decl
+   #:ext-ent-decl-kind
+   #:ext-ent-decl-name
+   #:ext-ent-decl-public-id
+   #:ext-ent-decl-system-id
+
+   #:unp-ent-decl
+   #:unp-ent-decl-name
+   #:unp-ent-decl-public-id
+   #:unp-ent-decl-system-id
+   #:unp-ent-decl-nota-name
    ))
 
 (defpackage #:utils
