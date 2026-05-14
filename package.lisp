@@ -27,6 +27,11 @@
    #:elem-decl
    #:elem-decl-name
    #:elem-decl-model
+
+   #:nota-decl
+   #:nota-decl-name
+   #:nota-decl-public-id
+   #:nota-decl-system-id
    ))
 
 (defpackage #:utils

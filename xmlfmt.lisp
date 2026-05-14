@@ -33,13 +33,13 @@
     (push elem-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
     (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~A~%~%" name model)))
 
-(defmethod sax:attribute-declaration ((mysax mysax) element-name attribute-name type default)
-  (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
-          element-name attribute-name type default))
-
 (defmethod sax:notation-declaration ((mysax mysax) name public-id system-id)
-  (format t "NOTATION-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
-          name public-id system-id))
+  (let ((nota-decl (make-instance 'model:nota-decl :name name
+                                                   :public-id public-id
+                                                   :system-id system-id)))
+    (push nota-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+    (format t "NOTATION-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
+            name public-id system-id)))
 
 (defmethod sax:internal-entity-declaration ((mysax mysax) kind name value)
   (format t "INTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A VALUE: ~A~%~%" kind name value))

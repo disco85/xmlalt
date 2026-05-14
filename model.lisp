@@ -175,17 +175,28 @@
    (type :type string
          :documentation ""
          :accessor attr-decl-type
-         :initarg :attribute-type)
+         :initarg :type)
    (default :type string
             :documentation ""
             :accessor attr-decl-default
             :initarg :default)))
 
 (defclass nota-decl ()
-  ((content :type content
-            :documentation ""
-            :accessor nota-decl-content
-            :initarg :content)))
+  ((name :type string
+         :documentation ""
+         :accessor nota-name
+         :initform ""
+         :initarg :name)
+   (public-id :type string
+              :documentation ""
+              :accessor nota-public-id
+              :initform ""
+              :initarg :public-id)
+   (system-id :type string
+              :documentation ""
+              :accessor nota-system-id
+              :initform ""
+              :initarg :system-id)))
 
 (deftype entity-decl-kind-type ()
   '(member :internal :external :unparsed))
