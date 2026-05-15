@@ -53,6 +53,14 @@
    #:unp-int-subs
    #:unp-int-subs-content
 
+   #:attr
+   #:attr-namespace-uri
+   #:attr-local-name
+   #:attr-qname
+   #:attr-value
+   #:attr-value
+   #:attr-specified
+
    #:elem
    #:elem-namespace-uri
    #:elem-local-name

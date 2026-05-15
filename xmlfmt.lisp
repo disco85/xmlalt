@@ -80,6 +80,14 @@
 (defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri)
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
 
+(defun adapt-attr (sax-standard-attribute)
+  "Creates MODEL:ATTR from SAX:STANDARD-ATTRIBUTE object"
+  (make-instance 'model:attr :namespace-uri (sax:attribute-namespace-uri sax-standard-attribute)
+                             :local-name (sax:attribute-local-name sax-standard-attribute)
+                             :qname (sax:attribute-qname sax-standard-attribute)
+                             :value (sax:attribute-value sax-standard-attribute)
+                             :specified (sax:attribute-specified-p sax-standard-attribute)))
+
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
   (symbol-macrolet
       ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
@@ -87,8 +95,8 @@
     (let ((elem (make-instance 'model:elem :namespace-uri namespace-uri
                                            :local-name local-name
                                            :qname qname
-                                           :attributes attributes)))
-      (when elems-stack (setf cur-elem-children (append cur-elem-children (list elem))))
+                                           :attributes (mapcar #'adapt-attr attributes))))
+      (when elems-stack (setf cur-elem-children (append cur-elem-children (list elem)))) ; TODO try nconc
       (push elem elems-stack)
       (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
               namespace-uri local-name qname attributes))))

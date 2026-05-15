@@ -64,14 +64,38 @@
              :documentation "")))
 
 
-(defclass attribute ()
-  ((name :type name
-         :documentation ""
-         :accessor attribute-name)
-   (value :type content
+(defclass attr ()
+  ((namespace-uri :type string
+                  :documentation ""
+                  :initform ""
+                  :initarg :namespace-uri
+                  :accessor attr-namespace-uri)
+   (local-name :type string
+               :documentation ""
+               :initform ""
+               :initarg :local-name
+               :accessor attr-local-name)
+   (qname :type string  ;; TODO start to use my NAME class
           :documentation ""
-          :accessor attribute-value)))
-
+          :initform ""
+          :initarg :qname
+          :accessor attr-qname)
+   (value :type string
+          :documentation ""
+          :initform ""
+          :initarg :value
+          :accessor attr-value)
+   (specified :type boolean
+              :documentation ""
+              :initform nil
+              :initarg :specified
+              :accessor attr-specified)))
+;; #S(SAX::STANDARD-ATTRIBUTE
+;;                    :NAMESPACE-URI "http://www.w3.org/2000/xmlns/"
+;;                    :LOCAL-NAME NIL
+;;                    :QNAME "xmlns"
+;;                    :VALUE "urn:default"
+;;                    :SPECIFIED-P T)
 
 (defclass text (node)
   ((open-by :initform "" :reader text-open-by)
