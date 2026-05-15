@@ -81,13 +81,17 @@
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
 
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
-  (let ((elem (make-instance 'model:elem :namespace-uri namespace-uri
-                                         :local-name local-name
-                                         :qname qname
-                                         :attributes attributes)))
-    (push elem (model:doc-elems-stack (mysax-doc mysax)))
-    (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
-            namespace-uri local-name qname attributes)))
+  (symbol-macrolet
+      ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
+       (cur-elem-children (model:elem-children (car elems-stack))))
+    (let ((elem (make-instance 'model:elem :namespace-uri namespace-uri
+                                           :local-name local-name
+                                           :qname qname
+                                           :attributes attributes)))
+      (when elems-stack (setf cur-elem-children (append cur-elem-children (list elem))))
+      (push elem elems-stack)
+      (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
+              namespace-uri local-name qname attributes))))
 
 (defmethod sax:comment ((mysax mysax) data)
   (format t "COMMENT! DATA: ~A~%~%" data))

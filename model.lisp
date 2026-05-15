@@ -1,6 +1,6 @@
 (in-package :model)
 
-(defclass uri ()
+(defclass uri ()  ;; TODO use URI, NS, PREFIX
   ((value :type string
           :documentation ""
           :accessor uri-value)))
@@ -54,10 +54,6 @@
   ((dir :type dir
         :documentation "A construct is located at some DIR reflecting it nesting"
         :accessor node-dir)
-   (children :initform nil
-             :type list
-             :documentation "Refers zero or more children of its own type CONSTRUCT"
-             :accessor node-children)
    (open-by :type string
             :initform "<"
             :reader node-open-by
@@ -143,10 +139,10 @@
                :initarg :attributes
                :documentation ""
                :accessor elem-attributes)
-   (items :type list
-          :documentation ""
-          :initform nil
-          :accessor elem-items)))
+   (children :type list
+             :documentation ""
+             :initform nil
+             :accessor elem-children)))
 
 
 (defclass entity (node)

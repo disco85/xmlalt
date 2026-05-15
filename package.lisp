@@ -58,7 +58,7 @@
    #:elem-local-name
    #:elem-qname
    #:elem-attributes
-   #:elem-items
+   #:elem-children
    ))
 
 (defpackage #:utils
