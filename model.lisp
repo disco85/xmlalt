@@ -123,13 +123,30 @@
 
 
 (defclass elem (node)
-  ((attributes :type list
+  ((namespace-uri :type string
+                  :initform ""
+                  :initarg :namespace-uri
+                  :documentation ""
+                  :accessor elem-namespace-uri)
+   (local-name :type string
+               :initform ""
+               :initarg :local-name
+               :documentation ""
+               :accessor elem-local-name)
+   (qname :type string
+          :initform ""
+          :initarg :qname
+          :documentation ""
+          :accessor elem-qname)
+   (attributes :type list
                :initform nil
+               :initarg :attributes
                :documentation ""
                :accessor elem-attributes)
-   (name :type name
-         :documentation ""
-         :accessor elem-name)))
+   (items :type list
+          :documentation ""
+          :initform nil
+          :accessor elem-items)))
 
 
 (defclass entity (node)
@@ -259,6 +276,13 @@
               :initform ""
               :initarg :nota-name)))
 
+(defclass unp-int-subs ()
+  ((content :type string
+         :documentation ""
+         :accessor unp-int-subs-content
+         :initform ""
+         :initarg :content)))
+
 (defclass dtd ()
   ((items :type list  ;; items as attr-decl, elem-decl...
           :documentation ""
@@ -289,7 +313,11 @@
         :accessor doc-dtd
         :documentation ""
         :initform nil)
-   (elems :type list
-          :documentation ""
-          :initform nil
-          :accessor doc-elems)))
+   ;; (root :type elem
+   ;;       :documentation ""
+   ;;       :initform nil
+   ;;       :accessor doc-root)
+   (elems-stack :type list  ;; the last elem is the root
+                :documentation ""
+                :initform nil
+                :accessor doc-elems-stack)))

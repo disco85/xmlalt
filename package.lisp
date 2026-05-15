@@ -10,7 +10,7 @@
    #:doc
    #:doc-xml-decl
    #:doc-dtd
-   #:doc-elems
+   #:doc-elems-stack
 
    #:dtd
    #:dtd-items
@@ -49,6 +49,16 @@
    #:unp-ent-decl-public-id
    #:unp-ent-decl-system-id
    #:unp-ent-decl-nota-name
+
+   #:unp-int-subs
+   #:unp-int-subs-content
+
+   #:elem
+   #:elem-namespace-uri
+   #:elem-local-name
+   #:elem-qname
+   #:elem-attributes
+   #:elem-items
    ))
 
 (defpackage #:utils

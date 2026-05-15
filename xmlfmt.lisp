@@ -67,7 +67,9 @@
             name public-id system-id notation-name)))
 
 (defmethod sax:unparsed-internal-subset ((mysax mysax) str)
-  (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str))
+  (let ((unp-int-subs (make-instance 'model:unp-int-subs :content cont)))
+    (push unp-int-subs (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str)))
 
 (defmethod sax:end-internal-subset ((mysax mysax))
   (format t "END-INTERNAL-SUBSET!~%~%"))
@@ -79,8 +81,13 @@
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
 
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
-  (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
-          namespace-uri local-name qname attributes))
+  (let ((elem (make-instance 'model:elem :namespace-uri namespace-uri
+                                         :local-name local-name
+                                         :qname qname
+                                         :attributes attributes)))
+    (push elem (model:doc-elems-stack (mysax-doc mysax)))
+    (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
+            namespace-uri local-name qname attributes)))
 
 (defmethod sax:comment ((mysax mysax) data)
   (format t "COMMENT! DATA: ~A~%~%" data))
@@ -98,6 +105,9 @@
   (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data))
 
 (defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
+  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
+    (when (cdr elems-stack)
+      (pop elems-stack)))
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
           namespace-uri local-name qname))
 
