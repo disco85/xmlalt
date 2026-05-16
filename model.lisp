@@ -333,10 +333,6 @@
         :accessor doc-dtd
         :documentation ""
         :initform nil)
-   ;; (root :type elem
-   ;;       :documentation ""
-   ;;       :initform nil
-   ;;       :accessor doc-root)
    (elems-stack :type list  ;; the last elem is the root
                 :documentation ""
                 :initform nil

@@ -105,10 +105,16 @@
 
 
 (defun form-dir (mysax elem)
+  "Forms DIR (path) of ELEM using also the current full path from the ELEMS-STACK"
   (let* ((elems-stack
            (reverse (model:doc-elems-stack (mysax-doc mysax))))
          (elem-names (mapcar #'model:elem-local-name elems-stack)))
     (format nil "~{~A~^/~}/~A" elem-names (model:elem-local-name elem))))
+
+
+(defun ensure-elem-dir (elem mysax)
+  "Sets DIR of ELEM using also ELEMS-STACK from MYSAX"
+  (setf (model:node-dir elem) (form-dir mysax elem)))
 
 
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
@@ -118,7 +124,7 @@
                                            :local-name local-name
                                            :qname qname
                                            :attributes (mapcar #'adapt-attr attributes))))
-      (setf (model:node-dir elem) (form-dir mysax elem))
+      (ensure-elem-dir elem mysax)
       (when elems-stack (setf cur-elem-children
                               (append cur-elem-children
                                       (list elem)))) ; TODO try nconc
