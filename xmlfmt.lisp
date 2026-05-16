@@ -106,7 +106,7 @@
 
 (defun form-dir (mysax elem)
   "Forms DIR (path) of ELEM using also the current full path from the ELEMS-STACK"
-  (let* ((elems-stack
+  (let* ((elems-stack ;; TODO use full name instead of elem-local-name or?
            (reverse (model:doc-elems-stack (mysax-doc mysax))))
          (elem-names (mapcar #'model:elem-local-name elems-stack)))
     (format nil "~{~A~^/~}/~A" elem-names (model:elem-local-name elem))))
@@ -117,20 +117,42 @@
   (setf (model:node-dir elem) (form-dir mysax elem)))
 
 
-(defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
+(defun add-elem-as-child (elem mysax)
   (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
                     (cur-elem-children (model:elem-children (car elems-stack))))
+      (when elems-stack (setf cur-elem-children
+                              (append cur-elem-children  ; TODO try nconc
+                                      (list elem))))))
+
+
+(defun set-current-elem (elem mysax)
+  "Pushes ELEM to ELEMS-STACK making it the current element"
+  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
+    (push elem elems-stack)))
+
+
+(defun back-to-above-current-elem (mysax)
+  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
+    (when (cdr elems-stack)
+      (pop elems-stack))))
+
+
+(defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
     (let ((elem (make-instance 'model:elem :namespace-uri namespace-uri
                                            :local-name local-name
                                            :qname qname
                                            :attributes (mapcar #'adapt-attr attributes))))
       (ensure-elem-dir elem mysax)
-      (when elems-stack (setf cur-elem-children
-                              (append cur-elem-children
-                                      (list elem)))) ; TODO try nconc
-      (push elem elems-stack)
+      (add-elem-as-child elem mysax)
+      (set-current-elem elem mysax)
       (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
-              namespace-uri local-name qname attributes))))
+              namespace-uri local-name qname attributes)))
+
+
+(defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
+  (back-to-above-current-elem mysax)
+  (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
+          namespace-uri local-name qname))
 
 
 (defmethod sax:comment ((mysax mysax) data)
@@ -151,14 +173,6 @@
 
 (defmethod sax:processing-instruction ((mysax mysax) target data)
   (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data))
-
-
-(defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
-  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
-    (when (cdr elems-stack)
-      (pop elems-stack)))
-  (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
-          namespace-uri local-name qname))
 
 
 (defmethod sax:end-prefix-mapping ((mysax mysax) prefix)
