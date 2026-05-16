@@ -142,7 +142,9 @@ so we save them first here, then add to an element, also they are scoped")))
 
 (defun current-dir-with-elem (mysax elem)
   "Forms DIR (path) of ELEM using also the current full path from the ELEMS-STACK"
-  (format nil "~A/~A" (current-dir mysax) (model:elem-local-name elem)))
+  (let* ((cd (current-dir mysax))
+         (fmt (if (string= cd "") "~*~A" "~A/~A"))) ;; form "a/b" or "b" but not "/b"
+    (format nil fmt cd (model:elem-local-name elem))))
 
 
 (defun ensure-node-dir (node mysax)
