@@ -7,6 +7,11 @@
   (:export #:main
    #:uri
 
+   #:node
+   #:node-dir
+   #:node-open-by
+   #:node-close-by
+
    #:doc
    #:doc-xml-decl
    #:doc-dtd
