@@ -102,6 +102,11 @@
 (defclass pinstr (node)
   ((open-by :initform "<?" :reader pinstr-open-by)
    (close-by :initform "?>" :reader pinstr-close-by)
+   (target :type string
+           :initform ""
+           :initarg :target
+           :accessor pinstr-target
+           :documentation "")
    (content :type string
             :documentation ""
             :initarg :content

@@ -272,8 +272,11 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:processing-instruction ((mysax mysax) target data)
-  (reset-characters-accumulation mysax)
-  (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data))
+  (let ((pinstr (make-instance 'model:pinstr :target target :content data)))
+    (set-node-dir pinstr mysax)
+    (add-node-as-child pinstr mysax)
+    (reset-characters-accumulation mysax)
+    (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data)))
 
 
 (defmethod sax:end-document ((mysax mysax))

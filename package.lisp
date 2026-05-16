@@ -86,6 +86,10 @@
 
            #:cdata
            #:cdata-content
+
+           #:pinstr
+           #:pinstr-target
+           #:pinstr-content
            ))
 
 (defpackage #:utils
