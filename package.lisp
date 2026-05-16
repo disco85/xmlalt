@@ -72,6 +72,9 @@
    #:elem-qname
    #:elem-attributes
    #:elem-children
+
+   #:comment
+   #:comment-content
    ))
 
 (defpackage #:utils

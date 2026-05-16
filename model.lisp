@@ -128,6 +128,7 @@
    (close-by :initform "-->")
    (content :type content
             :initform nil
+            :initarg :content
             :documentation ""
             :accessor comment-content)))
 
