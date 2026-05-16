@@ -43,13 +43,6 @@
   (length (dir-names dir)))
 
 
-(defclass content ()
-  ((value :type string
-          :initform ""
-          :documentation ""
-          :accessor content-value)))
-
-
 (defclass node ()
   ((dir :type dir
         :documentation "A construct is located at some DIR reflecting it nesting"
@@ -100,16 +93,18 @@
 (defclass text (node)
   ((open-by :initform "" :reader text-open-by)
    (close-by :initform "" :reader text-close-by)
-   (conent :type content
-           :documentation ""
-           :accessor text-conent)))
+   (content :type string
+            :initarg :content
+            :documentation ""
+            :accessor text-content)))
 
 
 (defclass pinstr (node)
   ((open-by :initform "<?" :reader pinstr-open-by)
    (close-by :initform "?>" :reader pinstr-close-by)
-   (content :type content
+   (content :type string
             :documentation ""
+            :initarg :content
             :accessor pinstr-content))
   (:documentation "Processing instruction"))
 
@@ -117,17 +112,17 @@
 (defclass cdata (node)
   ((open-by :initform "<![CDATA[" :reader cdata-open-by)
    (close-by :initform "]]>" :reader cdata-close-by)
-   (content :type content
-            :initform nil
+   (content :type string
             :documentation ""
+            :initform ""
+            :initarg :content
             :accessor cdata-content)))
 
 
 (defclass comment (node)
   ((open-by :initform "<!--")
    (close-by :initform "-->")
-   (content :type content
-            :initform nil
+   (content :type string
             :initarg :content
             :documentation ""
             :accessor comment-content)))
@@ -190,20 +185,20 @@
 (defclass entity (node)
   ((open-by :initform "&" :reader entity-open-by)
    (close-by :initform ";" :reader entity-close-by)
-   (entity-code :type content
+   (entity-code :type string
                 :documentation ""
                 :accessor entity-entity-code)))
 
 
 (defclass doctype ()
-  ((content :type content
+  ((content :type string
             :documentation ""
             :accessor doctype-content
             :initarg :content)))
 
 
 (defclass xml-decl ()
-  ((content :type content
+  ((content :type string
             :documentation ""
             :accessor xml-decl-content
             :initarg :content)))
@@ -316,10 +311,10 @@
 
 (defclass unp-int-subs ()
   ((content :type string
-         :documentation ""
-         :accessor unp-int-subs-content
-         :initform ""
-         :initarg :content)))
+            :documentation ""
+            :accessor unp-int-subs-content
+            :initform ""
+            :initarg :content)))
 
 (defclass dtd ()
   ((items :type list  ;; items as attr-decl, elem-decl...

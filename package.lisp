@@ -5,86 +5,93 @@
 (defpackage #:model
   (:use #:cl)
   (:export #:main
-   #:uri
+           #:uri
 
-   #:node
-   #:node-dir
-   #:node-open-by
-   #:node-close-by
+           #:node
+           #:node-dir
+           #:node-open-by
+           #:node-close-by
 
-   #:doc
-   #:doc-xml-decl
-   #:doc-dtd
-   #:doc-elems-stack
+           #:doc
+           #:doc-xml-decl
+           #:doc-dtd
+           #:doc-elems-stack
 
-   #:dtd
-   #:dtd-items
-   #:dtd-name
-   #:dtd-public-id
-   #:dtd-system-id
+           #:dtd
+           #:dtd-items
+           #:dtd-name
+           #:dtd-public-id
+           #:dtd-system-id
 
-   #:attr-decl
-   #:attr-decl-element-name
-   #:attr-decl-attribute-name
-   #:attr-decl-type
-   #:attr-decl-default
+           #:attr-decl
+           #:attr-decl-element-name
+           #:attr-decl-attribute-name
+           #:attr-decl-type
+           #:attr-decl-default
 
-   #:elem-decl
-   #:elem-decl-name
-   #:elem-decl-model
+           #:elem-decl
+           #:elem-decl-name
+           #:elem-decl-model
 
-   #:nota-decl
-   #:nota-decl-name
-   #:nota-decl-public-id
-   #:nota-decl-system-id
+           #:nota-decl
+           #:nota-decl-name
+           #:nota-decl-public-id
+           #:nota-decl-system-id
 
-   #:int-ent-decl
-   #:int-ent-decl-kind
-   #:int-ent-decl-name
-   #:int-ent-decl-value
+           #:int-ent-decl
+           #:int-ent-decl-kind
+           #:int-ent-decl-name
+           #:int-ent-decl-value
 
-   #:ext-ent-decl
-   #:ext-ent-decl-kind
-   #:ext-ent-decl-name
-   #:ext-ent-decl-public-id
-   #:ext-ent-decl-system-id
+           #:ext-ent-decl
+           #:ext-ent-decl-kind
+           #:ext-ent-decl-name
+           #:ext-ent-decl-public-id
+           #:ext-ent-decl-system-id
 
-   #:unp-ent-decl
-   #:unp-ent-decl-name
-   #:unp-ent-decl-public-id
-   #:unp-ent-decl-system-id
-   #:unp-ent-decl-nota-name
+           #:unp-ent-decl
+           #:unp-ent-decl-name
+           #:unp-ent-decl-public-id
+           #:unp-ent-decl-system-id
+           #:unp-ent-decl-nota-name
 
-   #:unp-int-subs
-   #:unp-int-subs-content
+           #:unp-int-subs
+           #:unp-int-subs-content
 
-   #:attr
-   #:attr-namespace-uri
-   #:attr-local-name
-   #:attr-qname
-   #:attr-value
-   #:attr-value
-   #:attr-specified
+           #:attr
+           #:attr-namespace-uri
+           #:attr-local-name
+           #:attr-qname
+           #:attr-value
+           #:attr-value
+           #:attr-specified
 
-   #:prefix-mappings
-   #:prefix-mappings-items
-   #:add-prefix-mappings
+           #:prefix-mappings
+           #:prefix-mappings-items
+           #:add-prefix-mappings
 
-   #:elem
-   #:elem-namespace-uri
-   #:elem-local-name
-   #:elem-qname
-   #:elem-prefix-mappings
-   #:elem-attributes
-   #:elem-children
+           #:elem
+           #:elem-namespace-uri
+           #:elem-local-name
+           #:elem-qname
+           #:elem-prefix-mappings
+           #:elem-attributes
+           #:elem-children
 
-   #:comment
-   #:comment-content
-   ))
+           #:comment
+           #:comment-content
+
+           #:text
+           #:text-content
+
+           #:cdata
+           #:cdata-content
+           ))
 
 (defpackage #:utils
   (:use #:cl)
-  (:export #:call-with-input-stream))
+  (:export #:call-with-input-stream
+           #:whitespace-char-p))
 
 (defpackage #:blkfmt
   (:use #:cl))

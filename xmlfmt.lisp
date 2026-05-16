@@ -1,3 +1,8 @@
+;; TERMINOLOGY:
+;;
+;; XML construct ([cur-]xml-construct) - any construction/item inside XML
+;; DTD, items in DTD, elements, comments
+
 (in-package :xmlfmt)
 
 
@@ -10,7 +15,11 @@
                     :initform nil
                     :accessor mysax-prefix-mappings
                     :documentation "Current list of PREFIX-MAPPINGS. Their events are fired before their element,
-so we save them first here, then add to an element, also they are scoped")))
+so we save them first here, then add to an element, also they are scoped")
+   (characters :type string
+               :initform ""
+               :accessor mysax-characters
+               :documentation "Buffer to accumulate fragments of characters")))
 
 
 (defun remember-prefix-mapping (mysax prefix uri)
@@ -37,6 +46,31 @@ so we save them first here, then add to an element, also they are scoped")))
             element-name attribute-name type default)))
 
 
+(defun reset-characters-accumulation (mysax)
+  "Resets accumulation of characters so to be able to start from beginning"
+  ;; When characters are related to another XML construct, we should
+  ;; reset accumulated characters to "". We do it in:
+  ;;   * START-ELEMENT
+  ;;   * END-ELEMENT
+  ;;   * START-CDATA
+  ;;   * END-CDATA
+  ;;   * PROCESSING-INSTRUCTION
+  ;;   * COMMENT
+  ;;   * START-DOCUMENT (INITIAL RESET)
+  ;;   * END-DOCUMENT (FINAL FLUSH)
+  (setf (mysax-characters mysax) ""))
+
+
+(defun accumulate-characters (mysax new-characters)
+  (setf (mysax-characters mysax)
+        (concatenate 'string (mysax-characters mysax) new-characters)))
+
+
+(defun accumulated-characters-exist (mysax)
+  (let ((accumulated (mysax-characters mysax)))
+    (and (stringp accumulated) (string/= accumulated ""))))
+
+
 (defmethod sax:start-document ((mysax mysax))
   (format t "START-DOCUMENT!~%~%"))
 
@@ -51,7 +85,7 @@ so we save them first here, then add to an element, also they are scoped")))
   (format t "DTD! DTD: ~A~%~%" dtd))
 
 
-(defmethod sax:start-internal-subset ((mysax mysax)) ;; TODO ?
+(defmethod sax:start-internal-subset ((mysax mysax))
   (format t "START-INTERNAL-SUBSET!~%~%"))
 
 
@@ -113,7 +147,7 @@ so we save them first here, then add to an element, also they are scoped")))
   (format t "END-DTD!~%~%"))
 
 
-(defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri) ;; TODO
+(defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri)
   (remember-prefix-mapping mysax prefix uri)
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
 
@@ -147,7 +181,7 @@ so we save them first here, then add to an element, also they are scoped")))
     (format nil fmt cd (model:elem-local-name elem))))
 
 
-(defun ensure-node-dir (node mysax)
+(defun set-node-dir (node mysax)
   "Sets DIR of NODE using also ELEMS-STACK from MYSAX"
   (let ((node-dir (if (typep node 'model:elem)
                       (current-dir-with-elem mysax node)
@@ -155,9 +189,10 @@ so we save them first here, then add to an element, also they are scoped")))
     (setf (model:node-dir node) node-dir)))
 
 
-(defun add-elem-as-child (elem mysax) ;; TODO add-NODE-ad-child
+(defun add-node-as-child (elem mysax)
   (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
-                    (cur-elem-children (model:elem-children (car elems-stack))))
+                    (cur-elem (car elems-stack))
+                    (cur-elem-children (model:elem-children cur-elem)))
       (when elems-stack (setf cur-elem-children
                               (append cur-elem-children  ; TODO try nconc
                                       (list elem))))))
@@ -181,39 +216,63 @@ so we save them first here, then add to an element, also they are scoped")))
                                          :qname qname
                                          :prefix-mappings (car (mysax-prefix-mappings mysax))
                                          :attributes (mapcar #'adapt-attr attributes))))
-    (ensure-node-dir elem mysax)
-    (add-elem-as-child elem mysax)
+    (when (accumulated-characters-exist mysax)
+      (let ((text (make-instance 'model:text :content (mysax-characters mysax))))
+        (set-node-dir text mysax)
+        (add-node-as-child text mysax)
+        (reset-characters-accumulation mysax)))
+    (set-node-dir elem mysax)
+    (add-node-as-child elem mysax)
     (enter-elem elem mysax)
+    (reset-characters-accumulation mysax)
     (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
             namespace-uri local-name qname attributes)))
 
 
 (defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
   (exit-from-elem mysax)
+  (reset-characters-accumulation mysax)
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
           namespace-uri local-name qname))
 
 
 (defmethod sax:comment ((mysax mysax) data)
   (let ((comment (make-instance 'model:comment :content data)))
-    (ensure-node-dir comment mysax)
-    (add-elem-as-child comment mysax)
+    (set-node-dir comment mysax)
+    (add-node-as-child comment mysax)
+    (reset-characters-accumulation mysax)
     (format t "COMMENT! DATA: ~A~%~%" data)))
 
 
 (defmethod sax:start-cdata ((mysax mysax))
-  (format t "START-CDATA!~%~%"))
-
-
-(defmethod sax:characters ((mysax mysax) data)
-  (format t "CHARACTERS! DATA: ~A~%~%" data))
+  (let ((cdata (make-instance 'model:cdata)))
+    (set-node-dir cdata mysax)
+    (add-node-as-child cdata mysax)
+    (reset-characters-accumulation mysax)
+    (format t "START-CDATA!~%~%")))
 
 
 (defmethod sax:end-cdata ((mysax mysax))
-  (format t "END-CDATA!~%~%"))
+  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
+                    (cur-elem (car elems-stack))
+                    (cur-elem-children (model:elem-children cur-elem))
+                    (cur-xml-construct (car (last cur-elem-children))))
+    (when (and (typep cur-xml-construct 'model:cdata)
+               (accumulated-characters-exist mysax))
+      (setf (model:cdata-content cur-xml-construct)
+            (mysax-characters mysax)))
+    (reset-characters-accumulation mysax)
+    (format t "END-CDATA!~%~%")))
+
+
+(defmethod sax:characters ((mysax mysax) data)
+  (unless (every #'utils:whitespace-char-p data)
+    (accumulate-characters mysax data))
+  (format t "CHARACTERS! DATA: ~A~%~%" data))
 
 
 (defmethod sax:processing-instruction ((mysax mysax) target data)
+  (reset-characters-accumulation mysax)
   (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data))
 
 

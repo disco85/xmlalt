@@ -10,3 +10,7 @@
                               :direction :input
                               :element-type '(unsigned-byte 8))
         (funcall fn stream))))
+
+
+(defun whitespace-char-p (c)
+ (member c '(#\Space #\Tab #\Newline #\Return)))
