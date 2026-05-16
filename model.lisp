@@ -143,6 +143,18 @@
          :accessor empty-name)))
 
 
+(defclass prefix-mappings ()
+  ((items :type list
+          :initform nil
+          :initarg :items
+          :accessor prefix-mappings-items
+          :documentation "Pairs (list of cons)")))
+
+
+(defun add-prefix-mappings (prefix-mappings &rest new-pairs)
+  (push (prefix-mappings-items prefix-mappings) new-pairs))
+
+
 (defclass elem (node)
   ((namespace-uri :type string
                   :initform ""
@@ -159,6 +171,11 @@
           :initarg :qname
           :documentation ""
           :accessor elem-qname)
+   (prefix-mappings :type list
+                    :documentation ""
+                    :initform nil
+                    :initarg :prefix-mappings
+                    :accessor elem-prefix-mappings)
    (attributes :type list
                :initform nil
                :initarg :attributes

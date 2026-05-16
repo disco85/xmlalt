@@ -2,7 +2,29 @@
 
 
 (defclass mysax (sax:abstract-handler)
-  ((doc :initform (make-instance 'model:doc) :accessor mysax-doc)))
+  ((doc :type model:doc
+        :documentation ""
+        :initform (make-instance 'model:doc)
+        :accessor mysax-doc)
+   (prefix-mappings :type list
+                    :initform nil
+                    :accessor mysax-prefix-mappings
+                    :documentation "Current list of PREFIX-MAPPINGS. Their events are fired before their element,
+so we save them first here, then add to an element, also they are scoped")))
+
+
+(defun remember-prefix-mapping (mysax prefix uri)
+  "Adds to current prefix mappings yet another mapping"
+  (unless (mysax-prefix-mappings mysax)
+    (push (make-instance 'model:prefix-mappings)
+          (mysax-prefix-mappings mysax)))
+  (model:add-prefix-mappings (car (mysax-prefix-mappings mysax))
+                             (list (cons prefix uri))))
+
+
+(defun forget-prefix-mappings (mysax)
+  "Drops current prefix mappins"
+  (pop (mysax-prefix-mappings mysax)))
 
 
 (defmethod sax:attribute-declaration ((mysax mysax) element-name attribute-name type default)
@@ -29,7 +51,7 @@
   (format t "DTD! DTD: ~A~%~%" dtd))
 
 
-(defmethod sax:start-internal-subset ((mysax mysax))
+(defmethod sax:start-internal-subset ((mysax mysax)) ;; TODO ?
   (format t "START-INTERNAL-SUBSET!~%~%"))
 
 
@@ -91,8 +113,14 @@
   (format t "END-DTD!~%~%"))
 
 
-(defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri)
+(defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri) ;; TODO
+  (remember-prefix-mapping mysax prefix uri)
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
+
+
+(defmethod sax:end-prefix-mapping ((mysax mysax) prefix)
+  (forget-prefix-mappings mysax)
+  (format t "END-PREFIX-MAPPING! PREFIX: ~A~%~%" prefix))
 
 
 (defun adapt-attr (sax-standard-attribute)
@@ -149,6 +177,7 @@
   (let ((elem (make-instance 'model:elem :namespace-uri namespace-uri
                                          :local-name local-name
                                          :qname qname
+                                         :prefix-mappings (car (mysax-prefix-mappings mysax))
                                          :attributes (mapcar #'adapt-attr attributes))))
     (ensure-node-dir elem mysax)
     (add-elem-as-child elem mysax)
@@ -184,10 +213,6 @@
 
 (defmethod sax:processing-instruction ((mysax mysax) target data)
   (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data))
-
-
-(defmethod sax:end-prefix-mapping ((mysax mysax) prefix)
-  (format t "END-PREFIX-MAPPING! PREFIX: ~A~%~%" prefix))
 
 
 (defmethod sax:end-document ((mysax mysax))

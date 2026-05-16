@@ -66,10 +66,15 @@
    #:attr-value
    #:attr-specified
 
+   #:prefix-mappings
+   #:prefix-mappings-items
+   #:add-prefix-mappings
+
    #:elem
    #:elem-namespace-uri
    #:elem-local-name
    #:elem-qname
+   #:elem-prefix-mappings
    #:elem-attributes
    #:elem-children
 
