@@ -5,26 +5,26 @@
   "Serializes MODEL:DOC object"
   (serialize-dtd doc stream)
   (with-truly root (car (model:doc-elems-stack doc))
-              (serialize-nodes doc root stream)))
+    (serialize-nodes doc root stream)))
 
 
 (defun serialize-dtd (doc stream)
   (with-truly dtd (model:doc-dtd doc)
-              (format stream ".DTD~%")
-              (serialize-dtd-attrs doc dtd stream)
-              (with-truly items (model:dtd-items dtd)
-                          (serialize-dtd-items doc dtd items stream))
-              (format stream ".DTDE~%")))
+    (format stream ".DTD~%")
+    (serialize-dtd-attrs doc dtd stream)
+    (with-truly items (model:dtd-items dtd)
+      (serialize-dtd-items doc dtd items stream))
+    (format stream ".DTDE~%")))
 
 
 (defun serialize-dtd-attrs (doc dtd stream)
   (declare (ignore doc))
   (with-truly name (model:dtd-name dtd)
-              (format stream ".DTD.NAME ~A~%" name))
+    (format stream ".DTD.NAME ~A~%" name))
   (with-truly public-id (model:dtd-public-id dtd)
-              (format stream ".DTD.PUB.ID ~A~%" public-id))
+    (format stream ".DTD.PUB.ID ~A~%" public-id))
   (with-truly system-id (model:dtd-system-id dtd)
-              (format stream ".DTD.SYS.ID ~A~%" system-id)))
+    (format stream ".DTD.SYS.ID ~A~%" system-id)))
 
 
 (defun serialize-dtd-items (doc dtd items stream)
@@ -37,59 +37,74 @@
   (typecase item
     (model:attr-decl
      (with-truly element-name (model:attr-decl-element-name item)
-                 (format stream ".DTD.ATTR.EL.NAME ~A~%" element-name))
+       (format stream ".DTD.ATTR.EL.NAME ~A~%" element-name))
      (with-truly attribute-name (model:attr-decl-attribute-name item)
-                 (format stream ".DTD.ATTR.ATTR.NAME ~A~%" attribute-name))
+       (format stream ".DTD.ATTR.ATTR.NAME ~A~%" attribute-name))
      (with-truly type (model:attr-decl-type item)
-                 (format stream ".DTD.ATTR.TYPE ~A~%" type))
+       (format stream ".DTD.ATTR.TYPE ~A~%" type))
      (with-truly default (model:attr-decl-default item)
-                 (format stream ".DTD.ATTR.DEF ~A~%" default)))
+       (format stream ".DTD.ATTR.DEF ~A~%" default)))
 
     (model:elem-decl
      (with-truly name (model:elem-decl-name item)
-                 (format stream ".DTD.EL.NAME ~A~%" name))
+       (format stream ".DTD.EL.NAME ~A~%" name))
      (with-truly model (model:elem-decl-model item)
-                 (format stream ".DTD.EL.MODEL ~A~%" model)))
+       (format stream ".DTD.EL.MODEL ~A~%" model)))
 
     (model:nota-decl
      (with-truly name (model:nota-decl-name item)
-                 (format stream ".DTD.NOTA.NAME ~A~%" name))
+       (format stream ".DTD.NOTA.NAME ~A~%" name))
      (with-truly public-id (model:nota-decl-public-id item)
-                 (format stream ".DTD.NOTA.PUB.ID ~A~%" public-id))
+       (format stream ".DTD.NOTA.PUB.ID ~A~%" public-id))
      (with-truly system-id (model:nota-decl-system-id item)
-                 (format stream ".DTD.NOTA.SYS.ID ~A~%" system-id)))
+       (format stream ".DTD.NOTA.SYS.ID ~A~%" system-id)))
 
     (model:int-ent-decl
      (with-truly kind (model:int-ent-decl-kind item)
-                 (format stream ".DTD.INT.ENT.KIND ~A~%" kind))
+       (format stream ".DTD.INT.ENT.KIND ~A~%" kind))
      (with-truly name (model:int-ent-decl-name item)
-                 (format stream ".DTD.INT.ENT.NAME ~A~%" name))
+       (format stream ".DTD.INT.ENT.NAME ~A~%" name))
      (with-truly value (model:int-ent-decl-value item)
-                 (format stream ".DTD.INT.ENT.VALUE ~A~%" value)))
+       (format stream ".DTD.INT.ENT.VALUE ~A~%" value)))
 
     (model:ext-ent-decl
      (with-truly kind (model:ext-ent-decl-kind item)
-                 (format stream ".DTD.EXT.ENT.KIND ~A~%" kind))
+       (format stream ".DTD.EXT.ENT.KIND ~A~%" kind))
      (with-truly name (model:ext-ent-decl-name item)
-                 (format stream ".DTD.EXT.ENT.NAME ~A~%" name))
+       (format stream ".DTD.EXT.ENT.NAME ~A~%" name))
      (with-truly public-id (model:ext-ent-decl-public-id item)
-                 (format stream ".DTD.EXT.PUB.ID ~A~%" public-id))
+       (format stream ".DTD.EXT.PUB.ID ~A~%" public-id))
      (with-truly system-id (model:ext-ent-decl-system-id item)
-                 (format stream ".DTD.EXT.SYS.ID ~A~%" system-id)))
+       (format stream ".DTD.EXT.SYS.ID ~A~%" system-id)))
 
     (model:unp-ent-decl
      (with-truly name (model:unp-ent-decl-name item)
-                 (format stream ".DTD.UNP.ENT.NAME ~A~%" name))
+       (format stream ".DTD.UNP.ENT.NAME ~A~%" name))
      (with-truly public-id (model:unp-ent-decl-public-id item)
-                 (format stream ".DTD.UNP.ENT.PUB.ID ~A~%" public-id))
+       (format stream ".DTD.UNP.ENT.PUB.ID ~A~%" public-id))
      (with-truly system-id (model:unp-ent-decl-system-id item)
-                 (format stream ".DTD.UNP.ENT.SYS.ID ~A~%" system-id))
+       (format stream ".DTD.UNP.ENT.SYS.ID ~A~%" system-id))
      (with-truly nota-name (model:unp-ent-decl-nota-name item)
-                 (format stream ".DTD.UNP.ENT.NOTA.NAME ~A~%" nota-name)))
+       (format stream ".DTD.UNP.ENT.NOTA.NAME ~A~%" nota-name)))
 
     (model:unp-int-subs
      (with-truly content (model:unp-int-subs-content item)
-                 (format stream ".DTD.UNP.INT.SUBS.CONT ~A~%" content)))))
+       (format stream ".DTD.UNP.INT.SUBS.CONT ~A~%" content)))))
+
+
+(defun serialize-elem-attributes (doc attributes stream)
+  (declare (ignore doc))
+  (dolist (attribute attributes)
+    (format stream ".EL.ATTR ")
+    (with-truly local-name (model:attr-local-name attribute)
+      (format stream "~A" local-name))
+    (with-truly qname (model:attr-qname attribute)
+      (format stream " ~A" qname))
+    (with-truly value (model:attr-value attribute)
+      (format stream " ~A" value))
+    (with-truly namespace-uri (model:attr-namespace-uri attribute)
+      (format stream " ~A" namespace-uri))
+    (format stream " ~A~%" (model:attr-specified attribute))))
 
 
 (defun serialize-prefix-mappings (doc node prefix-mappings stream)
@@ -106,32 +121,34 @@
     (model:elem
      (format stream ".EL ~A~%" (model:node-dir node))
      (with-truly namespace-uri (model:elem-namespace-uri node)
-                 (format stream ".EL.NS ~A~%" namespace-uri))
+       (format stream ".EL.NS ~A~%" namespace-uri))
      (with-truly local-name (model:elem-local-name node)
-                 (format stream ".EL.LOC.NAME ~A~%" local-name))
+       (format stream ".EL.LOC.NAME ~A~%" local-name))
      (with-truly qname (model:elem-qname node)
-                 (format stream ".EL.Q.NAME ~A~%" qname))
+       (format stream ".EL.Q.NAME ~A~%" qname))
      (with-truly prefix-mappings (model:elem-prefix-mappings node)
-                 (serialize-prefix-mappings doc node prefix-mappings stream))
+       (serialize-prefix-mappings doc node prefix-mappings stream))
+     (with-truly attributes (model:elem-attributes node)
+       (serialize-elem-attributes doc attributes stream))
      (with-truly children (model:elem-children node)
-                 (dolist (child children)
-                   (serialize-nodes doc child stream)))
+       (dolist (child children)
+         (serialize-nodes doc child stream)))
      (format stream ".ELE ~A~%" (model:node-dir node)))
 
     (model:text
      (with-truly content (model:text-content node)
-                 (format stream ".TEXT~%~A~%.TEXTE~%" content)))
+       (format stream ".TEXT~%~A~%.TEXTE~%" content)))
 
     (model:comment
      (with-truly content (model:comment-content node)
-                 (format stream ".COM~%~A~%.COME~%" content)))
+       (format stream ".COM~%~A~%.COME~%" content)))
 
     (model:cdata
      (with-truly content (model:cdata-content node)
-                 (format stream ".CD~%~A~%.CDE~%" content)))
+       (format stream ".CD~%~A~%.CDE~%" content)))
 
     (model:pinstr
      (with-truly target (model:pinstr-target node)
-                 (format stream ".PI.TARG ~A~%" target))
+       (format stream ".PI.TARG ~A~%" target))
      (with-truly content (model:pinstr-content node)
        (format stream ".PI~%~A~%.PIE~%" content)))))

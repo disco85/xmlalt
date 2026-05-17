@@ -83,12 +83,7 @@
               :initform nil
               :initarg :specified
               :accessor attr-specified)))
-;; #S(SAX::STANDARD-ATTRIBUTE
-;;                    :NAMESPACE-URI "http://www.w3.org/2000/xmlns/"
-;;                    :LOCAL-NAME NIL
-;;                    :QNAME "xmlns"
-;;                    :VALUE "urn:default"
-;;                    :SPECIFIED-P T)
+
 
 (defclass text (node)
   ((open-by :initform "" :reader text-open-by)
