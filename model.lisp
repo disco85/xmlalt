@@ -152,7 +152,9 @@
 
 
 (defun add-prefix-mappings (prefix-mappings &rest new-pairs)
-  (push new-pairs (prefix-mappings-items prefix-mappings)))
+  (setf (prefix-mappings-items prefix-mappings)
+        (append new-pairs
+                (prefix-mappings-items prefix-mappings))))
 
 
 (defclass elem (node)

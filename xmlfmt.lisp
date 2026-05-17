@@ -28,7 +28,7 @@ so we save them first here, then add to an element, also they are scoped")
     (push (make-instance 'model:prefix-mappings)
           (mysax-prefix-mappings mysax)))
   (model:add-prefix-mappings (car (mysax-prefix-mappings mysax))
-                             (list (cons prefix uri))))
+                             (cons prefix uri)))
 
 
 (defun forget-prefix-mappings (mysax)
