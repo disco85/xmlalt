@@ -104,7 +104,7 @@
   "Serializes XML node"
   (typecase node
     (model:elem
-     (format stream ".EL~%")
+     (format stream ".EL ~A~%" (model:node-dir node))
      (with-truly namespace-uri (model:elem-namespace-uri node)
                  (format stream ".EL.NS ~A~%" namespace-uri))
      (with-truly local-name (model:elem-local-name node)
@@ -116,7 +116,7 @@
      (with-truly children (model:elem-children node)
                  (dolist (child children)
                    (serialize-nodes doc child stream)))
-     (format stream ".ELE~%"))
+     (format stream ".ELE ~A~%" (model:node-dir node)))
 
     (model:text
      (with-truly content (model:text-content node)
