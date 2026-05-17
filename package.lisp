@@ -1,9 +1,15 @@
-(defpackage #:xmlalt
+(defpackage #:utils
   (:use #:cl)
+  (:export #:call-with-input-stream
+           #:whitespace-char-p
+           #:with-truly))
+
+(defpackage #:xmlalt
+  (:use #:cl #:utils)
   (:export #:main))
 
 (defpackage #:model
-  (:use #:cl)
+  (:use #:cl #:utils)
   (:export #:main
            #:uri
 
@@ -92,27 +98,22 @@
            #:pinstr-content
            ))
 
-(defpackage #:utils
-  (:use #:cl)
-  (:export #:call-with-input-stream
-           #:whitespace-char-p))
-
 (defpackage #:blkfmt
-  (:use #:cl))
+  (:use #:cl #:utils))
 
 (defpackage #:cmdfmt
-  (:use #:cl))
+  (:use #:cl #:utils)
+  (:export #:serialize))
 
 (defpackage #:mrkfmt
-  (:use #:cl))
+  (:use #:cl #:utils))
 
 (defpackage #:regfmt
-  (:use #:cl))
+  (:use #:cl #:utils))
 
 (defpackage #:xmlfmt
-  (:use #:cl))
+  (:use #:cl #:utils))
 
 
 (defpackage #:xmlalt-tests
-  (:use #:cl #:xmlalt)
-  )
+  (:use #:cl #:xmlalt #:utils))

@@ -14,3 +14,22 @@
 
 (defun whitespace-char-p (c)
  (member c '(#\Space #\Tab #\Newline #\Return)))
+
+
+;; (defun nzstr (str)
+;;   "STR is not-empty string"
+;;   (string/= str ""))
+
+
+(defun truly (x)
+  "Like Python's bool."
+  (typecase x
+    (null nil)
+    (number (not (zerop x)))
+    (string (string/= x ""))
+    (t t)))
+
+
+(defmacro with-truly (var value &body body)
+  `(let ((,var ,value))
+     (when (truly ,var) ,@body)))

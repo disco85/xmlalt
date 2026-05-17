@@ -133,7 +133,7 @@
             :accessor comment-content)))
 
 
-(defclass empty (node)
+(defclass empty (node)  ;; FIXME wtf is it?
   ((attributes :type list
                :initform nil
                :documentation ""
@@ -187,7 +187,7 @@
              :accessor elem-children)))
 
 
-(defclass entity (node)
+(defclass entity (node) ; TODO do I use it?
   ((open-by :initform "&" :reader entity-open-by)
    (close-by :initform ";" :reader entity-close-by)
    (entity-code :type string
@@ -208,6 +208,7 @@
             :accessor xml-decl-content
             :initarg :content)))
 
+
 (defclass elem-decl ()
   ((name :type string
          :documentation ""
@@ -217,6 +218,7 @@
           :documentation ""
           :accessor elem-decl-model
           :initarg :model)))
+
 
 (defclass attr-decl ()
   ((element-name :type string
@@ -236,22 +238,24 @@
             :accessor attr-decl-default
             :initarg :default)))
 
+
 (defclass nota-decl ()
   ((name :type string
          :documentation ""
-         :accessor nota-name
+         :accessor nota-decl-name
          :initform ""
          :initarg :name)
    (public-id :type string
               :documentation ""
-              :accessor nota-public-id
+              :accessor nota-decl-public-id
               :initform ""
               :initarg :public-id)
    (system-id :type string
               :documentation ""
-              :accessor nota-system-id
+              :accessor nota-decl-system-id
               :initform ""
               :initarg :system-id)))
+
 
 (defclass int-ent-decl ()
   ((kind :type string
@@ -269,6 +273,7 @@
           :accessor int-ent-decl-value
           :initform ""
           :initarg :value)))
+
 
 (defclass ext-ent-decl ()
   ((kind :type string
@@ -292,6 +297,7 @@
               :initform ""
               :initarg :system-id)))
 
+
 (defclass unp-ent-decl ()
   ((name :type string
          :documentation ""
@@ -314,12 +320,14 @@
               :initform ""
               :initarg :nota-name)))
 
+
 (defclass unp-int-subs ()
   ((content :type string
             :documentation ""
             :accessor unp-int-subs-content
             :initform ""
             :initarg :content)))
+
 
 (defclass dtd ()
   ((items :type list  ;; items as attr-decl, elem-decl...
@@ -343,8 +351,9 @@
               :initform ""
               :initarg :system-id)))
 
+
 (defclass doc ()
-  ((xml-decl :accessor doc-xml-decl
+  ((xml-decl :accessor doc-xml-decl ;; TODO find a way to populate it
              :initform nil
              :initarg :xml-decl)
    (dtd :type dtd

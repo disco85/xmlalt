@@ -266,7 +266,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:characters ((mysax mysax) data)
-  (unless (every #'utils:whitespace-char-p data)
+  (unless (every #'whitespace-char-p data)
     (accumulate-characters mysax data))
   (format t "CHARACTERS! DATA: ~A~%~%" data))
 
@@ -294,7 +294,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defun parse-xml (path)
   (let ((mysax (make-instance 'mysax)))
     (handler-case
-        (progn (utils:call-with-input-stream
+        (progn (call-with-input-stream
                 path
                 (lambda (f) (cxml:parse f mysax)))
                (cons :ok (mysax-doc mysax)))

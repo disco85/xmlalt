@@ -5,6 +5,6 @@
 
 (defun main ()
   (let ((parsed (xmlfmt::parse-xml #P"./t1.xml")))
-    ;;(format t "~A~%" parsed)
-    (inspect parsed)
+    ;; (inspect parsed)
+    (cmdfmt:serialize (cdr parsed) t)
     ))
