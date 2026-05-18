@@ -183,6 +183,9 @@
              :initform nil
              :accessor elem-children)))
 
+(defun elem-children-num (elem)
+  (length (elem-children elem)))
+
 
 (defclass entity (node) ; TODO do I use it?
   ((open-by :initform "&" :reader entity-open-by)

@@ -83,6 +83,7 @@
            #:elem-prefix-mappings
            #:elem-attributes
            #:elem-children
+           #:elem-children-num
 
            #:comment
            #:comment-content
