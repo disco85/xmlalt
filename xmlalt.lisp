@@ -2,9 +2,9 @@
 
 
 
-
 (defun main ()
   (let ((parsed (xmlfmt::parse-xml #P"./t1.xml")))
     ;; (inspect parsed)
-    (cmdfmt:serialize (cdr parsed) t)
+    ;; (cmdfmt:serialize (cdr parsed) t)
+    (regfmt:serialize (cdr parsed) t)
     ))

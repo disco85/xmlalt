@@ -110,7 +110,9 @@
   (:use #:cl #:utils))
 
 (defpackage #:regfmt
-  (:use #:cl #:utils))
+  (:use #:cl #:utils)
+  (:export #:serialize
+           #:esc))
 
 (defpackage #:xmlfmt
   (:use #:cl #:utils))
