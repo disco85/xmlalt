@@ -2,7 +2,8 @@
   (:use #:cl)
   (:export #:call-with-input-stream
            #:whitespace-char-p
-           #:with-truly))
+           #:with-truly
+           #:subs))
 
 (defpackage #:xmlalt
   (:use #:cl #:utils)

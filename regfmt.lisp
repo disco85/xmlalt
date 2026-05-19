@@ -1,24 +1,47 @@
 (in-package :regfmt)
-
 ;; TODO maybe to unite multiple lines of some constructs to 1 line?
 
+(defparameter *is* " = ")
+(defparameter *sep* "\\")
+(defparameter +whitespace+ '(#\Space #\Tab #\Newline #\Return))
+
+(defun dyn-escape-chars ()
+  (coerce (remove-if (lambda (c) (member c +whitespace+))
+                     (remove-duplicates
+                      (concatenate 'string *is* *sep*)
+                      :test #'char=))
+          'list))
+
+
 (defun safe-key-string (str)
-  (flet ((safer (c)
-           (case c
-             (#\< "<<>")
-             (#\> "<>>")
-             (#\/ "</>")
-             (#\Newline "<NL>")
-             (t (string c)))))
-    (apply #'concatenate 'string (map 'list #'safer str))))
+  (let ((dyn-extra (dyn-escape-chars)))
+    (flet ((safer (c)
+             (cond
+               ((char= c #\<) "<<>")
+               ((char= c #\>) "<>>")
+               ((char= c #\Newline) "<NL>")
+               ((member c dyn-extra :test #'char=)
+                (format nil "<~A>" c))   ; escape dynamic chars
+               (t (string c)))))
+      (apply #'concatenate 'string (map 'list #'safer str)))))
+
+
+(defun to-safe-str (obj)
+  "Converts OBJ to STRING and make it safe on the sense of SAFE-KEY-STRING"
+  (let* ((s0 (princ-to-string obj))
+         (s1 (safe-key-string s0)))
+    s1))
 
 (defun esc (stream arg &rest args)
-  "Can be used in FORMAT: (format t \"Start ~/esc/ End\" \"aa/bb\") to get
+  "Can be used in FORMAT: (format t \"Start ~/regfmt:esc/ End\" \"aa/bb\") to get
 similar to ~A but with escaping"
-  (let* ((arg0 (princ-to-string arg))
-         (arg1 (safe-key-string arg0)))
-    (write-string arg1 stream)))
+  (declare (ignore args))
+  (write-string (to-safe-str arg) stream))
 
+(defun key (stream arg &rest args)
+  (declare (ignore args))
+  (let ((fmtstr (format nil "~A~A~A~A" "~{~A~^" *sep* "~}" *is*)))
+    (format stream fmtstr arg)))
 
 (defun serialize (doc stream)
   "Serializes MODEL:DOC object"
@@ -37,11 +60,11 @@ similar to ~A but with escaping"
 (defun serialize-dtd-attrs (doc dtd stream)
   (declare (ignore doc))
   (with-truly name (model:dtd-name dtd)
-    (format stream "<dtd>/<name> : ~A~%" name))
+    (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<name>") name))
   (with-truly public-id (model:dtd-public-id dtd)
-    (format stream "<dtd>/<public-id> : ~A~%" public-id))
+    (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<public-id>") public-id))
   (with-truly system-id (model:dtd-system-id dtd)
-    (format stream "<dtd>/<system-id> : ~A~%" system-id)))
+    (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<system-id>") system-id)))
 
 
 (defun serialize-dtd-items (doc dtd items stream)
@@ -54,73 +77,80 @@ similar to ~A but with escaping"
   (typecase item
     (model:attr-decl
      (with-truly element-name (model:attr-decl-element-name item)
-       (format stream "<dtd>/<attribute>/<element-name> : ~A~%" element-name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<attribute>" "<element-name>") element-name))
      (with-truly attribute-name (model:attr-decl-attribute-name item)
-       (format stream "<dtd>/<attribute>/<attribute-name> : ~A~%" attribute-name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<attribute>" "<attribute-name>") attribute-name))
      (with-truly type (model:attr-decl-type item)
-       (format stream "<dtd>/<attribute>/<type> : ~A~%" type))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<attribute>" "<type>") type))
      (with-truly default (model:attr-decl-default item)
-       (format stream "<dtd>/<attribute>/<default> : ~/regfmt:esc/~%" default)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<attribute>" "<default>") default)))
 
     (model:elem-decl
      (with-truly name (model:elem-decl-name item)
-       (format stream "<dtd>/<element>/<name> : ~A~%" name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<element>" "<name>") name))
      (with-truly model (model:elem-decl-model item)
-       (format stream "<dtd>/<element>/<model> : ~A~%" model)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<element>" "<model>") model)))
 
     (model:nota-decl
      (with-truly name (model:nota-decl-name item)
-       (format stream "<dtd>/<notation>/<name> : ~A~%" name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<notation>" "<name>") name))
      (with-truly public-id (model:nota-decl-public-id item)
-       (format stream "<dtd>/<notation>/<public-id> : ~A~%" public-id))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<notation>" "<public-id>") public-id))
      (with-truly system-id (model:nota-decl-system-id item)
-       (format stream "<dtd>/<notation>/<system-id> : ~A~%" system-id)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<notation>" "<system-id>") system-id)))
 
     (model:int-ent-decl
      (with-truly kind (model:int-ent-decl-kind item)
-       (format stream "<dtd>/<internal-entity>/<kind> : ~A~%" kind))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<internal-entity>" "<kind>") kind))
      (with-truly name (model:int-ent-decl-name item)
-       (format stream "<dtd>/<internal-entity>/<name> : ~A~%" name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<internal-entity>" "<name>") name))
      (with-truly value (model:int-ent-decl-value item)
-       (format stream "<dtd>/<internal-entity>/<value> : ~/regfmt:esc/~%" value)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<internal-entity>" "<value>") value)))
 
     (model:ext-ent-decl
      (with-truly kind (model:ext-ent-decl-kind item)
-       (format stream "<dtd>/<external-entity>/<kind> : ~A~%" kind))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<external-entity>" "<kind>") kind))
      (with-truly name (model:ext-ent-decl-name item)
-       (format stream "<dtd>/<external-entity>/<name> : ~A~%" name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<external-entity>" "<name>") name))
      (with-truly public-id (model:ext-ent-decl-public-id item)
-       (format stream "<dtd>/<external-entity>/<public-id> : ~A~%" public-id))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<external-entity>" "<public-id>") public-id))
      (with-truly system-id (model:ext-ent-decl-system-id item)
-       (format stream "<dtd>/<external-entity>/<system-id> : ~A~%" system-id)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<external-entity>" "<system-id>") system-id)))
 
     (model:unp-ent-decl
      (with-truly name (model:unp-ent-decl-name item)
-       (format stream "<dtd>/<unparsed-entity>/<name> : ~A~%" name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<unparsed-entity>" "<name>") name))
      (with-truly public-id (model:unp-ent-decl-public-id item)
-       (format stream "<dtd>/<unparsed-entity>/<public-id> : ~A~%" public-id))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<unparsed-entity>" "<public-id>") public-id))
      (with-truly system-id (model:unp-ent-decl-system-id item)
-       (format stream "<dtd>/<unparsed-entity>/<system-id> : ~A~%" system-id))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<unparsed-entity>" "<system-id>") system-id))
      (with-truly nota-name (model:unp-ent-decl-nota-name item)
-       (format stream "<dtd>/<unparsed-entity>/<notation-name> : ~A~%" nota-name)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<unparsed-entity>" "<notation-name>") nota-name)))
 
     (model:unp-int-subs
      (with-truly content (model:unp-int-subs-content item)
-       (format stream "<dtd>/<unparsed-internal-subset> : ~/esc/~%" content)))))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%" '("<dtd>" "<unparsed-internal-subset>") content)))))
 
 
 (defun serialize-elem-attributes (doc node attributes stream)
-  (declare (ignore doc)) ;; TODO
+  (declare (ignore doc))
   (dolist (attribute attributes)
-    (with-truly local-name (model:attr-local-name attribute)
-      (format stream " ~A" local-name))
+    (format stream "~/regfmt:key/~/regfmt:esc/~%"
+            (list (utils:subs (model:node-dir node) "/" *sep*)
+                  (concatenate 'string "@" (model:attr-local-name attribute)))
+            (model:attr-value attribute))
     (with-truly qname (model:attr-qname attribute)
-      (format stream " ~A" qname))
-    (with-truly value (model:attr-value attribute)
-      (format stream " ~A" value))
+      (format stream "~/regfmt:key/~/regfmt:esc/~%"
+            (list (utils:subs (model:node-dir node) "/" *sep*)
+                  (concatenate 'string "@" (model:attr-local-name attribute))
+                  "<qname>")
+            qname))
     (with-truly namespace-uri (model:attr-namespace-uri attribute)
-      (format stream " ~A" namespace-uri))
-    (format stream " ~A~%" (model:attr-specified attribute))))
+      (format stream "~/regfmt:key/~/regfmt:esc/~%"
+            (list (utils:subs (model:node-dir node) "/" *sep*)
+                  (concatenate 'string "@" (model:attr-local-name attribute))
+                  "<namespace-uri>")
+              namespace-uri))))
 
 
 (defun serialize-prefix-mappings (doc node prefix-mappings stream)
