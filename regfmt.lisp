@@ -2,7 +2,7 @@
 ;; TODO maybe to unite multiple lines of some constructs to 1 line?
 
 (defparameter *is* " = ")
-(defparameter *sep* "\\")
+(defparameter *sep* "::")
 (defparameter +whitespace+ '(#\Space #\Tab #\Newline #\Return))
 
 (defun dyn-escape-chars ()
@@ -40,8 +40,11 @@ similar to ~A but with escaping"
 
 (defun key (stream arg &rest args)
   (declare (ignore args))
-  (let ((fmtstr (format nil "~A~A~A~A" "~{~A~^" *sep* "~}" *is*)))
-    (format stream fmtstr arg)))
+  (flet ((escape-1-char-word (w) (if (= 1 (length w)) ;; FIXME not 1 char word, but when symbol is 1 len ":".
+                                     (to-safe-str w)  ;; FIXME or don't esc "<..>" if len is > 3?
+                                     w)))
+   (let ((fmtstr (format nil "~A~A~A~A" "~{~A~^" *sep* "~}" *is*)))
+    (format stream fmtstr (mapcar #'escape-1-char-word arg)))))
 
 (defun serialize (doc stream)
   "Serializes MODEL:DOC object"
@@ -137,20 +140,20 @@ similar to ~A but with escaping"
   (dolist (attribute attributes)
     (format stream "~/regfmt:key/~/regfmt:esc/~%"
             (list (utils:subs (model:node-dir node) "/" *sep*)
-                  (concatenate 'string "@" (model:attr-local-name attribute)))
+                  (concatenate 'string "@" (model:attr-qname attribute)))
             (model:attr-value attribute))
-    (with-truly qname (model:attr-qname attribute)
+    (with-truly local-name (model:attr-local-name attribute)
       (format stream "~/regfmt:key/~/regfmt:esc/~%"
             (list (utils:subs (model:node-dir node) "/" *sep*)
-                  (concatenate 'string "@" (model:attr-local-name attribute))
-                  "<qname>")
-            qname))
+                  (concatenate 'string "@" (model:attr-qname attribute))
+                  "<local-name>")
+            local-name))
     (with-truly namespace-uri (model:attr-namespace-uri attribute)
       (format stream "~/regfmt:key/~/regfmt:esc/~%"
             (list (utils:subs (model:node-dir node) "/" *sep*)
-                  (concatenate 'string "@" (model:attr-local-name attribute))
+                  (concatenate 'string "@" (model:attr-qname attribute))
                   "<namespace-uri>")
-              namespace-uri))))
+            namespace-uri))))
 
 
 (defun serialize-prefix-mappings (doc node prefix-mappings stream)
