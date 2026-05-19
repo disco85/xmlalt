@@ -157,10 +157,12 @@ similar to ~A but with escaping"
 
 
 (defun serialize-prefix-mappings (doc node prefix-mappings stream)
-  (declare (ignore doc node))
+  (declare (ignore doc))
   (dolist (pair (model:prefix-mappings-items prefix-mappings))
-    (format stream ".EL.PREF.MAP ~A ~A~%"
-            (car pair)
+    (format stream "~/regfmt:key/~/regfmt:esc/~%"
+            (list (utils:subs (model:node-dir node) "/" *sep*)
+                  "<prefix-mapping>"
+                  (car pair))
             (cdr pair))))
 
 
