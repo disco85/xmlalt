@@ -170,36 +170,60 @@ similar to ~A but with escaping"
   "Serializes XML node"
   (typecase node
     (model:elem
-     (format stream ".EL ~A ~A~%" (model:elem-children-num node) (model:node-dir node))
+     (if (> (model:elem-children-num node) 0)
+         (format stream "~/regfmt:key/~/regfmt:esc/~%"  ;; TODO I always repeat this fmt str, make in global
+                 (list (utils:subs (model:node-dir node) "/" *sep*)
+                       "<children>")
+                 (model:elem-children-num node)))
+     ;; (with-truly local-name (model:elem-local-name node)
+     ;;   (format stream "~/regfmt:key/~/regfmt:esc/~%"
+     ;;           (list (utils:subs (model:node-dir node) "/" *sep*)
+     ;;                 "<local-name>")
+     ;;           local-name))
      (with-truly namespace-uri (model:elem-namespace-uri node)
-       (format stream ".EL.NS ~A~%" namespace-uri))
-     (with-truly local-name (model:elem-local-name node)
-       (format stream ".EL.LOC.NAME ~A~%" local-name))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%"
+               (list (utils:subs (model:node-dir node) "/" *sep*)
+                     "<namespace-uri>")
+               namespace-uri))
      (with-truly qname (model:elem-qname node)
-       (format stream ".EL.Q.NAME ~A~%" qname))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%"
+               (list (utils:subs (model:node-dir node) "/" *sep*)
+                     "<qname>")
+               qname))
      (with-truly prefix-mappings (model:elem-prefix-mappings node)
        (serialize-prefix-mappings doc node prefix-mappings stream))
      (with-truly attributes (model:elem-attributes node)
        (serialize-elem-attributes doc node attributes stream))
      (with-truly children (model:elem-children node)
        (dolist (child children)
-         (serialize-nodes doc child stream)))
-     (format stream ".ELE ~A~%" (model:node-dir node)))
+         (serialize-nodes doc child stream))))
 
     (model:text
      (with-truly content (model:text-content node)
-       (format stream ".TEXT~%~A~%.TEXTE~%" content)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%"
+               (list (utils:subs (model:node-dir node) "/" *sep*)
+                     "<text>")
+               content)))
 
     (model:comment
      (with-truly content (model:comment-content node)
-       (format stream ".COM~%~A~%.COME~%" content)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%"
+               (list (utils:subs (model:node-dir node) "/" *sep*)
+                     "<comment>")
+               content)))
 
     (model:cdata
      (with-truly content (model:cdata-content node)
-       (format stream ".CD~%~A~%.CDE~%" content)))
+       (format stream "~/regfmt:key/~/regfmt:esc/~%"
+               (list (utils:subs (model:node-dir node) "/" *sep*)
+                     "<cdata>")
+               content)))
 
     (model:pinstr
-     (with-truly target (model:pinstr-target node)
-       (format stream ".PI.TARG ~A~%" target))
      (with-truly content (model:pinstr-content node)
-       (format stream ".PI~%~A~%.PIE~%" content)))))
+       ;; (format stream ".PI.TARG ~A~%" target)
+       (format stream "~/regfmt:key/~/regfmt:esc/~%"
+               (list (utils:subs (model:node-dir node) "/" *sep*)
+                     "<processing-instruction>"
+                     (model:pinstr-target node))
+               content)))))
