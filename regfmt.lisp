@@ -50,6 +50,11 @@ similar to ~A but with escaping"
     (format stream fmtstr (mapcar #'escape-1-char-word arg)))))
 
 
+(defun node-idx-to-str (node)
+  (with-truly idx (model:node-idx node)
+      (format nil "<~A>" idx)))
+
+
 (defun serialize (doc stream)
   "Serializes MODEL:DOC object"
   (serialize-dtd doc stream)
@@ -138,26 +143,30 @@ similar to ~A but with escaping"
      (with-truly content (model:unp-int-subs-content item)
        (format stream *stdfmt* '("<dtd>" "<unparsed-internal-subset>") content)))))
 
+;; TODO add suffix like <1> to same elems, maybe texts too
 
 (defun serialize-elem-attributes (doc node attributes stream)
   (declare (ignore doc))
   (dolist (attribute attributes)
     (format stream *stdfmt*
             (list (utils:subs (model:node-dir node) "/" *sep*)
+                  (node-idx-to-str node)
                   (concatenate 'string "@" (model:attr-qname attribute)))
             (model:attr-value attribute))
     (with-truly local-name (model:attr-local-name attribute)
       (format stream *stdfmt*
-            (list (utils:subs (model:node-dir node) "/" *sep*)
-                  (concatenate 'string "@" (model:attr-qname attribute))
-                  "<local-name>")
-            local-name))
+              (list (utils:subs (model:node-dir node) "/" *sep*)
+                    (node-idx-to-str node)
+                    (concatenate 'string "@" (model:attr-qname attribute))
+                    "<local-name>")
+              local-name))
     (with-truly namespace-uri (model:attr-namespace-uri attribute)
       (format stream *stdfmt*
-            (list (utils:subs (model:node-dir node) "/" *sep*)
-                  (concatenate 'string "@" (model:attr-qname attribute))
-                  "<namespace-uri>")
-            namespace-uri))))
+              (list (utils:subs (model:node-dir node) "/" *sep*)
+                    (node-idx-to-str node)
+                    (concatenate 'string "@" (model:attr-qname attribute))
+                    "<namespace-uri>")
+              namespace-uri))))
 
 
 (defun serialize-prefix-mappings (doc node prefix-mappings stream)
@@ -165,6 +174,7 @@ similar to ~A but with escaping"
   (dolist (pair (model:prefix-mappings-items prefix-mappings))
     (format stream *stdfmt*
             (list (utils:subs (model:node-dir node) "/" *sep*)
+                  (node-idx-to-str node)
                   "<prefix-mapping>"
                   (car pair))
             (cdr pair))))
@@ -181,6 +191,7 @@ similar to ~A but with escaping"
      (if (> (model:elem-children-num node) 0)
          (format stream *stdfmt*  ;; TODO I always repeat this fmt str, make in global
                  (list (utils:subs (model:node-dir node) "/" *sep*)
+                       (node-idx-to-str node)
                        "<children>")
                  (model:elem-children-num node)))
      ;; (with-truly local-name (model:elem-local-name node)
@@ -191,11 +202,13 @@ similar to ~A but with escaping"
      (with-truly namespace-uri (model:elem-namespace-uri node)
        (format stream *stdfmt*
                (list (utils:subs (model:node-dir node) "/" *sep*)
+                     (node-idx-to-str node)
                      "<namespace-uri>")
                namespace-uri))
      (with-truly qname (model:elem-qname node)
        (format stream *stdfmt*
                (list (utils:subs (model:node-dir node) "/" *sep*)
+                     (node-idx-to-str node)
                      "<qname>")
                qname))
      (with-truly prefix-mappings (model:elem-prefix-mappings node)
@@ -210,6 +223,7 @@ similar to ~A but with escaping"
      (with-truly content (model:text-content node)
        (format stream *stdfmt*
                (list (utils:subs (model:node-dir node) "/" *sep*)
+                     (node-idx-to-str node)
                      "<text>")
                content)))
 
@@ -217,6 +231,7 @@ similar to ~A but with escaping"
      (with-truly content (model:comment-content node)
        (format stream *stdfmt*
                (list (utils:subs (model:node-dir node) "/" *sep*)
+                     (node-idx-to-str node)
                      "<comment>")
                content)))
 
@@ -224,6 +239,7 @@ similar to ~A but with escaping"
      (with-truly content (model:cdata-content node)
        (format stream *stdfmt*
                (list (utils:subs (model:node-dir node) "/" *sep*)
+                     (node-idx-to-str node)
                      "<cdata>")
                content)))
 
@@ -232,6 +248,7 @@ similar to ~A but with escaping"
        ;; (format stream ".PI.TARG ~A~%" target)
        (format stream *stdfmt*
                (list (utils:subs (model:node-dir node) "/" *sep*)
+                     (node-idx-to-str node)
                      "<processing-instruction>"
                      (model:pinstr-target node))
                content)))))

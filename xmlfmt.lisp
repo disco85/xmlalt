@@ -189,13 +189,29 @@ so we save them first here, then add to an element, also they are scoped")
     (setf (model:node-dir node) node-dir)))
 
 
-(defun add-node-as-child (elem mysax)
+(defun numerate-elem-siblings (elem)
+  (let (counters)
+    (flet ((proc-child (child)
+             (when (typep child 'model:node)
+               (let* ((child-class (type-of child))
+                      (child-counter (assoc child-class counters))
+                      (child-num (or (cdr child-counter) 0)))
+                 (setf (model:node-idx child) child-num)
+                 (if child-counter
+                     (incf (cdr child-counter))
+                     (push (cons child-class 0) counters))))))
+      (mapcar #'proc-child (model:elem-children elem)))))
+
+
+(defun add-node-as-child (node mysax)
   (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
                     (cur-elem (car elems-stack))
                     (cur-elem-children (model:elem-children cur-elem)))
-      (when elems-stack (setf cur-elem-children
-                              (append cur-elem-children  ; TODO try nconc
-                                      (list elem))))))
+    (when elems-stack (setf cur-elem-children
+                              (append cur-elem-children
+                                      (list node))))
+    (when (typep cur-elem 'model:elem)
+      (numerate-elem-siblings cur-elem))))
 
 
 (defun enter-elem (elem mysax)
@@ -207,7 +223,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defun exit-from-elem (mysax)
   (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
     (when (cdr elems-stack)
-      (pop elems-stack))))
+      (pop elems-stack)))) ;; TODO numerate same elems in children
 
 
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)

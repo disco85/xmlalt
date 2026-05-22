@@ -18,6 +18,7 @@
            #:node-dir
            #:node-open-by
            #:node-close-by
+           #:node-idx
 
            #:doc
            #:doc-xml-decl

@@ -47,13 +47,17 @@
   ((dir :type dir
         :documentation "A construct is located at some DIR reflecting it nesting"
         :accessor node-dir)
+   (idx :type integer
+        :documentation "Index of a node among same type siblings"
+        :initform 0
+        :accessor node-idx)
    (open-by :type string
             :initform "<"
             :reader node-open-by
             :documentation "")
    (close-by :type string
              :initform ">"
-             :reader node-open-by
+             :reader node-close-by
              :documentation "")))
 
 
