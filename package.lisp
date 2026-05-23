@@ -11,94 +11,70 @@
 
 (defpackage #:model
   (:use #:cl #:utils)
-  (:export #:main
+  (:export
            #:uri
 
            #:node
-           #:node-dir
-           #:node-open-by
-           #:node-close-by
-           #:node-idx
-
-           #:doc
-           #:doc-xml-decl
-           #:doc-dtd
-           #:doc-elems-stack
-
-           #:dtd
-           #:dtd-items
-           #:dtd-name
-           #:dtd-public-id
-           #:dtd-system-id
-
-           #:attr-decl
-           #:attr-decl-element-name
-           #:attr-decl-attribute-name
-           #:attr-decl-type
-           #:attr-decl-default
-
-           #:elem-decl
-           #:elem-decl-name
-           #:elem-decl-model
-
-           #:nota-decl
-           #:nota-decl-name
-           #:nota-decl-public-id
-           #:nota-decl-system-id
-
-           #:int-ent-decl
-           #:int-ent-decl-kind
-           #:int-ent-decl-name
-           #:int-ent-decl-value
-
-           #:ext-ent-decl
-           #:ext-ent-decl-kind
-           #:ext-ent-decl-name
-           #:ext-ent-decl-public-id
-           #:ext-ent-decl-system-id
-
-           #:unp-ent-decl
-           #:unp-ent-decl-name
-           #:unp-ent-decl-public-id
-           #:unp-ent-decl-system-id
-           #:unp-ent-decl-nota-name
-
-           #:unp-int-subs
-           #:unp-int-subs-content
+           #:create-node
+           #:set-node-idx
 
            #:attr
-           #:attr-namespace-uri
-           #:attr-local-name
-           #:attr-qname
-           #:attr-value
-           #:attr-value
-           #:attr-specified
+           #:create-attr
+
+           #:text
+           #:create-text
+
+           #:pinstr
+           #:create-pinstr
+
+           #:cdata
+           #:create-cdata
+
+           #:comment
+           #:create-comment
 
            #:prefix-mappings
-           #:prefix-mappings-items
+           #:create-prefix-mappings
            #:add-prefix-mappings
 
            #:elem
-           #:elem-namespace-uri
-           #:elem-local-name
-           #:elem-qname
-           #:elem-prefix-mappings
-           #:elem-attributes
-           #:elem-children
+           #:create-elem
            #:elem-children-num
 
-           #:comment
-           #:comment-content
+           #:doctype
+           #:create-doctype
 
-           #:text
-           #:text-content
+           #:xml-decl
+           #:create-xml-decl
 
-           #:cdata
-           #:cdata-content
+           #:elem-decl
+           #:create-elem-decl
 
-           #:pinstr
-           #:pinstr-target
-           #:pinstr-content
+           #:attr-decl
+           #:create-attr-decl
+
+           #:nota-decl
+           #:create-nota-decl
+
+           #:int-ent-decl
+           #:create-int-ent-decl
+
+           #:ext-ent-decl
+           #:create-ext-ent-decl
+
+           #:unp-ent-decl
+           #:create-unp-ent-decl
+
+           #:unp-int-subs
+           #:create-unp-int-subs
+
+           #:dtd
+           #:create-dtd
+           #:add-dtd-item
+
+           #:doc
+           #:create-doc
+           #:set-doc-dtd
            ))
 
 (defpackage #:blkfmt

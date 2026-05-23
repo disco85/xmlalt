@@ -25,7 +25,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defun remember-prefix-mapping (mysax prefix uri)
   "Adds to current prefix mappings yet another mapping"
   (unless (mysax-prefix-mappings mysax)
-    (push (make-instance 'model:prefix-mappings)
+    (push (model:create-prefix-mappings)
           (mysax-prefix-mappings mysax)))
   (model:add-prefix-mappings (car (mysax-prefix-mappings mysax))
                              (cons prefix uri)))
@@ -37,11 +37,11 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:attribute-declaration ((mysax mysax) element-name attribute-name type default)
-  (let ((attr-decl (make-instance 'model:attr-decl :element-name element-name
-                                                   :attribute-name attribute-name
-                                                   :type type
-                                                   :default default)))
-    (push attr-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((attr-decl (model:create-attr-decl :elem-name element-name
+                                           :attr-name attribute-name
+                                           :type type
+                                           :default default)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) attr-decl)
     (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
             element-name attribute-name type default)))
 
@@ -76,8 +76,8 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:start-dtd ((mysax mysax) name public-id system-id)
-  (setf (model:doc-dtd (mysax-doc mysax))
-        (make-instance 'model:dtd :name name :public-id public-id :system-id system-id))
+  (model:set-doc-dtd (mysax-doc mysax)
+                     (model:create-dtd :name name :public-id public-id :system-id system-id))
   (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id))
 
 
@@ -90,52 +90,47 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:element-declaration ((mysax mysax) name model)
-  (let ((elem-decl (make-instance 'model:elem-decl :name name
-                                                   :model model)))
-    (push elem-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((elem-decl (model:create-elem-decl :name name :model model)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) elem-decl)
     (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~A~%~%" name model)))
 
 
 (defmethod sax:notation-declaration ((mysax mysax) name public-id system-id)
-  (let ((nota-decl (make-instance 'model:nota-decl :name name
-                                                   :public-id public-id
-                                                   :system-id system-id)))
-    (push nota-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((nota-decl (model:create-nota-decl :name name :public-id public-id :system-id system-id)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) nota-decl)
     (format t "NOTATION-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
             name public-id system-id)))
 
 
 (defmethod sax:internal-entity-declaration ((mysax mysax) kind name value)
-  (let ((int-ent-decl (make-instance 'model:int-ent-decl :kind kind
-                                                         :name name
-                                                         :value value)))
-    (push int-ent-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((int-ent-decl (model:create-int-ent-decl :kind kind :name name :value value)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) int-ent-decl)
     (format t "INTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A VALUE: ~A~%~%" kind name value)))
 
 
 (defmethod sax:external-entity-declaration ((mysax mysax) kind name public-id system-id)
-  (let ((ext-ent-decl (make-instance 'model:ext-ent-decl :kind kind
-                                                         :name name
-                                                         :public-id public-id
-                                                         :system-id system-id)))
-    (push ext-ent-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((ext-ent-decl (model:create-ext-ent-decl :kind kind
+                                                 :name name
+                                                 :public-id public-id
+                                                 :system-id system-id)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) ext-ent-decl)
     (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
             kind name public-id system-id)))
 
 
 (defmethod sax:unparsed-entity-declaration ((mysax mysax) name public-id system-id notation-name)
-  (let ((unp-ent-decl (make-instance 'model:unp-ent-decl :name name
-                                                         :public-id public-id
-                                                         :system-id system-id
-                                                         :nota-name notation-name)))
-    (push unp-ent-decl (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((unp-ent-decl (model:create-unp-ent-decl :name name
+                                                 :public-id public-id
+                                                 :system-id system-id
+                                                 :nota-name notation-name)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) unp-ent-decl)
     (format t "UNPARSED-ENTITY-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A NOTATION-NAME: ~A~%~%"
             name public-id system-id notation-name)))
 
 
 (defmethod sax:unparsed-internal-subset ((mysax mysax) str)
-  (let ((unp-int-subs (make-instance 'model:unp-int-subs :content str)))
-    (push unp-int-subs (model:dtd-items (model:doc-dtd (mysax-doc mysax))))
+  (let ((unp-int-subs (model:create-unp-int-subs :content str)))
+    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) unp-int-subs)
   (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str)))
 
 
@@ -159,34 +154,34 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defun adapt-attr (sax-standard-attribute)
   "Creates MODEL:ATTR from SAX:STANDARD-ATTRIBUTE object"
-  (make-instance 'model:attr :namespace-uri (sax:attribute-namespace-uri sax-standard-attribute)
-                             :local-name (sax:attribute-local-name sax-standard-attribute)
-                             :qname (sax:attribute-qname sax-standard-attribute)
-                             :value (sax:attribute-value sax-standard-attribute)
-                             :specified (sax:attribute-specified-p sax-standard-attribute)))
+  (model:create-attr :namespace-uri (sax:attribute-namespace-uri sax-standard-attribute)
+                     :local-name (sax:attribute-local-name sax-standard-attribute)
+                     :qname (sax:attribute-qname sax-standard-attribute)
+                     :value (sax:attribute-value sax-standard-attribute)
+                     :specified (sax:attribute-specified-p sax-standard-attribute)))
 
 
-(defun current-dir (mysax)
-  "Current DIR (path) using the current full path from the ELEMS-STACK"
-  (let* ((elems-stack ;; TODO use full name instead of elem-local-name or?
-           (reverse (model:doc-elems-stack (mysax-doc mysax))))
-         (elem-names (mapcar #'model:elem-local-name elems-stack)))
-    (format nil "~{~A~^/~}" elem-names)))
+;; (defun current-dir (mysax)
+;;   "Current DIR (path) using the current full path from the ELEMS-STACK"
+;;   (let* ((elems-stack ;; TODO use full name instead of elem-local-name or?
+;;            (reverse (model:doc-elems-stack (mysax-doc mysax))))
+;;          (elem-names (mapcar #'model:elem-local-name elems-stack)))
+;;     (format nil "~{~A~^/~}" elem-names)))
 
 
-(defun current-dir-with-elem (mysax elem)
-  "Forms DIR (path) of ELEM using also the current full path from the ELEMS-STACK"
-  (let* ((cd (current-dir mysax))
-         (fmt (if (string= cd "") "~*~A" "~A/~A"))) ;; form "a/b" or "b" but not "/b"
-    (format nil fmt cd (model:elem-local-name elem))))
+;; (defun current-dir-with-elem (mysax elem)
+;;   "Forms DIR (path) of ELEM using also the current full path from the ELEMS-STACK"
+;;   (let* ((cd (current-dir mysax))
+;;          (fmt (if (string= cd "") "~*~A" "~A/~A"))) ;; form "a/b" or "b" but not "/b"
+;;     (format nil fmt cd (model:elem-local-name elem))))
 
 
-(defun set-node-dir (node mysax)
-  "Sets DIR of NODE using also ELEMS-STACK from MYSAX"
-  (let ((node-dir (if (typep node 'model:elem)
-                      (current-dir-with-elem mysax node)
-                      (current-dir mysax))))
-    (setf (model:node-dir node) node-dir)))
+;; (defun set-node-dir (node mysax)
+;;   "Sets DIR of NODE using also ELEMS-STACK from MYSAX"
+;;   (let ((node-dir (if (typep node 'model:elem)
+;;                       (current-dir-with-elem mysax node)
+;;                       (current-dir mysax))))
+;;     (setf (model:node-dir node) node-dir)))
 
 
 (defun numerate-elem-siblings (elem)

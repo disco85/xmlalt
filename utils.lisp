@@ -16,9 +16,9 @@
  (member c '(#\Space #\Tab #\Newline #\Return)))
 
 
-;; (defun nzstr (str)
-;;   "STR is not-empty string"
-;;   (string/= str ""))
+(defun empty-string-p (str)
+  "STR is empty string"
+  (string= str ""))
 
 
 (defun truly (x)
