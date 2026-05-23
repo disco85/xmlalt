@@ -36,41 +36,41 @@
   (assert (and (integerp idx) (>= idx 0)))
   (setf (node-idx node) idx))
 
-(defun node-dir (node &key with-idx non-elem-name join-by)
+(defun calc-node-dir (node &key with-idx non-elem-name join-by)
   "Collects DIR of a NODE (adding IDX, if WITH-IDX is T) of every ELEM en route and
 returns the result as a list of strings. But if JOIN-BY was passed as some STRING,
 then returns it as a STRING joining components by this delimiter"
   (check-type node node)
   (check-type join-by (or null string))
-  (label ((prep-idx (n)
-                    "Prepares IDX of a NODE N as a string"
-                    (write-to-string (node-idx n)))
-          (prep-join-fmt (delim)
-                         "Prepares FORMAT string able to join items by DELIM"
-                         (concatenate 'string "~{~A~^" delim "~}"))
-          (cons-idx-if (n lst)
-                       "Adds IDX of a NODE N to the front of list LST if WITH-IDX"
-                       (if with-idx
-                           (cons (prep-idx n) lst)
-                           lst))
-          (collect-dir (n dir)
-                       "Recursively collects DIR from a node N to the top parent"
-                       (typecase n
-                         (null dir)
-                         (elem (collect-dir (node-parent n)
-                                            (cons-idx-if n
-                                                         (cons (elem-local-name n) dir))))
-                         (node (if non-elem-name
-                                   (collect-dir (node-parent n)
-                                                (cons-idx-if n
-                                                             (cons (non-elem-name n) dir)))
-                                   (collect-dir (node-parent n) dir)))
-                         (t dir))))
-         (let* ((dir0 (collect-dir node nil))
-                (dir1 (reverse dir0)))
-           (if join-by
-               (format nil (prep-join-fmt join-by) dir1)
-               dir1))))
+  (labels ((prep-idx (n)
+             "Prepares IDX of a NODE N as a string"
+             (write-to-string (node-idx n)))
+           (prep-join-fmt (delim)
+             "Prepares FORMAT string able to join items by DELIM"
+             (concatenate 'string "~{~A~^" delim "~}"))
+           (cons-idx-if (n lst)
+             "Adds IDX of a NODE N to the front of list LST if WITH-IDX"
+             (if with-idx
+                 (cons (prep-idx n) lst)
+                 lst))
+           (collect-dir (n dir)
+             "Recursively collects DIR from a node N to the top parent"
+             (typecase n
+               (null dir)
+               (elem (collect-dir (node-parent n)
+                                  (cons-idx-if n
+                                               (cons (elem-local-name n) dir))))
+               (node (if non-elem-name
+                         (collect-dir (node-parent n)
+                                      (cons-idx-if n
+                                                   (cons (non-elem-name n) dir)))
+                         (collect-dir (node-parent n) dir)))
+               (t dir))))
+    (let* ((dir0 (collect-dir node nil))
+           (dir1 (reverse dir0)))
+      (if join-by
+          (format nil (prep-join-fmt join-by) dir1)
+          dir1))))
 
 
 (defstruct attr
@@ -174,8 +174,17 @@ then returns it as a STRING joining components by this delimiter"
              :children children))
 
 (defun elem-children-num (elem)
+  (check-type elem elem)
   (length (elem-children elem)))
 
+(defun over-elem-children (elem &key (collect nil collect-p) (do nil do-p))
+  (check-type elem elem)
+  (assert (not (and collect-p do-p)))
+  (cond (collect-p (mapcar collect
+                           (elem-children elem)))
+        (do-p      (dolist (child (elem-children elem))
+                     (funcall do child)))
+        (t (error "Pass either :collect or :do")))))
 
 
 (defstruct doctype

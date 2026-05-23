@@ -17,6 +17,7 @@
            #:node
            #:create-node
            #:set-node-idx
+           #:calc-node-dir
 
            #:attr
            #:create-attr
@@ -40,6 +41,7 @@
            #:elem
            #:create-elem
            #:elem-children-num
+           #:over-elem-children
 
            #:doctype
            #:create-doctype
