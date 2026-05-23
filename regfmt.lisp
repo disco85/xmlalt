@@ -42,17 +42,21 @@ similar to ~A but with escaping"
 
 
 (defun key (stream arg &rest args)
+  "ARG is a list of keys"
   (declare (ignore args))
   (flet ((escape-1-char-word (w) (if (= 1 (length w)) ;; FIXME not 1 char word, but when symbol is 1 len ":".
                                      (to-safe-str w)  ;; FIXME or don't esc "<..>" if len is > 3?
                                      w)))
-   (let ((fmtstr (format nil "~A~A~A~A" "~{~A~^" *sep* "~}" *is*)))
-    (format stream fmtstr (mapcar #'escape-1-char-word arg)))))
+    (let ((fmtstr (format nil "~A~A~A~A" "~{~A~^" *sep* "~}" *is*))
+          (arg1 (remove nil arg)))
+      (format stream fmtstr (mapcar #'escape-1-char-word arg1)))))
 
 
 (defun node-idx-to-str (node)
-  (with-truly idx (model:node-idx node)
-      (format nil "<~A>" idx)))
+  "If (NODE-IDX NODE) is -1 returns NIL, else it as a STRING"
+  (let ((idx (model:node-idx node)))
+    (when (> idx -1)
+      (format nil "<~A>" idx))))
 
 
 (defun serialize (doc stream)

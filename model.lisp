@@ -49,7 +49,7 @@
         :accessor node-dir)
    (idx :type integer
         :documentation "Index of a node among same type siblings"
-        :initform 0
+        :initform -1
         :accessor node-idx)
    (open-by :type string
             :initform "<"
