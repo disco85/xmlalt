@@ -42,6 +42,9 @@
            #:create-elem
            #:elem-children-num
            #:over-elem-children
+           #:add-child-node-to-current-elem
+           #:enter-elem
+           #:exit-from-elem
 
            #:doctype
            #:create-doctype

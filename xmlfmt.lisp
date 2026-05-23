@@ -184,57 +184,12 @@ so we save them first here, then add to an element, also they are scoped")
 ;;     (setf (model:node-dir node) node-dir)))
 
 
-(defun numerate-elem-siblings (elem)
-  (let ((counters nil)
-        (deferred-updates nil))
-    (labels ((calc-child-id (child)
-               (format nil "~A--~A" (type-of child) (model:calc-node-dir child :join-by "")))
-             (defer-child-update (child)
-               (when (typep child 'model:node)
-                 (let* ((child-id (calc-child-id child))
-                        (child-counter (assoc child-id counters :test #'equal))
-                        (child-num (or (cdr child-counter) 0)))
-                   ;; (format t "!!!!!!!!!!!!!!!!!!!!! ~A  ~A (~A): ~A~%"
-                   ;;         (type-of child) (model:node-dir child) child-id child-num)
-                   ;; (setf (model:node-idx child) child-num)
-                   (push (cons child child-num) deferred-updates)
-                   (if child-counter
-                       (incf (cdr child-counter))
-                       (push (cons child-id 1) counters)))))
-             (execute-deferred-update (deferred-update)
-               (let* ((child (car deferred-update))
-                      (child-num (cdr deferred-update))
-                      (child-id (calc-child-id child)))
-                 (when (> (cdr (assoc child-id counters :test #'equal)) 1)
-                   (model:set-node-idx child child-num)))))
-      (model:over-elem-children elem :do defer-child-update)
-      (dolist (deferred-update (reverse deferred-updates))
-        (execute-deferred-update deferred-update))
-      ;;(format t "         !!!!! AFTER: ~A~%" (mapcar #'model:node-idx (model:elem-children elem)))
-      )))
 
 
-(defun add-node-as-child (node mysax) ;; TODO
-  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
-                    (cur-elem (car elems-stack))
-                    (cur-elem-children (model:elem-children cur-elem)))
-    (when elems-stack (setf cur-elem-children
-                              (append cur-elem-children
-                                      (list node))))
-    (when (typep cur-elem 'model:elem)
-      (numerate-elem-siblings cur-elem))))
-
-
-(defun enter-elem (elem mysax)
-  "Pushes ELEM to ELEMS-STACK making it the current element"
-  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
-    (push elem elems-stack)))
-
-
-(defun exit-from-elem (mysax)
-  (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax))))
-    (when (cdr elems-stack)
-      (pop elems-stack)))) ;; TODO numerate same elems in children
+;; (defun model:add-child-node-to-current-elem (node mysax)
+;;   (check-type node model:node)
+;;   (check-type mysax mysax)
+;;   (model:add-child-node-to-current-elem node (mysax-doc mysax)))
 
 
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
@@ -244,8 +199,8 @@ so we save them first here, then add to an element, also they are scoped")
                                          :prefix-mappings (car (mysax-prefix-mappings mysax))
                                          :attributes (mapcar #'adapt-attr attributes))))
     (set-node-dir elem mysax)
-    (add-node-as-child elem mysax)
-    (enter-elem elem mysax)
+    (model:add-child-node-to-current-elem elem (mysax-doc mysax))
+    (model:enter-elem elem (mysax-doc mysax))
     (reset-characters-accumulation mysax)
     (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
             namespace-uri local-name qname attributes)))
@@ -255,8 +210,8 @@ so we save them first here, then add to an element, also they are scoped")
   (when (accumulated-characters-exist mysax)
     (let ((text (make-instance 'model:text :content (mysax-characters mysax))))
       (set-node-dir text mysax)
-      (add-node-as-child text mysax)))
-  (exit-from-elem mysax)
+      (model:add-child-node-to-current-elem text (mysax-doc mysax))))
+  (model:exit-from-elem (mysax-doc mysax))
   (reset-characters-accumulation mysax)
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
           namespace-uri local-name qname))
@@ -265,7 +220,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defmethod sax:comment ((mysax mysax) data)
   (let ((comment (make-instance 'model:comment :content data)))
     (set-node-dir comment mysax)
-    (add-node-as-child comment mysax)
+    (model:add-child-node-to-current-elem comment (mysax-doc mysax))
     (reset-characters-accumulation mysax)
     (format t "COMMENT! DATA: ~A~%~%" data)))
 
@@ -273,7 +228,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defmethod sax:start-cdata ((mysax mysax))
   (let ((cdata (make-instance 'model:cdata)))
     (set-node-dir cdata mysax)
-    (add-node-as-child cdata mysax)
+    (model:add-child-node-to-current-elem cdata (mysax-doc mysax))
     (reset-characters-accumulation mysax)
     (format t "START-CDATA!~%~%")))
 
@@ -300,7 +255,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defmethod sax:processing-instruction ((mysax mysax) target data)
   (let ((pinstr (make-instance 'model:pinstr :target target :content data)))
     (set-node-dir pinstr mysax)  ;; TODO maybe to unite these 2 calls?
-    (add-node-as-child pinstr mysax)
+    (model:add-child-node-to-current-elem pinstr (mysax-doc mysax))
     (reset-characters-accumulation mysax)
     (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data)))
 

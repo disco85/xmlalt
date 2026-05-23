@@ -72,6 +72,24 @@ then returns it as a STRING joining components by this delimiter"
           (format nil (prep-join-fmt join-by) dir1)
           dir1))))
 
+(defun %add-child-node-to-elem (child-node to-elem)
+  "Adds a CHILD-NODE to ELEM TO-ELEM"
+  (assert child-node node)
+  (assert to-elem elem)
+  (symbol-macrolet ((elem-children (model:elem-children to-elem)))
+    (setf elem-children (append elem-children (list child-node)))
+    (setf (node-parent child-node) to-elem))
+  (%numerate-elem-children to-elem))
+
+(defun add-child-node-to-current-elem (child-node doc)
+  "Adds CHILD-NODE to the current ELEM (tracked in DOC)"
+  (assert child-node node)
+  (assert doc doc)
+  (let* ((elems-stack (model:doc-elems-stack doc))
+         (cur-elem (car elems-stack)))
+    (when cur-elem (%add-child-node-to-elem child-node cur-elem))))
+
+
 
 (defstruct attr
   (namespace-uri nil :type (or null uri))
@@ -185,6 +203,50 @@ then returns it as a STRING joining components by this delimiter"
         (do-p      (dolist (child (elem-children elem))
                      (funcall do child)))
         (t (error "Pass either :collect or :do")))))
+
+(defun %numerate-elem-children (elem)
+  "Refreshes NODE-IDX field of ....."
+  (check-type elem elem)
+  (let ((counters nil)
+        (deferred-updates nil))
+    (labels ((calc-child-id (child)
+               (format nil "~A--~A" (type-of child) (calc-node-dir child :join-by "")))
+             (defer-child-update (child)
+               (when (typep child 'node)
+                 (let* ((child-id (calc-child-id child))
+                        (child-counter (assoc child-id counters :test #'equal))
+                        (child-num (or (cdr child-counter) 0)))
+                   ;; (format t "!!!!!!!!!!!!!!!!!!!!! ~A  ~A (~A): ~A~%"
+                   ;;         (type-of child) (node-dir child) child-id child-num)
+                   ;; (setf (node-idx child) child-num)
+                   (push (cons child child-num) deferred-updates)
+                   (if child-counter
+                       (incf (cdr child-counter))
+                       (push (cons child-id 1) counters)))))
+             (execute-deferred-update (deferred-update)
+               (let* ((child (car deferred-update))
+                      (child-num (cdr deferred-update))
+                      (child-id (calc-child-id child)))
+                 (when (> (cdr (assoc child-id counters :test #'equal)) 1)
+                   (set-node-idx child child-num)))))
+      (over-elem-children elem :do defer-child-update)
+      (dolist (deferred-update (reverse deferred-updates))
+        (execute-deferred-update deferred-update))
+      ;;(format t "         !!!!! AFTER: ~A~%" (mapcar #'node-idx (elem-children elem)))
+      )))
+
+(defun enter-elem (elem doc)
+  "Pushes ELEM to ELEMS-STACK making it the current element"
+  (check-type elem elem)
+  (check-type doc doc)
+    (push elem (model:doc-elems-stack doc)))
+
+(defun exit-from-elem (doc)
+  "Pops (like Linux popd(1) command) current ELEM from the stack of XML elements"
+  (symbol-macrolet ((elems-stack (model:doc-elems-stack doc)))
+    (when (cdr elems-stack)
+      (pop elems-stack))))
+
 
 
 (defstruct doctype
