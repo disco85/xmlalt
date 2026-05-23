@@ -147,7 +147,6 @@ similar to ~A but with escaping"
      (with-truly content (model:unp-int-subs-content item)
        (format stream *stdfmt* '("<dtd>" "<unparsed-internal-subset>") content)))))
 
-;; TODO add suffix like <1> to same elems, maybe texts too
 
 (defun serialize-elem-attributes (doc node attributes stream)
   (declare (ignore doc))
@@ -193,7 +192,7 @@ similar to ~A but with escaping"
   (typecase node
     (model:elem
      (if (> (model:elem-children-num node) 0)
-         (format stream *stdfmt*  ;; TODO I always repeat this fmt str, make in global
+         (format stream *stdfmt*
                  (list (utils:subs (model:node-dir node) "/" *sep*)
                        (node-idx-to-str node)
                        "<children>")

@@ -44,7 +44,7 @@
 
 
 (defclass node ()
-  ((dir :type dir
+  ((dir :type dir ;; FIXME it seems I use it as string!!!
         :documentation "A construct is located at some DIR reflecting it nesting"
         :accessor node-dir)
    (idx :type integer
