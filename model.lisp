@@ -1,6 +1,108 @@
 (in-package :model)
 
 
+(defstruct uri
+  (value "" :type string))
+
+(defstruct node
+  (idx nil :type (or null (integer 0)))
+  (open-by "<" :type string)
+  (close-by ">" :type string)
+  (parent nil :type (or null node)))
+
+(defstruct attr
+  (namespace-uri nil :type (or null uri))
+  (local-name nil :type (or null string))
+  (qname nil :type (or null string))
+  (value nil :type (or null string))
+  (specified nil :type boolean))
+
+(defstruct (text (:include node
+                  (open-by "")
+                  (close-by "")))
+  (content "" :type string))
+
+(defstruct (pinstr (:include node
+                    (open-by "<?")
+                    (close-by "?>")))
+  (target "" :type string)
+  (data nil :type (or null string)))
+
+(defstruct (cdata (:include node
+                   (open-by "<![CDATA[")
+                   (close-by "]]>")))
+  (content "" :type string))
+
+(defstruct (comment (:include node
+                     (open-by "<!--")
+                     (close-by "-->")))
+  (content "" :type string))
+
+(defstruct prefix-mappings
+  (items nil :type list))
+
+(defstruct (elem (:include node))
+  (namespace-uri nil :type (or null uri))
+  (local-name nil :type (or null string))
+  (qname nil :type (or null string))
+  (prefix-mappings nil :type (or null prefix-mappings))
+  (attributes nil :type list)
+  (children nil :type list))
+
+(defstruct doctype
+  (content "" :type string))
+
+(defstruct xml-decl
+  (content "" :type string))
+
+(defstruct dtd-item)
+
+(defstruct (elem-decl (:include dtd-item))
+  (name "" :type string)
+  (model "" :type string))
+
+(defstruct (attr-decl (:include dtd-item))
+  (elem-name "" :type string)
+  (attr-name "" :type string)
+  (type "" :type string)
+  (default "" :type string))
+
+(defstruct (nota-decl (:include dtd-item))
+  (name "" :type string)
+  (public-id nil :type (or null string))
+  (system-id nil :type (or null string)))
+
+(defstruct (int-ent-decl (:include dtd-item))
+  (kind "" :type string)
+  (name "" :type string)
+  (value "" :type string))
+
+(defstruct (ext-ent-decl (:include dtd-item))
+  (kind "" :type string)
+  (name "" :type string)
+  (public-id nil :type (or null string))
+  (system-id nil :type (or null string)))
+
+(defstruct (unp-ent-decl (:include dtd-item))
+  (name "" :type string)
+  (public-id nil :type (or null string))
+  (system-id nil :type (or null string))
+  (nota-name "" :type string))
+
+(defstruct (unp-int-subs (:include dtd-item))
+  (content "" :type string))
+
+(defstruct dtd
+  (items nil :type list)
+  (name "" :type string)
+  (public-id nil :type (or null string))
+  (system-id nil :type (or null string)))
+
+(defstruct doc
+  (xml-decl nil :type (or null xml-decl))
+  (dtd nil :type (or null dtd))
+  (elems-stack nil :type list))
+
 
 ;; TODO move these 2 funcs to utils
 (defun non-empty-string-p (s)
@@ -14,8 +116,6 @@
 
 
 
-(defstruct uri
-  (value "" :type string))
 
 (defun create-uri (uri-value)
   (assert (non-empty-string-p uri-value))
@@ -26,11 +126,6 @@
   (format stream "~A" uri))
 
 
-(defstruct node
-  (idx nil :type (or null (integer 0)))
-  (open-by "<" :type string)
-  (close-by ">" :type string)
-  (parent nil :type (or null node)))
 
 (defun create-node (&key idx parent)
   (make-node :idx idx :parent parent))
@@ -71,7 +166,7 @@ then returns it as a STRING joining components by this delimiter"
                (node (if non-elem-name
                          (collect-dir (node-parent n)
                                       (cons-idx-if n
-                                                   (cons (non-elem-name n) dir)))
+                                                   (cons (funcall non-elem-name n) dir)))
                          (collect-dir (node-parent n) dir)))
                (t dir))))
     (let* ((dir0 (collect-dir node nil))
@@ -99,12 +194,6 @@ then returns it as a STRING joining components by this delimiter"
 
 
 
-(defstruct attr
-  (namespace-uri nil :type (or null uri))
-  (local-name nil :type (or null string))
-  (qname nil :type (or null string))
-  (value nil :type (or null string))
-  (specified nil :type boolean))
 
 (defun create-attr (&key namespace-uri (local-name nil local-name-p) (qname nil qname-p) value specified)
   (assert (or (null namespace-uri) (non-empty-string-p namespace-uri)))
@@ -139,10 +228,6 @@ then returns it as a STRING joining components by this delimiter"
 
 
 
-(defstruct (text (:include node
-                  (open-by "")
-                  (close-by "")))
-  (content "" :type string))
 
 (defun create-text (content)
   (assert (non-empty-string-p content))
@@ -153,11 +238,7 @@ then returns it as a STRING joining components by this delimiter"
   (text-content text))
 
 
-(defstruct (pinstr (:include node
-                    (open-by "<?")
-                    (close-by "?>")))
-  (target "" :type string)
-  (data nil :type (or null string)))
+
 
 (defun create-pinstr (&key target data)
   (assert (non-empty-string-p target))
@@ -165,19 +246,14 @@ then returns it as a STRING joining components by this delimiter"
   (make-pinstr :target target :data data))
 
 (defun get-pinstr-target (pinstr)
-  (check-type pinst pinstr)
-  (pinst-target pinstr))
+  (check-type pinstr pinstr)
+  (pinstr-target pinstr))
 
 (defun get-pinstr-data (pinstr)
-  (check-type pinst pinstr)
-  (pinst-data pinstr))
+  (check-type pinstr pinstr)
+  (pinstr-data pinstr))
 
 
-
-(defstruct (cdata (:include node
-                   (open-by "<![CDATA[")
-                   (close-by "]]>")))
-  (content "" :type string))
 
 (defun create-cdata (content)
   (assert (non-empty-string-p content))
@@ -188,10 +264,7 @@ then returns it as a STRING joining components by this delimiter"
   (cdata-content cdata))
 
 
-(defstruct (comment (:include node
-                     (open-by "<!--")
-                     (close-by "-->")))
-  (content "" :type string))
+
 
 (defun create-comment (content)
   (assert (non-empty-string-p content))
@@ -203,8 +276,7 @@ then returns it as a STRING joining components by this delimiter"
 
 
 
-(defstruct prefix-mappings
-  (items nil :type list))
+
 
 (defun create-prefix-mappings (&optional items)
   (make-prefix-mappings :items items))
@@ -225,13 +297,7 @@ then returns it as a STRING joining components by this delimiter"
 
 
 
-(defstruct (elem (:include node))
-  (namespace-uri nil :type (or null uri))
-  (local-name nil :type (or null string))
-  (qname nil :type (or null string))
-  (prefix-mappings nil :type (or null prefix-mappings))
-  (attributes nil :type list)
-  (children nil :type list))
+
 
 (defun create-elem (&key namespace-uri (local-name nil local-name-p) (qname nil qname-p)
                       prefix-mappings attributes children)
@@ -328,31 +394,19 @@ then returns it as a STRING joining components by this delimiter"
 
 
 
-
-(defstruct doctype
-  (content "" :type string))
-
 (defun create-doctype (content)
   (assert (non-empty-string-p content))
   (make-doctype :content content))
 
 
 
-(defstruct xml-decl
-  (content "" :type string))
+
 
 (defun create-xml-decl (content)
   (assert (non-empty-string-p content))
   (make-xml-decl :content content))
 
 
-
-(defstruct dtd-item)
-
-
-(defstruct (elem-decl (:include dtd-item))
-  (name "" :type string)
-  (model "" :type string))
 
 (defun create-elem-decl (&key name model)
   (assert (non-empty-string-p name))
@@ -368,13 +422,6 @@ then returns it as a STRING joining components by this delimiter"
   (elem-decl-model elem-decl))
 
 
-
-
-(defstruct (attr-decl (:include dtd-item))
-  (elem-name "" :type string)
-  (attr-name "" :type string)
-  (type "" :type string)
-  (default "" :type string))
 
 (defun create-attr-decl (&key elem-name attr-name type default)
   (assert (non-empty-string-p elem-name))
@@ -400,13 +447,6 @@ then returns it as a STRING joining components by this delimiter"
   (attr-decl-default attr-decl))
 
 
-
-
-(defstruct (nota-decl (:include dtd-item))
-  (name "" :type string)
-  (public-id nil :type (or null string))
-  (system-id nil :type (or null string)))
-
 (defun create-nota-decl (&key name (public-id nil public-id-p) (system-id nil system-id-p))
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
@@ -427,12 +467,6 @@ then returns it as a STRING joining components by this delimiter"
   (nota-decl-system-id nota-decl))
 
 
-
-(defstruct (int-ent-decl (:include dtd-item))
-  (kind "" :type string)
-  (name "" :type string)
-  (value "" :type string))
-
 (defun create-int-ent-decl (&key kind name value)
   (assert (non-empty-string-p kind))
   (assert (non-empty-string-p name))
@@ -452,12 +486,6 @@ then returns it as a STRING joining components by this delimiter"
   (int-ent-decl-value int-ent-decl))
 
 
-
-(defstruct (ext-ent-decl (:include dtd-item))
-  (kind "" :type string)
-  (name "" :type string)
-  (public-id nil :type (or null string))
-  (system-id nil :type (or null string)))
 
 (defun create-ext-ent-decl (&key kind name (public-id nil public-id-p) (system-id nil system-id-p))
   (assert (non-empty-string-p kind))
@@ -484,13 +512,6 @@ then returns it as a STRING joining components by this delimiter"
   (ext-ent-decl-system-id ext-ent-decl))
 
 
-
-(defstruct (unp-ent-decl (:include dtd-item))
-  (name "" :type string)
-  (public-id nil :type (or null string))
-  (system-id nil :type (or null string))
-  (nota-name "" :type string))
-
 (defun create-unp-ent-decl (&key name (public-id nil public-id-p) (system-id nil system-id-p) nota-name)
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
@@ -516,11 +537,6 @@ then returns it as a STRING joining components by this delimiter"
   (unp-ent-decl-nota-name unp-ent-decl))
 
 
-
-
-(defstruct (unp-int-subs (:include dtd-item))
-  (content "" :type string))
-
 (defun create-unp-int-subs (content)
   (assert (non-empty-string-p content))
   (make-unp-int-subs :content content))
@@ -529,12 +545,6 @@ then returns it as a STRING joining components by this delimiter"
   (check-type unp-int-subs unp-int-subs)
   (unp-int-subs-content unp-int-subs))
 
-
-(defstruct dtd
-  (items nil :type list)
-  (name "" :type string)
-  (public-id nil :type (or null string))
-  (system-id nil :type (or null string)))
 
 (defun create-dtd (&key items name (public-id nil public-id-p) (system-id nil system-id-p))
   (assert (every (lambda (it) (dtd-item-p it)) items))
@@ -547,7 +557,7 @@ then returns it as a STRING joining components by this delimiter"
 (defun add-dtd-item (dtd item)
   (check-type dtd dtd)
   (check-type item dtd-item)
-  (pushf item (dtd-items dtd)))
+  (push item (dtd-items dtd)))
 
 (defun get-dtd-items (dtd)
   (check-type dtd dtd)
@@ -565,12 +575,6 @@ then returns it as a STRING joining components by this delimiter"
   (check-type dtd dtd)
   (dtd-system-id dtd))
 
-
-
-(defstruct doc
-  (xml-decl nil :type (or null xml-decl))
-  (dtd nil :type (or null dtd))
-  (elems-stack nil :type list))
 
 (defun set-doc-dtd (doc dtd)
   (check-type doc doc)
@@ -956,4 +960,3 @@ then returns it as a STRING joining components by this delimiter"
 ;;                 :documentation ""
 ;;                 :initform nil
 ;;                 :accessor doc-elems-stack)))
-<

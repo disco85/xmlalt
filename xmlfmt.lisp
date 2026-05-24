@@ -129,7 +129,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:unparsed-internal-subset ((mysax mysax) str)
-  (let ((unp-int-subs (model:create-unp-int-subs :content str)))
+  (let ((unp-int-subs (model:create-unp-int-subs str)))
     (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) unp-int-subs)
   (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str)))
 
@@ -208,7 +208,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
   (when (accumulated-characters-exist mysax)
-    (let ((text (model:create-text :content (mysax-characters mysax))))
+    (let ((text (model:create-text (mysax-characters mysax))))
       ;; (set-node-dir text mysax)
       (model:add-child-node-to-current-elem text (mysax-doc mysax))))
   (model:exit-from-elem (mysax-doc mysax))
@@ -218,7 +218,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:comment ((mysax mysax) data)
-  (let ((comment (model:create-comment :content data)))
+  (let ((comment (model:create-comment data)))
     ;; (set-node-dir comment mysax) ;; TODO remove all set-node-dir ?
     (model:add-child-node-to-current-elem comment (mysax-doc mysax))
     (reset-characters-accumulation mysax)
@@ -260,7 +260,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:processing-instruction ((mysax mysax) target data)
-  (let ((pinstr (model:create-pinstr :target target :content data)))
+  (let ((pinstr (model:create-pinstr :target target :data data)))
     ;; (set-node-dir pinstr mysax)  ;; TODO maybe to unite these 2 calls?
     (model:add-child-node-to-current-elem pinstr (mysax-doc mysax))
     (reset-characters-accumulation mysax)
