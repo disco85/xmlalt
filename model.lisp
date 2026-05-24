@@ -186,14 +186,15 @@ then returns it as a STRING joining components by this delimiter"
           (format nil (prep-join-fmt join-by) dir1)
           dir1))))
 
-(defun %add-child-node-to-elem (child-node to-elem)
+(defun %add-child-node-to-elem (child-node parent-elem)
   "Adds a CHILD-NODE to ELEM TO-ELEM"
   (check-type child-node node)
-  (check-type to-elem elem)
-  (symbol-macrolet ((children (elem-children to-elem)))
+  (check-type parent-elem elem)
+  (assert (not (eq child-node parent-elem)))
+  (symbol-macrolet ((children (elem-children parent-elem)))
     (setf children (append children (list child-node)))
-    (setf (node-parent child-node) to-elem))
-  (%numerate-elem-children to-elem))
+    (setf (node-parent child-node) parent-elem))
+  (%numerate-elem-children parent-elem))
 
 (defun add-child-node-to-current-elem (child-node doc)
   "Adds CHILD-NODE to the current ELEM (tracked in DOC)"

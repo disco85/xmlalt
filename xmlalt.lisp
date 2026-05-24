@@ -6,7 +6,7 @@
   (let* ((parsed (xmlfmt::parse-xml #P"./t1.xml"))
          (res (car parsed)))
     (if (eq res :ok)
-        (progn (inspect parsed)
+        (progn ;(inspect parsed)
                (cmdfmt:serialize (cdr parsed) t)
                (format t "~%~%~%")
                (regfmt:serialize (cdr parsed) t))
