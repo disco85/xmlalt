@@ -41,7 +41,7 @@ so we save them first here, then add to an element, also they are scoped")
                                            :attr-name attribute-name
                                            :type type
                                            :default default)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) attr-decl)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) attr-decl)
     (format t "ATTRIBUTE-DECLARATION! ELEMENT-NAME: ~A ATTRIBUTE-NAME: ~A TYPE: ~A DEFAULT: ~A~%~%"
             element-name attribute-name type default)))
 
@@ -91,20 +91,20 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defmethod sax:element-declaration ((mysax mysax) name model)
   (let ((elem-decl (model:create-elem-decl :name name :model model)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) elem-decl)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) elem-decl)
     (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~A~%~%" name model)))
 
 
 (defmethod sax:notation-declaration ((mysax mysax) name public-id system-id)
   (let ((nota-decl (model:create-nota-decl :name name :public-id public-id :system-id system-id)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) nota-decl)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) nota-decl)
     (format t "NOTATION-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
             name public-id system-id)))
 
 
 (defmethod sax:internal-entity-declaration ((mysax mysax) kind name value)
   (let ((int-ent-decl (model:create-int-ent-decl :kind kind :name name :value value)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) int-ent-decl)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) int-ent-decl)
     (format t "INTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A VALUE: ~A~%~%" kind name value)))
 
 
@@ -113,7 +113,7 @@ so we save them first here, then add to an element, also they are scoped")
                                                  :name name
                                                  :public-id public-id
                                                  :system-id system-id)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) ext-ent-decl)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) ext-ent-decl)
     (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
             kind name public-id system-id)))
 
@@ -123,14 +123,14 @@ so we save them first here, then add to an element, also they are scoped")
                                                  :public-id public-id
                                                  :system-id system-id
                                                  :nota-name notation-name)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) unp-ent-decl)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) unp-ent-decl)
     (format t "UNPARSED-ENTITY-DECLARATION! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A NOTATION-NAME: ~A~%~%"
             name public-id system-id notation-name)))
 
 
 (defmethod sax:unparsed-internal-subset ((mysax mysax) str)
   (let ((unp-int-subs (model:create-unp-int-subs :content str)))
-    (model:add-dtd-item (model:doc-dtd (mysax-doc mysax)) unp-int-subs)
+    (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) unp-int-subs)
   (format t "UNPARSED-INTERNAL-SUBSET! STR: ~A~%~%" str)))
 
 

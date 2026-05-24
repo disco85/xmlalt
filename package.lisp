@@ -18,21 +18,32 @@
            #:create-node
            #:set-node-idx
            #:calc-node-dir
+           #:get-node-idx
 
            #:attr
            #:create-attr
+           #:get-attr-namespace-uri
+           #:get-attr-local-name
+           #:get-attr-qname
+           #:get-attr-value
+           #:get-attr-specified
 
            #:text
            #:create-text
+           #:get-text-content
 
            #:pinstr
            #:create-pinstr
+           #:get-pinstr-target
+           #:get-pinstr-data
 
            #:cdata
            #:create-cdata
+           #:get-cdata-content
 
            #:comment
            #:create-comment
+           #:get-comment-content
 
            #:prefix-mappings
            #:create-prefix-mappings
@@ -41,11 +52,17 @@
 
            #:elem
            #:create-elem
-           #:elem-children-num
+           #:get-elem-children-num
            #:over-elem-children
            #:add-child-node-to-current-elem
            #:enter-elem
            #:exit-from-elem
+           #:get-elem-namespace-uri
+           #:get-elem-local-name
+           #:get-elem-qname
+           #:get-elem-prefix-mappings
+           #:get-elem-attributes
+           #:get-elem-children
 
            #:doctype
            #:create-doctype
@@ -67,6 +84,7 @@
 
            #:nota-decl
            #:create-nota-decl
+           #:get-nota-decl-name
            #:get-nota-decl-public-id
            #:get-nota-decl-system-id
 

@@ -2,13 +2,14 @@
 
 
 
+;; TODO move these 2 funcs to utils
 (defun non-empty-string-p (s)
   (and (stringp s) (string/= s "")))
 
 
 
 (defun empty-string-to-nil (s)
-  (assert (stringp s))
+  (check-type s string)
   (if (string= s "") nil s))
 
 
@@ -38,6 +39,10 @@
   (check-type node node)
   (assert (and (integerp idx) (>= idx 0)))
   (setf (node-idx node) idx))
+
+(defun get-node-idx (node)
+  (check-type node node)
+  (node-idx node))
 
 (defun calc-node-dir (node &key with-idx non-elem-name join-by)
   "Collects DIR of a NODE (adding IDX, if WITH-IDX is T) of every ELEM en route and
@@ -77,18 +82,18 @@ then returns it as a STRING joining components by this delimiter"
 
 (defun %add-child-node-to-elem (child-node to-elem)
   "Adds a CHILD-NODE to ELEM TO-ELEM"
-  (assert child-node node)
-  (assert to-elem elem)
-  (symbol-macrolet ((elem-children (model:elem-children to-elem)))
-    (setf elem-children (append elem-children (list child-node)))
+  (check-type child-node node)
+  (check-type to-elem elem)
+  (symbol-macrolet ((children (elem-children to-elem)))
+    (setf children (append children (list child-node)))
     (setf (node-parent child-node) to-elem))
   (%numerate-elem-children to-elem))
 
 (defun add-child-node-to-current-elem (child-node doc)
   "Adds CHILD-NODE to the current ELEM (tracked in DOC)"
-  (assert child-node node)
-  (assert doc doc)
-  (let* ((elems-stack (model:doc-elems-stack doc))
+  (check-type child-node node)
+  (check-type doc doc)
+  (let* ((elems-stack (doc-elems-stack doc))
          (cur-elem (car elems-stack)))
     (when cur-elem (%add-child-node-to-elem child-node cur-elem))))
 
@@ -112,22 +117,45 @@ then returns it as a STRING joining components by this delimiter"
              :value value
              :specified specified))
 
+(defun get-attr-namespace-uri (attr)
+  (check-type attr attr)
+  (attr-namespace-uri attr))
+
+(defun get-attr-local-name (attr)
+  (check-type attr attr)
+  (attr-local-name attr))
+
+(defun get-attr-qname (attr)
+  (check-type attr attr)
+  (attr-qname attr))
+
+(defun get-attr-value (attr)
+  (check-type attr attr)
+  (attr-value attr))
+
+(defun get-attr-specified (attr)
+  (check-type attr attr)
+  (attr-specified attr))
 
 
-(defstruct (text (:include node))
-  (open-by "")
-  (close-by "")
+
+(defstruct (text (:include node
+                  (open-by "")
+                  (close-by "")))
   (content "" :type string))
 
 (defun create-text (content)
   (assert (non-empty-string-p content))
   (make-text :content content))
 
+(defun get-text-content (text)
+  (check-type text text)
+  (text-content text))
 
 
-(defstruct (pinstr (:include node))
-  (open-by "<?")
-  (close-by "?>")
+(defstruct (pinstr (:include node
+                    (open-by "<?")
+                    (close-by "?>")))
   (target "" :type string)
   (data nil :type (or null string)))
 
@@ -136,27 +164,42 @@ then returns it as a STRING joining components by this delimiter"
   (assert (or (null data) (non-empty-string-p data)))
   (make-pinstr :target target :data data))
 
+(defun get-pinstr-target (pinstr)
+  (check-type pinst pinstr)
+  (pinst-target pinstr))
+
+(defun get-pinstr-data (pinstr)
+  (check-type pinst pinstr)
+  (pinst-data pinstr))
 
 
-(defstruct (cdata (:include node))
-  (open-by "<![CDATA[")
-  (close-by "]]>")
+
+(defstruct (cdata (:include node
+                   (open-by "<![CDATA[")
+                   (close-by "]]>")))
   (content "" :type string))
 
 (defun create-cdata (content)
   (assert (non-empty-string-p content))
   (make-cdata :content content))
 
+(defun get-cdata-content (cdata)
+  (check-type cdata cdata)
+  (cdata-content cdata))
 
 
-(defstruct (comment (:include node))
-  (open-by "<!--")
-  (close-by "-->")
+(defstruct (comment (:include node
+                     (open-by "<!--")
+                     (close-by "-->")))
   (content "" :type string))
 
 (defun create-comment (content)
   (assert (non-empty-string-p content))
   (make-comment :content content))
+
+(defun get-comment-content (comment)
+  (check-type comment comment)
+  (comment-content comment))
 
 
 
@@ -203,7 +246,7 @@ then returns it as a STRING joining components by this delimiter"
              :attributes attributes
              :children children))
 
-(defun elem-children-num (elem)
+(defun get-elem-children-num (elem)
   (check-type elem elem)
   (length (elem-children elem)))
 
@@ -214,7 +257,7 @@ then returns it as a STRING joining components by this delimiter"
                            (elem-children elem)))
         (do-p      (dolist (child (elem-children elem))
                      (funcall do child)))
-        (t (error "Pass either :COLLECT or :DO")))))
+        (t (error "Pass either :COLLECT or :DO"))))
 
 (defun %numerate-elem-children (elem)
   "Refreshes NODE-IDX field of ....."
@@ -241,7 +284,7 @@ then returns it as a STRING joining components by this delimiter"
                       (child-id (calc-child-id child)))
                  (when (> (cdr (assoc child-id counters :test #'equal)) 1)
                    (set-node-idx child child-num)))))
-      (over-elem-children elem :do defer-child-update)
+      (over-elem-children elem :do #'defer-child-update)
       (dolist (deferred-update (reverse deferred-updates))
         (execute-deferred-update deferred-update))
       ;;(format t "         !!!!! AFTER: ~A~%" (mapcar #'node-idx (elem-children elem)))
@@ -251,21 +294,39 @@ then returns it as a STRING joining components by this delimiter"
   "Pushes ELEM to ELEMS-STACK making it the current element"
   (check-type elem elem)
   (check-type doc doc)
-    (push elem (model:doc-elems-stack doc)))
+    (push elem (doc-elems-stack doc)))
 
 (defun exit-from-elem (doc)
   "Pops (like Linux popd(1) command) current ELEM from the stack of XML elements"
-  (symbol-macrolet ((elems-stack (model:doc-elems-stack doc)))
+  (symbol-macrolet ((elems-stack (doc-elems-stack doc)))
     (when (cdr elems-stack)
       (pop elems-stack))))
 
-(defun get-elem-decl-name (elem-decl)
-  (check-type elem-decl elem-decl)
-  (elem-decl-name elem-decl))
+(defun get-elem-namespace-uri (elem)
+  (check-type elem elem)
+  (elem-namespace-uri elem))
 
-(defun get-elem-decl-model (elem-decl)
-  (check-type elem-decl elem-decl)
-  (elem-decl-model elem-decl))
+(defun get-elem-local-name (elem)
+  (check-type elem elem)
+  (elem-local-name elem))
+
+(defun get-elem-qname (elem)
+  (check-type elem elem)
+  (elem-qname elem))
+
+(defun get-elem-prefix-mappings (elem)
+  (check-type elem elem)
+  (elem-prefix-mappings elem))
+
+(defun get-elem-attributes (elem)
+  (check-type elem elem)
+  (elem-attributes elem))
+
+(defun get-elem-children (elem)
+  (check-type elem elem)
+  (elem-children elem))
+
+
 
 
 (defstruct doctype
@@ -297,6 +358,15 @@ then returns it as a STRING joining components by this delimiter"
   (assert (non-empty-string-p name))
   (assert (non-empty-string-p model))
   (make-elem-decl :name name :model model))
+
+(defun get-elem-decl-name (elem-decl)
+  (check-type elem-decl elem-decl)
+  (elem-decl-name elem-decl))
+
+(defun get-elem-decl-model (elem-decl)
+  (check-type elem-decl elem-decl)
+  (elem-decl-model elem-decl))
+
 
 
 
@@ -395,7 +465,7 @@ then returns it as a STRING joining components by this delimiter"
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
-  (make-int-ent-decl :kind kind :name name :public-id public-id :system-id system-id))
+  (make-ext-ent-decl :kind kind :name name :public-id public-id :system-id system-id))
 
 (defun get-ext-ent-decl-kind (ext-ent-decl)
   (check-type ext-ent-decl ext-ent-decl)
@@ -510,7 +580,7 @@ then returns it as a STRING joining components by this delimiter"
 (defun get-doc-root (doc)
   "The root of XML document"
   (check-type doc doc)
-  (let ((root (car (model:doc-elems-stack doc))))
+  (let ((root (car (doc-elems-stack doc))))
     (check-type root (or null elem))
     root))
 

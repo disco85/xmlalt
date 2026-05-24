@@ -36,7 +36,7 @@
   (declare (ignore doc dtd))
   (typecase item
     (model:attr-decl
-     (with-truly element-name (model:get-attr-decl-element-name item)
+     (with-truly element-name (model:get-attr-decl-elem-name item)
        (format stream ".DTD.ATTR.EL.NAME ~A~%" element-name))
      (with-truly attribute-name (model:get-attr-decl-attr-name item)
        (format stream ".DTD.ATTR.ATTR.NAME ~A~%" attribute-name))
@@ -121,7 +121,7 @@
   "Serializes XML node"
   (typecase node
     (model:elem
-     (format stream ".EL ~A ~A~%" (model:get-elem-children-num node) (model:node-dir node))
+     (format stream ".EL ~A ~A~%" (model:get-elem-children-num node) (model:calc-node-dir node))
      (with-truly namespace-uri (model:get-elem-namespace-uri node)
        (format stream ".EL.NS ~A~%" namespace-uri))
      (with-truly local-name (model:get-elem-local-name node)
@@ -152,5 +152,5 @@
     (model:pinstr
      (with-truly target (model:get-pinstr-target node)
        (format stream ".PI.TARG ~A~%" target))
-     (with-truly content (model:get-pinstr-content node)
+     (with-truly content (model:get-pinstr-data node)
        (format stream ".PI~%~A~%.PIE~%" content)))))
