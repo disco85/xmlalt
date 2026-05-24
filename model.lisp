@@ -104,18 +104,29 @@
   (elems-stack nil :type list))
 
 
-;; TODO move these 2 funcs to utils
+;; TODO move these funcs to utils:
+
 (defun non-empty-string-p (s)
   (and (stringp s) (string/= s "")))
-
 
 
 (defun empty-string-to-nil (s)
   (check-type s string)
   (if (string= s "") nil s))
 
+(defun try-as-string (s)
+  (typecase s
+    (null s)
+    (string s)
+    (keyword (symbol-name s))
+    (t (format nil "~A" s))))
 
-
+(defun try-as-uri (s)
+  (typecase s
+    (null s)
+    (string (create-uri s))
+    (uri s)
+    (t (error (format nil "Invalid value for TRY-AS-URI (type ~A): ~A" s (type-of s))))))
 
 (defun create-uri (uri-value)
   (assert (non-empty-string-p uri-value))
@@ -200,7 +211,7 @@ then returns it as a STRING joining components by this delimiter"
   (assert (or (null local-name) (non-empty-string-p local-name)))
   (assert (or (null qname) (non-empty-string-p qname)))
   (assert (or local-name-p qname-p))
-  (make-attr :namespace-uri namespace-uri
+  (make-attr :namespace-uri (when namespace-uri (create-uri namespace-uri))
              :local-name local-name
              :qname qname
              :value value
@@ -305,7 +316,7 @@ then returns it as a STRING joining components by this delimiter"
   (assert (or (null local-name) (non-empty-string-p local-name)))
   (assert (or (null qname) (non-empty-string-p qname)))
   (assert (or local-name-p qname-p))
-  (make-elem :namespace-uri namespace-uri
+  (make-elem :namespace-uri (try-as-uri namespace-uri)
              :local-name local-name
              :qname qname
              :prefix-mappings prefix-mappings
@@ -410,8 +421,10 @@ then returns it as a STRING joining components by this delimiter"
 
 (defun create-elem-decl (&key name model)
   (assert (non-empty-string-p name))
-  (assert (non-empty-string-p model))
-  (make-elem-decl :name name :model model))
+  (assert (or (consp model)
+              (keywordp model)
+              (non-empty-string-p model)))
+  (make-elem-decl :name name :model (try-as-string model)))
 
 (defun get-elem-decl-name (elem-decl)
   (check-type elem-decl elem-decl)
@@ -426,9 +439,14 @@ then returns it as a STRING joining components by this delimiter"
 (defun create-attr-decl (&key elem-name attr-name type default)
   (assert (non-empty-string-p elem-name))
   (assert (non-empty-string-p attr-name))
-  (assert (non-empty-string-p type))
-  (assert (non-empty-string-p default))
-  (make-attr-decl :elem-name elem-name :attr-name attr-name :type type :default default))
+  (assert (or (keywordp type)
+              (non-empty-string-p type)))
+  (assert (or (keywordp default)
+              (non-empty-string-p default)))
+  (make-attr-decl :elem-name elem-name
+                  :attr-name attr-name
+                  :type (try-as-string type)
+                  :default (try-as-string default)))
 
 (defun get-attr-decl-elem-name (attr-decl)
   (check-type attr-decl attr-decl)
@@ -468,10 +486,11 @@ then returns it as a STRING joining components by this delimiter"
 
 
 (defun create-int-ent-decl (&key kind name value)
-  (assert (non-empty-string-p kind))
+  (assert (or (keywordp kind)
+              (non-empty-string-p kind)))
   (assert (non-empty-string-p name))
   (assert (non-empty-string-p value))
-  (make-int-ent-decl :kind kind :name name :value value))
+  (make-int-ent-decl :kind (try-as-string kind) :name name :value value))
 
 (defun get-int-ent-decl-kind (int-ent-decl)
   (check-type int-ent-decl int-ent-decl)
@@ -488,12 +507,13 @@ then returns it as a STRING joining components by this delimiter"
 
 
 (defun create-ext-ent-decl (&key kind name (public-id nil public-id-p) (system-id nil system-id-p))
-  (assert (non-empty-string-p kind))
+  (assert (or (keywordp kind)
+              (non-empty-string-p kind)))
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
-  (make-ext-ent-decl :kind kind :name name :public-id public-id :system-id system-id))
+  (make-ext-ent-decl :kind (try-as-string kind) :name name :public-id public-id :system-id system-id))
 
 (defun get-ext-ent-decl-kind (ext-ent-decl)
   (check-type ext-ent-decl ext-ent-decl)
