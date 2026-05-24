@@ -1,5 +1,7 @@
 (in-package :cmdfmt)
 
+(defparameter *dir-delim* "/")
+
 
 (defun serialize (doc stream)
   "Serializes MODEL:DOC object"
@@ -121,7 +123,9 @@
   "Serializes XML node"
   (typecase node
     (model:elem
-     (format stream ".EL ~A ~A~%" (model:get-elem-children-num node) (model:calc-node-dir node))
+     (format stream ".EL ~A ~A~%"
+             (model:get-elem-children-num node)
+             (model:calc-node-dir node :join-by *dir-delim*))
      (with-truly namespace-uri (model:get-elem-namespace-uri node)
        (format stream ".EL.NS ~A~%" namespace-uri))
      (with-truly local-name (model:get-elem-local-name node)
@@ -135,7 +139,8 @@
      (with-truly children (model:get-elem-children node)
        (dolist (child children)
          (serialize-nodes doc child stream)))
-     (format stream ".ELE ~A~%" (model:calc-node-dir node)))
+     (format stream ".ELE ~A~%"
+             (model:calc-node-dir node :join-by *dir-delim*)))
 
     (model:text
      (with-truly content (model:get-text-content node)

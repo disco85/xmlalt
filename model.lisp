@@ -153,7 +153,9 @@
 (defun calc-node-dir (node &key with-idx non-elem-name join-by)
   "Collects DIR of a NODE (adding IDX, if WITH-IDX is T) of every ELEM en route and
 returns the result as a list of strings. But if JOIN-BY was passed as some STRING,
-then returns it as a STRING joining components by this delimiter"
+then returns it as a STRING joining components by this delimiter. Non ELEM components
+are handled by optional NON-ELEM-NAME that must return a string for such one - without
+it such dir component will be skipped"
   (check-type node node)
   (check-type join-by (or null string))
   (labels ((prep-idx (n)
