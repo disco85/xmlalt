@@ -20,6 +20,9 @@
   (assert (non-empty-string-p uri-value))
   (make-uri :value uri-value))
 
+(defun write-uri (uri &optional stream)
+  (check-type uri uri)
+  (format stream "~A" uri))
 
 
 (defstruct node
@@ -168,6 +171,15 @@ then returns it as a STRING joining components by this delimiter"
         (append new-pairs
                 (prefix-mappings-items prefix-mappings))))
 
+(defun over-prefix-mappings (prefix-mappings &key (collect nil collect-p) (do nil do-p))
+  (check-type prefix-mappings prefix-mappings)
+  (assert (not (and collect-p do-p)))
+  (cond (collect-p (mapcar collect
+                           (prefix-mappings-items prefix-mappings)))
+        (do-p      (dolist (pm (prefix-mappings-items prefix-mappings))
+                     (funcall do pm)))
+        (t (error "Pass either :COLLECT or :DO"))))
+
 
 
 (defstruct (elem (:include node))
@@ -202,7 +214,7 @@ then returns it as a STRING joining components by this delimiter"
                            (elem-children elem)))
         (do-p      (dolist (child (elem-children elem))
                      (funcall do child)))
-        (t (error "Pass either :collect or :do")))))
+        (t (error "Pass either :COLLECT or :DO")))))
 
 (defun %numerate-elem-children (elem)
   "Refreshes NODE-IDX field of ....."
@@ -247,6 +259,13 @@ then returns it as a STRING joining components by this delimiter"
     (when (cdr elems-stack)
       (pop elems-stack))))
 
+(defun get-elem-decl-name (elem-decl)
+  (check-type elem-decl elem-decl)
+  (elem-decl-name elem-decl))
+
+(defun get-elem-decl-model (elem-decl)
+  (check-type elem-decl elem-decl)
+  (elem-decl-model elem-decl))
 
 
 (defstruct doctype
@@ -294,6 +313,23 @@ then returns it as a STRING joining components by this delimiter"
   (assert (non-empty-string-p default))
   (make-attr-decl :elem-name elem-name :attr-name attr-name :type type :default default))
 
+(defun get-attr-decl-elem-name (attr-decl)
+  (check-type attr-decl attr-decl)
+  (attr-decl-elem-name attr-decl))
+
+(defun get-attr-decl-attr-name (attr-decl)
+  (check-type attr-decl attr-decl)
+  (attr-decl-attr-name attr-decl))
+
+(defun get-attr-decl-type (attr-decl)
+  (check-type attr-decl attr-decl)
+  (attr-decl-type attr-decl))
+
+(defun get-attr-decl-default (attr-decl)
+  (check-type attr-decl attr-decl)
+  (attr-decl-default attr-decl))
+
+
 
 
 (defstruct (nota-decl (:include dtd-item))
@@ -308,6 +344,18 @@ then returns it as a STRING joining components by this delimiter"
   (assert (or public-id-p system-id-p))
   (make-nota-decl :name name :public-id public-id :system-id system-id))
 
+(defun get-nota-decl-name (nota-decl)
+  (check-type nota-decl nota-decl)
+  (nota-decl-name nota-decl))
+
+(defun get-nota-decl-public-id (nota-decl)
+  (check-type nota-decl nota-decl)
+  (nota-decl-public-id nota-decl))
+
+(defun get-nota-decl-system-id (nota-decl)
+  (check-type nota-decl nota-decl)
+  (nota-decl-system-id nota-decl))
+
 
 
 (defstruct (int-ent-decl (:include dtd-item))
@@ -320,6 +368,18 @@ then returns it as a STRING joining components by this delimiter"
   (assert (non-empty-string-p name))
   (assert (non-empty-string-p value))
   (make-int-ent-decl :kind kind :name name :value value))
+
+(defun get-int-ent-decl-kind (int-ent-decl)
+  (check-type int-ent-decl int-ent-decl)
+  (int-ent-decl-kind int-ent-decl))
+
+(defun get-int-ent-decl-name (int-ent-decl)
+  (check-type int-ent-decl int-ent-decl)
+  (int-ent-decl-name int-ent-decl))
+
+(defun get-int-ent-decl-value (int-ent-decl)
+  (check-type int-ent-decl int-ent-decl)
+  (int-ent-decl-value int-ent-decl))
 
 
 
@@ -337,6 +397,22 @@ then returns it as a STRING joining components by this delimiter"
   (assert (or public-id-p system-id-p))
   (make-int-ent-decl :kind kind :name name :public-id public-id :system-id system-id))
 
+(defun get-ext-ent-decl-kind (ext-ent-decl)
+  (check-type ext-ent-decl ext-ent-decl)
+  (ext-ent-decl-kind ext-ent-decl))
+
+(defun get-ext-ent-decl-name (ext-ent-decl)
+  (check-type ext-ent-decl ext-ent-decl)
+  (ext-ent-decl-name ext-ent-decl))
+
+(defun get-ext-ent-decl-public-id (ext-ent-decl)
+  (check-type ext-ent-decl ext-ent-decl)
+  (ext-ent-decl-public-id ext-ent-decl))
+
+(defun get-ext-ent-decl-system-id (ext-ent-decl)
+  (check-type ext-ent-decl ext-ent-decl)
+  (ext-ent-decl-system-id ext-ent-decl))
+
 
 
 (defstruct (unp-ent-decl (:include dtd-item))
@@ -353,6 +429,23 @@ then returns it as a STRING joining components by this delimiter"
   (assert (non-empty-string-p nota-name))
   (make-unp-ent-decl :name name :public-id public-id :system-id system-id :nota-name nota-name))
 
+(defun get-unp-ent-decl-name (unp-ent-decl)
+  (check-type unp-ent-decl unp-ent-decl)
+  (unp-ent-decl-name unp-ent-decl))
+
+(defun get-unp-ent-decl-public-id (unp-ent-decl)
+  (check-type unp-ent-decl unp-ent-decl)
+  (unp-ent-decl-public-id unp-ent-decl))
+
+(defun get-unp-ent-decl-system-id (unp-ent-decl)
+  (check-type unp-ent-decl unp-ent-decl)
+  (unp-ent-decl-system-id unp-ent-decl))
+
+(defun get-unp-ent-decl-nota-name (unp-ent-decl)
+  (check-type unp-ent-decl unp-ent-decl)
+  (unp-ent-decl-nota-name unp-ent-decl))
+
+
 
 
 (defstruct (unp-int-subs (:include dtd-item))
@@ -362,6 +455,9 @@ then returns it as a STRING joining components by this delimiter"
   (assert (non-empty-string-p content))
   (make-unp-int-subs :content content))
 
+(defun get-unp-int-subs-content (unp-int-subs)
+  (check-type unp-int-subs unp-int-subs)
+  (unp-int-subs-content unp-int-subs))
 
 
 (defstruct dtd
@@ -383,6 +479,22 @@ then returns it as a STRING joining components by this delimiter"
   (check-type item dtd-item)
   (pushf item (dtd-items dtd)))
 
+(defun get-dtd-items (dtd)
+  (check-type dtd dtd)
+  (dtd-items dtd))
+
+(defun get-dtd-name (dtd)
+  (check-type dtd dtd)
+  (dtd-name dtd))
+
+(defun get-dtd-public-id (dtd)
+  (check-type dtd dtd)
+  (dtd-public-id dtd))
+
+(defun get-dtd-system-id (dtd)
+  (check-type dtd dtd)
+  (dtd-system-id dtd))
+
 
 
 (defstruct doc
@@ -394,6 +506,17 @@ then returns it as a STRING joining components by this delimiter"
   (check-type doc doc)
   (check-type dtd dtd)
   (setf (doc-dtd doc) dtd))
+
+(defun get-doc-root (doc)
+  "The root of XML document"
+  (check-type doc doc)
+  (let ((root (car (model:doc-elems-stack doc))))
+    (check-type root (or null elem))
+    root))
+
+(defun get-doc-dtd (doc)
+  (check-type doc doc)
+  (doc-dtd doc))
 
 ;; (defclass uri ()
 ;;   ((value :type string
