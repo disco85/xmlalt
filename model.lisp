@@ -414,7 +414,8 @@ integer IDX to STRING"
 
 
 (defun over-elem-children (elem
-                           &key (collect nil collect-p)
+                           &key
+                             (collect nil collect-p)
                              (do nil do-p))
   (check-type elem elem)
   (assert (not (and collect-p do-p)))
@@ -595,7 +596,8 @@ integer IDX to STRING"
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-nota-decl (&key name
+(defun create-nota-decl (&key
+                           name
                            (public-id nil public-id-p)
                            (system-id nil system-id-p))
   (assert (non-empty-string-p name))
@@ -659,7 +661,9 @@ integer IDX to STRING"
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-ext-ent-decl (&key kind name
+(defun create-ext-ent-decl (&key
+                              kind
+                              name
                               (public-id nil public-id-p)
                               (system-id nil system-id-p))
   (assert (or (keywordp kind)
@@ -700,7 +704,8 @@ integer IDX to STRING"
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-unp-ent-decl (&key name
+(defun create-unp-ent-decl (&key
+                              name
                               (public-id nil public-id-p)
                               (system-id nil system-id-p) nota-name)
   (assert (non-empty-string-p name))
@@ -756,7 +761,9 @@ integer IDX to STRING"
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-dtd (&key items name
+(defun create-dtd (&key
+                     items
+                     name
                      (public-id nil public-id-p)
                      (system-id nil system-id-p))
   (assert (every (lambda (it) (dtd-item-p it)) items))

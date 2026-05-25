@@ -1,3 +1,7 @@
+;; TODO fix <..> escaping
+;; TODO CLI
+;; TODO load of cmdfmt, regfmt
+
 (asdf:defsystem #:xmlalt
   :description "Reconstruct directory tree"
   :author "John Doe"
