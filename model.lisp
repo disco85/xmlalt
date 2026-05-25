@@ -134,7 +134,7 @@
 
 (defun write-uri (uri &optional stream)
   (check-type uri uri)
-  (format stream "~A" uri))
+  (format stream "~A" (uri-value uri)))
 
 
 
@@ -335,8 +335,8 @@ it such dir component will be skipped"
   (assert (not (and collect-p do-p)))
   (cond (collect-p (mapcar collect
                            (elem-children elem)))
-        (do-p      (dolist (child (elem-children elem))
-                     (funcall do child)))
+        (do-p (dolist (child (elem-children elem))
+                (funcall do child)))
         (t (error "Pass either :COLLECT or :DO"))))
 
 (defun %numerate-elem-children (elem)

@@ -105,7 +105,7 @@
     (with-truly value (model:get-attr-value attribute)
       (format stream " ~A" value))
     (with-truly namespace-uri (model:get-attr-namespace-uri attribute)
-      (format stream " ~A" namespace-uri))
+      (format stream " ~A" (model:write-uri namespace-uri)))
     (format stream " ~A~%" (model:get-attr-specified attribute))))
 
 
@@ -127,7 +127,7 @@
              (model:get-elem-children-num node)
              (model:calc-node-dir node :join-by *dir-delim*))
      (with-truly namespace-uri (model:get-elem-namespace-uri node)
-       (format stream ".EL.NS ~A~%" namespace-uri))
+       (format stream ".EL.NS ~A~%" (model:write-uri namespace-uri)))
      (with-truly local-name (model:get-elem-local-name node)
        (format stream ".EL.LOC.NAME ~A~%" local-name))
      (with-truly qname (model:get-elem-qname node)
