@@ -3,7 +3,10 @@
   (:export #:call-with-input-stream
            #:whitespace-char-p
            #:with-truly
-           #:subs))
+           #:subs
+           #:non-empty-string-p
+           #:empty-string-to-nil
+           #:try-as-string))
 
 (defpackage #:xmlalt
   (:use #:cl #:utils)

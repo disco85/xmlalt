@@ -53,3 +53,20 @@ is replaced with REPLACEMENT"
                            :end (or pos (length string)))
           when pos do (write-string replacement out)
           while pos)))
+
+
+(defun non-empty-string-p (s)
+  (and (stringp s) (string/= s "")))
+
+
+(defun empty-string-to-nil (s)
+  (check-type s string)
+  (if (string= s "") nil s))
+
+
+(defun try-as-string (s)
+  (typecase s
+    (null s)
+    (string s)
+    (keyword (symbol-name s))
+    (t (format nil "~A" s))))

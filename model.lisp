@@ -1,6 +1,11 @@
 (in-package :model)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Structures ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Structures
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defstruct uri
   (value "" :type string))
@@ -125,25 +130,11 @@
   (elems-stack nil :type list))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO move these funcs to utils:
-
-(defun non-empty-string-p (s)
-  (and (stringp s) (string/= s "")))
-
-
-(defun empty-string-to-nil (s)
-  (check-type s string)
-  (if (string= s "") nil s))
-
-
-(defun try-as-string (s)
-  (typecase s
-    (null s)
-    (string s)
-    (keyword (symbol-name s))
-    (t (format nil "~A" s))))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun try-as-uri (s)
   (typecase s
@@ -163,7 +154,11 @@
   (format stream "~A" (uri-value uri)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NODE API ;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; NODE API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-node (&key idx parent)
   (make-node :idx idx :parent parent))
@@ -205,11 +200,13 @@ it such dir component will be skipped"
                (null dir)
                (elem (collect-dir (node-parent n)
                                   (cons-idx-if n
-                                               (cons (elem-local-name n) dir))))
+                                               (cons (elem-local-name n)
+                                                     dir))))
                (node (if non-elem-name
                          (collect-dir (node-parent n)
                                       (cons-idx-if n
-                                                   (cons (funcall non-elem-name n) dir)))
+                                                   (cons (funcall non-elem-name n)
+                                                         dir)))
                          (collect-dir (node-parent n) dir)))
                (t dir))))
     (let* ((dir0 (collect-dir node nil))
@@ -239,14 +236,23 @@ it such dir component will be skipped"
     (when cur-elem (%add-child-node-to-elem child-node cur-elem))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ATTR API ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; ATTR API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-attr (&key namespace-uri (local-name nil local-name-p) (qname nil qname-p) value specified)
+(defun create-attr (&key namespace-uri
+                      (local-name nil local-name-p)
+                      (qname nil qname-p)
+                      value
+                      specified)
   (assert (or (null namespace-uri) (non-empty-string-p namespace-uri)))
   (assert (or (null local-name) (non-empty-string-p local-name)))
   (assert (or (null qname) (non-empty-string-p qname)))
   (assert (or local-name-p qname-p))
-  (make-attr :namespace-uri (when namespace-uri (create-uri namespace-uri))
+  (make-attr :namespace-uri (when namespace-uri
+                              (create-uri namespace-uri))
              :local-name local-name
              :qname qname
              :value value
@@ -277,7 +283,12 @@ it such dir component will be skipped"
   (check-type attr attr)
   (attr-specified attr))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TEXT API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; TEXT API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-text (content)
   (assert (non-empty-string-p content))
@@ -288,12 +299,17 @@ it such dir component will be skipped"
   (check-type text text)
   (text-content text))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; PINSTR API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; PINSTR API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-pinstr (&key target data)
   (assert (non-empty-string-p target))
-  (assert (or (null data) (non-empty-string-p data)))
+  (assert (or (null data)
+              (non-empty-string-p data)))
   (make-pinstr :target target :data data))
 
 
@@ -306,7 +322,12 @@ it such dir component will be skipped"
   (check-type pinstr pinstr)
   (pinstr-data pinstr))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CDATA API ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; CDATA API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-cdata (content)
   (assert (non-empty-string-p content))
@@ -318,7 +339,11 @@ it such dir component will be skipped"
   (cdata-content cdata))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; COMMENT API ;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; COMMENT API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-comment (content)
   (assert (non-empty-string-p content))
@@ -330,7 +355,11 @@ it such dir component will be skipped"
   (comment-content comment))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; PREFIX MAPPINGS API ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; PREFIX MAPPINGS API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-prefix-mappings (&optional items)
   (make-prefix-mappings :items items))
@@ -342,7 +371,8 @@ it such dir component will be skipped"
                 (prefix-mappings-items prefix-mappings))))
 
 
-(defun over-prefix-mappings (prefix-mappings &key (collect nil collect-p) (do nil do-p))
+(defun over-prefix-mappings (prefix-mappings
+                             &key (collect nil collect-p) (do nil do-p))
   (check-type prefix-mappings prefix-mappings)
   (assert (not (and collect-p do-p)))
   (cond (collect-p (mapcar collect
@@ -352,13 +382,24 @@ it such dir component will be skipped"
         (t (error "Pass either :COLLECT or :DO"))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ELEM API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; ELEM API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-elem (&key namespace-uri (local-name nil local-name-p) (qname nil qname-p)
-                      prefix-mappings attributes children)
-  (assert (or (null namespace-uri) (non-empty-string-p namespace-uri)))
-  (assert (or (null local-name) (non-empty-string-p local-name)))
-  (assert (or (null qname) (non-empty-string-p qname)))
+(defun create-elem (&key namespace-uri
+                      (local-name nil local-name-p)
+                      (qname nil qname-p)
+                      prefix-mappings
+                      attributes
+                      children)
+  (assert (or (null namespace-uri)
+              (non-empty-string-p namespace-uri)))
+  (assert (or (null local-name)
+              (non-empty-string-p local-name)))
+  (assert (or (null qname)
+              (non-empty-string-p qname)))
   (assert (or local-name-p qname-p))
   (make-elem :namespace-uri (try-as-uri namespace-uri)
              :local-name local-name
@@ -373,7 +414,9 @@ it such dir component will be skipped"
   (length (elem-children elem)))
 
 
-(defun over-elem-children (elem &key (collect nil collect-p) (do nil do-p))
+(defun over-elem-children (elem
+                           &key (collect nil collect-p)
+                             (do nil do-p))
   (check-type elem elem)
   (assert (not (and collect-p do-p)))
   (cond (collect-p (mapcar collect
@@ -389,15 +432,14 @@ it such dir component will be skipped"
   (let ((counters nil)
         (deferred-updates nil))
     (labels ((calc-child-id (child)
-               (format nil "~A--~A" (type-of child) (calc-node-dir child :join-by "")))
+               (format nil "~A--~A"
+                       (type-of child)
+                       (calc-node-dir child :join-by "")))
              (defer-child-update (child)
                (when (typep child 'node)
                  (let* ((child-id (calc-child-id child))
                         (child-counter (assoc child-id counters :test #'equal))
                         (child-num (or (cdr child-counter) 0)))
-                   ;; (format t "!!!!!!!!!!!!!!!!!!!!! ~A  ~A (~A): ~A~%"
-                   ;;         (type-of child) (node-dir child) child-id child-num)
-                   ;; (setf (node-idx child) child-num)
                    (push (cons child child-num) deferred-updates)
                    (if child-counter
                        (incf (cdr child-counter))
@@ -411,7 +453,6 @@ it such dir component will be skipped"
       (over-elem-children elem :do #'defer-child-update)
       (dolist (deferred-update (reverse deferred-updates))
         (execute-deferred-update deferred-update))
-      ;;(format t "         !!!!! AFTER: ~A~%" (mapcar #'node-idx (elem-children elem)))
       )))
 
 
@@ -458,29 +499,42 @@ it such dir component will be skipped"
   (check-type elem elem)
   (elem-children elem))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; DOCTYPE API ;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; DOCTYPE API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-doctype (content)
   (assert (non-empty-string-p content))
   (make-doctype :content content))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; XML DECL API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; XML DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-xml-decl (content)
   (assert (non-empty-string-p content))
   (make-xml-decl :content content))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ELEM DECL API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; ELEM DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-elem-decl (&key name model)
   (assert (non-empty-string-p name))
   (assert (or (consp model)
               (keywordp model)
               (non-empty-string-p model)))
-  (make-elem-decl :name name :model (try-as-string model)))
+  (make-elem-decl :name name
+                  :model (try-as-string model)))
 
 
 (defun get-elem-decl-name (elem-decl)
@@ -492,7 +546,12 @@ it such dir component will be skipped"
   (check-type elem-decl elem-decl)
   (elem-decl-model elem-decl))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ATTR DECL API ;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; ATTR DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-attr-decl (&key elem-name attr-name type default)
   (assert (non-empty-string-p elem-name))
@@ -526,14 +585,23 @@ it such dir component will be skipped"
   (check-type attr-decl attr-decl)
   (attr-decl-default attr-decl))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NOTA DECL API ;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-nota-decl (&key name (public-id nil public-id-p) (system-id nil system-id-p))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; NOTA DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun create-nota-decl (&key name
+                           (public-id nil public-id-p)
+                           (system-id nil system-id-p))
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
-  (make-nota-decl :name name :public-id public-id :system-id system-id))
+  (make-nota-decl :name name
+                  :public-id public-id
+                  :system-id system-id))
 
 
 (defun get-nota-decl-name (nota-decl)
@@ -550,14 +618,21 @@ it such dir component will be skipped"
   (check-type nota-decl nota-decl)
   (nota-decl-system-id nota-decl))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INT ENT DECL API ;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; INT ENT DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-int-ent-decl (&key kind name value)
   (assert (or (keywordp kind)
               (non-empty-string-p kind)))
   (assert (non-empty-string-p name))
   (assert (non-empty-string-p value))
-  (make-int-ent-decl :kind (try-as-string kind) :name name :value value))
+  (make-int-ent-decl :kind (try-as-string kind)
+                     :name name
+                     :value value))
 
 
 (defun get-int-ent-decl-kind (int-ent-decl)
@@ -574,16 +649,26 @@ it such dir component will be skipped"
   (check-type int-ent-decl int-ent-decl)
   (int-ent-decl-value int-ent-decl))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EXT ENT DECL API ;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-ext-ent-decl (&key kind name (public-id nil public-id-p) (system-id nil system-id-p))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; EXT ENT DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun create-ext-ent-decl (&key kind name
+                              (public-id nil public-id-p)
+                              (system-id nil system-id-p))
   (assert (or (keywordp kind)
               (non-empty-string-p kind)))
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
-  (make-ext-ent-decl :kind (try-as-string kind) :name name :public-id public-id :system-id system-id))
+  (make-ext-ent-decl :kind (try-as-string kind)
+                     :name name
+                     :public-id public-id
+                     :system-id system-id))
 
 
 (defun get-ext-ent-decl-kind (ext-ent-decl)
@@ -605,15 +690,25 @@ it such dir component will be skipped"
   (check-type ext-ent-decl ext-ent-decl)
   (ext-ent-decl-system-id ext-ent-decl))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; UNP ENT DECL ;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-unp-ent-decl (&key name (public-id nil public-id-p) (system-id nil system-id-p) nota-name)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; UNP ENT DECL API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun create-unp-ent-decl (&key name
+                              (public-id nil public-id-p)
+                              (system-id nil system-id-p) nota-name)
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
   (assert (non-empty-string-p nota-name))
-  (make-unp-ent-decl :name name :public-id public-id :system-id system-id :nota-name nota-name))
+  (make-unp-ent-decl :name name
+                     :public-id public-id
+                     :system-id system-id
+                     :nota-name nota-name))
 
 
 (defun get-unp-ent-decl-name (unp-ent-decl)
@@ -635,7 +730,12 @@ it such dir component will be skipped"
   (check-type unp-ent-decl unp-ent-decl)
   (unp-ent-decl-nota-name unp-ent-decl))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; UNP INT SUBS API ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; UNP INT SUBS API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-unp-int-subs (content)
   (assert (non-empty-string-p content))
@@ -646,15 +746,25 @@ it such dir component will be skipped"
   (check-type unp-int-subs unp-int-subs)
   (unp-int-subs-content unp-int-subs))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; DTD API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun create-dtd (&key items name (public-id nil public-id-p) (system-id nil system-id-p))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; DTD API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun create-dtd (&key items name
+                     (public-id nil public-id-p)
+                     (system-id nil system-id-p))
   (assert (every (lambda (it) (dtd-item-p it)) items))
   (assert (non-empty-string-p name))
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
-  (make-dtd :items items :name name :public-id public-id :system-id system-id))
+  (make-dtd :items items
+            :name name
+            :public-id public-id
+            :system-id system-id))
 
 
 (defun add-dtd-item (dtd item)
@@ -682,7 +792,12 @@ it such dir component will be skipped"
   (check-type dtd dtd)
   (dtd-system-id dtd))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; DOC API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; DOC API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun create-doc ()
   (make-doc))
