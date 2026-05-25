@@ -1,5 +1,17 @@
 (in-package :regfmt)
-;; TODO maybe to unite multiple lines of some constructs to 1 line?
+;; Format
+;;   root::<0>::lib::<1>::book::<text> = Book2
+;;     |    |    |    |     |      |       `-- value/content/data
+;;     |    |    |    |     |      `---------- text node (pseudo element <text>)
+;;     |    |    |    |     `----------------- element <book>
+;;     |    |    |    `----------------------- the next is 1st item in 0-based array (2nd <book>)
+;;     |    |    `---------------------------- element <lib> (in contains <book> elements)
+;;     |    `--------------------------------- 0th item in array of <lib> elements (ie, 1st <lib>)
+;;     `-------------------------------------- top-level element <root>
+;;
+;;   root::@id = r1  Attribute id of element <root> with its value "r1"
+;;
+;;
 
 (defparameter *is* " = ")
 (defparameter *sep* "::")
@@ -160,20 +172,20 @@ to get similar to ~A but with escaping"
   (dolist (attribute attributes)
     (format stream *stdfmt*
             (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                  (node-idx-to-str node)
+                  ;;(node-idx-to-str node)
                   (concatenate 'string "@" (model:get-attr-qname attribute)))
             (model:get-attr-value attribute))
     (with-truly local-name (model:get-attr-local-name attribute)
       (format stream *stdfmt*
               (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                    (node-idx-to-str node)
+                    ;;(node-idx-to-str node)
                     (concatenate 'string "@" (model:get-attr-qname attribute))
                     "<local-name>")
               local-name))
     (with-truly namespace-uri (model:get-attr-namespace-uri attribute)
       (format stream *stdfmt*
               (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                    (node-idx-to-str node)
+                    ;;(node-idx-to-str node)
                     (concatenate 'string "@" (model:get-attr-qname attribute))
                     "<namespace-uri>")
               (model:write-uri namespace-uri)))))
@@ -186,7 +198,7 @@ to get similar to ~A but with escaping"
    :do (lambda (pair)
          (format stream *stdfmt*
                  (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                       (node-idx-to-str node)
+                       ;;(node-idx-to-str node)
                        "<prefix-mapping>"
                        (car pair))
                  (cdr pair)))))
@@ -203,7 +215,7 @@ to get similar to ~A but with escaping"
      (if (> (model:get-elem-children-num node) 0)
          (format stream *stdfmt*
                  (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                       (node-idx-to-str node)
+                       ;;(node-idx-to-str node)
                        "<children>")
                  (model:get-elem-children-num node)))
      ;; (with-truly local-name (model:elem-local-name node)
@@ -214,13 +226,13 @@ to get similar to ~A but with escaping"
      (with-truly namespace-uri (model:get-elem-namespace-uri node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                     (node-idx-to-str node)
+                     ;;(node-idx-to-str node)
                      "<namespace-uri>")
                (model:write-uri namespace-uri)))
      (with-truly qname (model:get-elem-qname node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                     (node-idx-to-str node)
+                     ;;(node-idx-to-str node)
                      "<qname>")
                qname))
      (with-truly prefix-mappings (model:get-elem-prefix-mappings node)
@@ -234,7 +246,7 @@ to get similar to ~A but with escaping"
      (with-truly content (model:get-text-content node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                     (node-idx-to-str node)
+                     ;;(node-idx-to-str node)
                      "<text>")
                content)))
 
@@ -242,7 +254,7 @@ to get similar to ~A but with escaping"
      (with-truly content (model:get-comment-content node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                     (node-idx-to-str node)
+                     ;;(node-idx-to-str node)
                      "<comment>")
                content)))
 
@@ -250,7 +262,7 @@ to get similar to ~A but with escaping"
      (with-truly content (model:get-cdata-content node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                     (node-idx-to-str node)
+                     ;;(node-idx-to-str node)
                      "<cdata>")
                content)))
 
@@ -258,7 +270,7 @@ to get similar to ~A but with escaping"
      (with-truly data (model:get-pinstr-data node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-                     (node-idx-to-str node)
+                     ;;(node-idx-to-str node)
                      "<processing-instruction>"
                      (model:get-pinstr-target node))
                data)))))
