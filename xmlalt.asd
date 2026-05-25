@@ -8,7 +8,6 @@
   :components ((:file "package")
                (:file "utils")
                (:file "model")
-               (:file "blkfmt")
                (:file "cmdfmt")
                (:file "mrkfmt")
                (:file "regfmt")

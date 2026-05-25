@@ -1,4 +1,3 @@
-(in-package :regfmt)
 ;; Format
 ;;   root::<0>::lib::<1>::book::<text> = Book2
 ;;     |    |    |    |     |      |       `-- value/content/data
@@ -12,6 +11,9 @@
 ;;   root::@id = r1  Attribute id of element <root> with its value "r1"
 ;;
 ;;
+
+
+(in-package :regfmt)
 
 (defparameter *is* " = ")
 (defparameter *sep* "::")

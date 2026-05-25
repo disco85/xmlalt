@@ -130,9 +130,6 @@
            #:get-doc-dtd
            ))
 
-(defpackage #:blkfmt
-  (:use #:cl #:utils))
-
 (defpackage #:cmdfmt
   (:use #:cl #:utils)
   (:export #:serialize))
