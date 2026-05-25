@@ -134,9 +134,6 @@
   (:use #:cl #:utils)
   (:export #:serialize))
 
-(defpackage #:mrkfmt
-  (:use #:cl #:utils))
-
 (defpackage #:regfmt
   (:use #:cl #:utils)
   (:export #:serialize

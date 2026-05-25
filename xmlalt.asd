@@ -9,7 +9,6 @@
                (:file "utils")
                (:file "model")
                (:file "cmdfmt")
-               (:file "mrkfmt")
                (:file "regfmt")
                (:file "xmlfmt")
                (:file "xmlalt"))
