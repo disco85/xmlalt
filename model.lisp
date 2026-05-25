@@ -197,7 +197,7 @@ it such dir component will be skipped"
            (collect-dir (n dir)
              "Recursively collects DIR from a node N to the top parent"
              (typecase n
-               (null dir)
+               (null (cdr dir))
                (elem (collect-dir (node-parent n)
                                   (cons-idx-if n
                                                (cons (elem-local-name n)
@@ -209,11 +209,10 @@ it such dir component will be skipped"
                                                          dir)))
                          (collect-dir (node-parent n) dir)))
                (t dir))))
-    (let* ((dir0 (collect-dir node nil))
-           (dir1 (reverse dir0)))
+    (let ((dir (collect-dir node nil)))
       (if join-by
-          (format nil (prep-join-fmt join-by) dir1)
-          dir1))))
+          (format nil (prep-join-fmt join-by) dir)
+          dir))))
 
 
 (defun %add-child-node-to-elem (child-node parent-elem)
