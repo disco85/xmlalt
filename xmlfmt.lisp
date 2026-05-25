@@ -9,7 +9,7 @@
 (defclass mysax (sax:abstract-handler)
   ((doc :type model:doc
         :documentation ""
-        :initform (make-instance 'model:doc)
+        :initform (model:create-doc)
         :accessor mysax-doc)
    (prefix-mappings :type list
                     :initform nil
