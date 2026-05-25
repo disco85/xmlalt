@@ -175,37 +175,37 @@
   (node-idx node))
 
 
-(defun calc-node-dir (node &key with-idx non-elem-name join-by)
-  "Collects DIR of a NODE (adding IDX, if WITH-IDX is T) of every ELEM en route and
-returns the result as a list of strings. But if JOIN-BY was passed as some STRING,
-then returns it as a STRING joining components by this delimiter. Non ELEM components
-are handled by optional NON-ELEM-NAME that must return a string for such one - without
-it such dir component will be skipped"
+(defun calc-node-dir (node &key with-idx-as non-elem-name-as join-by)
+  "Collects DIR of a NODE (adding IDX, if WITH-IDX-AS was passed) of every
+ELEM en route and returns the result as a list of strings. But if
+JOIN-BY was passed as some STRING, then returns it as a STRING joining
+components by this delimiter. Non ELEM components are handled by
+optional NON-ELEM-NAME-AS that must return a string for such one -
+without it such dir component will be skipped. WITH-IDX-AS converts
+integer IDX to STRING"
   (check-type node node)
   (check-type join-by (or null string))
-  (labels ((prep-idx (n)
-             "Prepares IDX of a NODE N as a string"
-             (write-to-string (node-idx n)))
-           (prep-join-fmt (delim)
+  (labels ((prep-join-fmt (delim)
              "Prepares FORMAT string able to join items by DELIM"
              (concatenate 'string "~{~A~^" delim "~}"))
            (cons-idx-if (n lst)
              "Adds IDX of a NODE N to the front of list LST if WITH-IDX"
-             (if with-idx
-                 (cons (prep-idx n) lst)
+             (if (and with-idx-as (node-idx n))
+                 (cons (funcall with-idx-as (node-idx n))
+                       lst)
                  lst))
            (collect-dir (n dir)
              "Recursively collects DIR from a node N to the top parent"
              (typecase n
-               (null (cdr dir))
+               (null dir)
                (elem (collect-dir (node-parent n)
                                   (cons-idx-if n
                                                (cons (elem-local-name n)
                                                      dir))))
-               (node (if non-elem-name
+               (node (if non-elem-name-as
                          (collect-dir (node-parent n)
                                       (cons-idx-if n
-                                                   (cons (funcall non-elem-name n)
+                                                   (cons (funcall non-elem-name-as n)
                                                          dir)))
                          (collect-dir (node-parent n) dir)))
                (t dir))))
@@ -431,9 +431,13 @@ it such dir component will be skipped"
   (let ((counters nil)
         (deferred-updates nil))
     (labels ((calc-child-id (child)
-               (format nil "~A--~A"
-                       (type-of child)
-                       (calc-node-dir child :join-by "")))
+               (cons (type-of child)
+                     (when (typep child 'elem)
+                       (elem-local-name child)))
+               ;; (format nil "~A--~A"
+               ;;         (type-of child)
+               ;;         (calc-node-dir child :join-by ""))
+               )
              (defer-child-update (child)
                (when (typep child 'node)
                  (let* ((child-id (calc-child-id child))
