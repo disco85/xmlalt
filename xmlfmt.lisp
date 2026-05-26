@@ -282,8 +282,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defun parse-xml (path)
   (let ((mysax (make-instance 'mysax)))
     (handler-case
-        (progn (call-with-input-stream
-                path
-                (lambda (f) (cxml:parse f mysax)))
+        (progn (with-input-stream (stream path)
+                 (cxml:parse stream mysax))
                (cons :ok (mysax-doc mysax)))
       (error (x) (cons :fail (format nil "Parsing of XML '~A' failed: ~A" path x))))))

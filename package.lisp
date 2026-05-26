@@ -6,7 +6,9 @@
            #:subs
            #:non-empty-string-p
            #:empty-string-to-nil
-           #:try-as-string))
+           #:try-as-string
+           #:with-input-stream
+           #:with-output-stream))
 
 (defpackage #:xmlalt
   (:use #:cl #:utils)

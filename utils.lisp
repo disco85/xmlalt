@@ -1,15 +1,56 @@
 (in-package :utils)
 
 
-(defun call-with-input-stream (path fn)
-  "Calls a function FN on a PATH which can be '-' which means 'use stdin'"
-  (if (and (stringp path)
-           (string= path "-"))
-      (funcall fn *standard-input*)
-      (with-open-file (stream path
-                              :direction :input
-                              :element-type '(unsigned-byte 8))
-        (funcall fn stream))))
+;; (defun call-with-input-stream (path fn)
+;;   "Calls a function FN on a PATH which can be '-' or NIL which means 'use stdin'"
+;;   (if (or (null path)
+;;           (and (stringp path)
+;;                (string= path "-")))
+;;       (funcall fn *standard-input*)
+;;       (with-open-file (stream path
+;;                               :direction :input
+;;                               :element-type '(unsigned-byte 8))
+;;         (funcall fn stream))))
+
+(defmacro with-input-stream ((var path &key (mode :binary))
+                             &body body)
+  "VAR is the name of the STREAM variable to be used inside BODY"
+  (let ((p (gensym "PATH")))
+    `(let ((,p ,path))
+       (if (or (null ,p)
+               (and (stringp ,p)
+                    (string= ,p "-")))
+           (let ((,var *standard-input*))
+             ,@body)
+           (with-open-file
+               (,var ,p
+                     :direction :input
+                     :element-type
+                     ,(ecase mode
+                        (:binary ''(unsigned-byte 8))
+                        (:text ''character)))
+             ,@body)))))
+
+
+(defmacro with-output-stream ((stream path &key (mode :binary))
+                              &body body)
+  (let ((p (gensym "PATH")))
+    `(let ((,p ,path))
+       (if (or (null ,p)
+               (and (stringp ,p)
+                    (string= ,p "-")))
+           (let ((,stream *standard-output*))
+             ,@body)
+           (with-open-file
+               (,stream ,p
+                        :direction :output
+                        :if-exists :supersede
+                        :if-does-not-exist :create
+                        :element-type
+                        ,(ecase mode
+                           (:binary ''(unsigned-byte 8))
+                           (:text ''character)))
+             ,@body)))))
 
 
 (defun whitespace-char-p (c)
