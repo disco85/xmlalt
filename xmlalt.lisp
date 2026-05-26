@@ -4,13 +4,40 @@
 (defparameter +formats+ '(:cmdfmt :regfmt :xmlfmt))
 
 
+(defun format-serialize-func (format)
+  (ecase format
+    (:cmdfmt #'cmdfmt:serialize)
+    (:regfmt #'regfmt:serialize)
+    (:xmlfmt #'xmlfmt:serialize)))
+
+
+(defun format-deserialize-func (format)
+  (ecase format
+    (:cmdfmt #'cmdfmt:deserialize)
+    (:regfmt #'regfmt:deserialize)
+    (:xmlfmt #'xmlfmt:deserialize)))
+
+
+(defun cli-kw-getopt (cmd key)
+  "Allows to get a choice/enum option as a symbol in :keyword package ready for eq/getf/..."
+  (intern (string-upcase (clingon:getopt cmd key)) :keyword))
+
+
 (defun cli-main-cmd-handler (cmd)
   (declare (ignorable cmd))
-  (let* ((in (clingon:getopt cmd :in))
-         (out (clingon:getopt cmd :out))
-         (from (clingon:getopt cmd :from))
-         (to (clingon:getopt cmd :to)))
-    (format t "RUN: ~A ~A ~A ~A~%" in out from to)
+  (let* ((in-path (clingon:getopt cmd :in))
+         (out-path (clingon:getopt cmd :out))
+         (from-format (cli-kw-getopt cmd :from))
+         (to-format (cli-kw-getopt cmd :to))
+         (doc nil))
+    ;; (format t "RUN: ~A ~A ~A ~A~%" in out from to)
+    (with-input-stream (in-stream in-path)
+      (setf doc (funcall (format-deserialize-func from-format)
+                         in-stream)))
+    (with-output-stream (out-stream out-path)
+      (funcall (format-serialize-func to-format)
+               doc
+               out-stream))
     t))
 
 

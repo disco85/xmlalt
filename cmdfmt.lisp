@@ -159,3 +159,7 @@
        (format stream ".PI.TARG ~A~%" target))
      (with-truly content (model:get-pinstr-data node)
        (format stream ".PI~%~A~%.PIE~%" content)))))
+
+
+(defun deserialize (in-stream)
+  (format t "NOT YET IMPLEMENTED~%"))

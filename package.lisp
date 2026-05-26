@@ -134,15 +134,19 @@
 
 (defpackage #:cmdfmt
   (:use #:cl #:utils)
-  (:export #:serialize))
+  (:export #:serialize
+           #:deserialize))
 
 (defpackage #:regfmt
   (:use #:cl #:utils)
   (:export #:serialize
+           #:deserialize
            #:esc))
 
 (defpackage #:xmlfmt
-  (:use #:cl #:utils))
+  (:use #:cl #:utils)
+  (:export #:serialize
+           #:deserialize))
 
 
 (defpackage #:xmlalt-tests

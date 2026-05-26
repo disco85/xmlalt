@@ -276,3 +276,7 @@ to get similar to ~A but with escaping"
                      "<processing-instruction>"
                      (model:get-pinstr-target node))
                data)))))
+
+
+(defun deserialize (in-stream)
+  (format t "NOT YET IMPLEMENTED~%"))

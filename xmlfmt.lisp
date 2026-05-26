@@ -279,10 +279,14 @@ so we save them first here, then add to an element, also they are scoped")
   (format t "UNESCAPED! DATA: ~A~%~%" data))
 
 
-(defun parse-xml (path)
+(defun deserialize (in-stream)
+  "PATH can be NIL, - or a valid path"
   (let ((mysax (make-instance 'mysax)))
     (handler-case
-        (progn (with-input-stream (stream path)
-                 (cxml:parse stream mysax))
+        (progn (cxml:parse in-stream mysax)
                (cons :ok (mysax-doc mysax)))
-      (error (x) (cons :fail (format nil "Parsing of XML '~A' failed: ~A" path x))))))
+      (error (x) (cons :fail (format nil "Parsing of input XML failed: ~A" x))))))
+
+
+(defun serialize (doc out-stream)
+  (format t "NOT YET IMPLEMENTED~%"))
