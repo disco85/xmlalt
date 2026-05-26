@@ -29,15 +29,19 @@
          (out-path (clingon:getopt cmd :out))
          (from-format (cli-kw-getopt cmd :from))
          (to-format (cli-kw-getopt cmd :to))
-         (doc nil))
+         (parsed nil))
     ;; (format t "RUN: ~A ~A ~A ~A~%" in out from to)
     (with-input-stream (in-stream in-path)
-      (setf doc (funcall (format-deserialize-func from-format)
-                         in-stream)))
-    (with-output-stream (out-stream out-path)
-      (funcall (format-serialize-func to-format)
-               doc
-               out-stream))
+      (setf parsed (funcall (format-deserialize-func from-format)
+                            in-stream)))
+    (ecase (car parsed)
+      (:ok (let ((doc (cdr parsed)))
+             (with-output-stream (out-stream out-path)
+               (funcall (format-serialize-func to-format)
+                        doc
+                        out-stream))))
+      (t (format t "ERROR: ~A~%" (cdr parsed))))
+
     t))
 
 
