@@ -29,7 +29,9 @@
          (out-path (clingon:getopt cmd :out))
          (from-format (cli-kw-getopt cmd :from))
          (to-format (cli-kw-getopt cmd :to))
-         (parsed nil))
+         (parsed nil)
+         (dir-delim (clingon:getopt cmd :dir-delim)))
+    (setf cmdfmt:*dir-delim* dir-delim)
     ;; (format t "RUN: ~A ~A ~A ~A~%" in out from to)
     (with-input-stream (in-stream in-path)
       (setf parsed (funcall (format-deserialize-func from-format)
@@ -62,29 +64,41 @@
     :key :out)
    (clingon:make-option
     :choice
+    :required t
     :description "From format"
     :short-name #\f
     :long-name "from"
     :key :from
-    :initial-value :xmlfmt
+    ;; :initial-value :xmlfmt
     :items +formats+)
    (clingon:make-option
     :choice
+    :required t
     :description "To format"
     :short-name #\t
     :long-name "to"
     :key :to
-    :initial-value :cmdfmt
-    :items +formats+)))
+    ;; :initial-value :cmdfmt
+    :items +formats+)
+   (clingon:make-option
+    :string
+    :description "Directory delimiter string [default is /]"
+    :short-name #\d
+    :long-name "dir-delim"
+    :key :dir-delim)))
 
 
 (defun cli-main-cmd ()
   (clingon:make-command
    :name "xmlalt"
    :description "XML serial alternative formats converter"
-   :usage "[-i|--in FILE] [-o|--out FILE] -f|--from CMDFMT|REGFMT|XMLFMT -t|--to CMDFMT|REGFMT|XMLFMT"
-   :examples '(("Convert XML to some serial format from stdin to stdout" . "cat a.xml|xmlalt -f XMLFMT -t CMDFMT")
-               ("Convert a serial format from a file to XML to a file" . "xmlalt -i a.reg -f REGFMT -t XMLFMT -o a.xml"))
+   :usage "[-i|--in FILE] [-o|--out FILE] -f|--from CMDFMT|REGFMT|XMLFMT -t|--to CMDFMT|REGFMT|XMLFMT
+         [-d|--dir-delim STRING]"
+   :examples
+   '(("Convert XML to some serial format from stdin to stdout" . "cat a.xml|xmlalt -f XMLFMT -t CMDFMT")
+     ("Convert XML to some serial format from stdin to stdout with a custom directory delimiter"
+      . "cat a.xml|xmlalt -f XMLFMT -t CMDFMT -d::")
+     ("Convert a serial format from a file to XML to a file" . "xmlalt -i a.reg -f REGFMT -t XMLFMT -o a.xml"))
    :version "0.1.0"
    :authors '("John Doe <john.doe@example.org>")
    :license "GPL-3.0-or-later"

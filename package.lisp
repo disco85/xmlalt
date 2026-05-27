@@ -135,7 +135,8 @@
 (defpackage #:cmdfmt
   (:use #:cl #:utils)
   (:export #:serialize
-           #:deserialize))
+           #:deserialize
+           #:*dir-delim*))
 
 (defpackage #:regfmt
   (:use #:cl #:utils)
