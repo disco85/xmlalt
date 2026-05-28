@@ -36,15 +36,24 @@ is shown in this way"
 
 (defun safe-key-string (str)
   (let ((dyn-extra (dyn-escape-chars)))
-    (flet ((safer (c)
-             (cond
-               ((char= c #\<) (as-internal-str "<"))
-               ((char= c #\>) (as-internal-str ">"))
-               ((char= c #\Newline) (as-internal-str "NL"))
-               ((member c dyn-extra :test #'char=)
-                (as-internal-str c))   ; escape dynamic chars
-               (t (string c)))))
-      (apply #'concatenate 'string (map 'list #'safer str)))))
+    (labels ((safer-char (c)
+               "Replaces unsafe char C"
+               (cond
+                 ((char= c #\<) (as-internal-str "<"))
+                 ((char= c #\>) (as-internal-str ">"))
+                 ((char= c #\Newline) (as-internal-str "NL"))
+                 ;; ((member c dyn-extra :test #'char=)
+                 ;;  (as-internal-str c))   ; escape dynamic chars
+                 (t (string c))))
+             (safer-substrings (s)
+               "Replaces unsafe substrings (*IS* and *SEP*) in S"
+               (subs (subs s *is* (as-internal-str *is*))
+                     *sep* (as-internal-str *sep*)))
+             (safer-chars (s)
+               "Replaces all unsafe characters in a string S"
+               (apply #'concatenate 'string (map 'list #'safer-char s))))
+      ;; order matters:
+      (safer-substrings (safer-chars str)))))
 
 
 (defun to-safe-str (obj)
