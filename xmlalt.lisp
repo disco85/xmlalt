@@ -31,7 +31,8 @@
          (to-format (cli-kw-getopt cmd :to))
          (parsed nil)
          (dir-delim (clingon:getopt cmd :dir-delim)))
-    (setf cmdfmt:*dir-delim* dir-delim)
+    (when dir-delim
+      (setf cmdfmt:*dir-delim* dir-delim))
     ;; (format t "RUN: ~A ~A ~A ~A~%" in out from to)
     (with-input-stream (in-stream in-path)
       (setf parsed (funcall (format-deserialize-func from-format)
