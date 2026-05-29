@@ -279,6 +279,12 @@ so we save them first here, then add to an element, also they are scoped")
   (format t "UNESCAPED! DATA: ~A~%~%" data))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; DESERIALIZE
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun deserialize (in-stream)
   "PATH can be NIL, - or a valid path"
   (let ((mysax (make-instance 'mysax)))
@@ -288,5 +294,26 @@ so we save them first here, then add to an element, also they are scoped")
       (error (x) (cons :fail (format nil "Parsing of input XML failed: ~A" x))))))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; SERIALIZE
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun serialize-xml-decl (xml-decl out-stream)
+  (check-type xml-decl (or null model:xml-decl))
+  (when xml-decl
+    (format out-stream (model:get-xml-decl-content xml-decl))))
+
+
+(defun serialize-doc-dtd (doc-dtd out-stream)
+  (check-type doc-dtd (or null model:doc-dtd))
+  (when doc-dtd
+    nil)) ;; TODO
+
+
 (defun serialize (doc out-stream)
-  (format t "NOT YET IMPLEMENTED~%"))
+  (let* ((xml-decl (model:get-doc-xml-decl doc))
+         (doc-dtd (model:get-doc-dtd doc)))
+    (serialize-xml-decl xml-decl out-stream)
+    (format t "NOT YET IMPLEMENTED~%")))

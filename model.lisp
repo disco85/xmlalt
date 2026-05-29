@@ -517,7 +517,7 @@ integer IDX to STRING"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; XML DECL API
+;; XML-DECL API
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -526,9 +526,14 @@ integer IDX to STRING"
   (make-xml-decl :content content))
 
 
+(defun get-xml-decl-content (xml-decl)
+  (check-type xml-decl xml-decl)
+  (xml-decl-content xml-decl))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; ELEM DECL API
+;; ELEM-DECL API
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -830,3 +835,8 @@ integer IDX to STRING"
 (defun get-doc-dtd (doc)
   (check-type doc doc)
   (doc-dtd doc))
+
+
+(defun get-doc-xml-decl (doc)
+  (check-type doc doc)
+  (doc-xml-decl doc))

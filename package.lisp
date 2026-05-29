@@ -74,6 +74,7 @@
 
            #:xml-decl
            #:create-xml-decl
+           #:get-xml-decl-content
 
            #:elem-decl
            #:create-elem-decl
@@ -130,6 +131,7 @@
            #:set-doc-dtd
            #:get-doc-root
            #:get-doc-dtd
+           #:get-doc-xml-decl
            ))
 
 (defpackage #:cmdfmt

@@ -131,7 +131,7 @@
      (with-truly local-name (model:get-elem-local-name node)
        (format stream ".EL.LOC.NAME ~A~%" local-name))
      (with-truly qname (model:get-elem-qname node)
-       (format stream ".EL.Q.NAME ~A~%" qname))
+       (format stream ".EL.QNAME ~A~%" qname))
      (with-truly prefix-mappings (model:get-elem-prefix-mappings node)
        (serialize-prefix-mappings doc node prefix-mappings stream))
      (with-truly attributes (model:get-elem-attributes node)
