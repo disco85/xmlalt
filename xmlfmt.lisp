@@ -307,7 +307,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defun serialize-doc-dtd (doc-dtd out-stream)
-  (check-type doc-dtd (or null model:doc-dtd))
+  (check-type doc-dtd (or null model:dtd))
   (when doc-dtd
     nil)) ;; TODO
 

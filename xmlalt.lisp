@@ -43,7 +43,7 @@
                (funcall (format-serialize-func to-format)
                         doc
                         out-stream))))
-      (t (format t "ERROR: ~A~%" (cdr parsed))))
+      (:fail (format t "ERROR: ~A~%" (cdr parsed))))
 
     t))
 
