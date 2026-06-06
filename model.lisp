@@ -100,7 +100,7 @@
 
 
 (defstruct (ext-ent-decl (:include dtd-item))
-  (kind "" :type string)
+  (kind "" :type string) ;; TODO :type (member :general :parameter)
   (name "" :type string)
   (public-id nil :type (or null string))
   (system-id nil :type (or null string)))
@@ -109,7 +109,7 @@
 (defstruct (unp-ent-decl (:include dtd-item))
   (name "" :type string)
   (public-id nil :type (or null string))
-  (system-id nil :type (or null string))
+  (system-id nil :type string)
   (nota-name "" :type string))
 
 

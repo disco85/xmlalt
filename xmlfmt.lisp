@@ -445,9 +445,46 @@ so we save them first here, then add to an element, also they are scoped")
      (format out-stream "<!ENTITY ~A \"~A\">~%"
              (model:get-int-ent-decl-name dtd-item)
              (model:get-int-ent-decl-value dtd-item)))
-    (model:ext-ent-decl )
-    (model:unp-ent-decl )
-    (model:unp-int-subs )))
+    (model:ext-ent-decl
+     (ecase (model:get-ext-ent-decl-kind dtd-item)
+       (:general
+        (case (model:get-ext-ent-decl-public-id dtd-item)
+          (nil (format
+                out-stream "<!ENTITY ~A SYSTEM \"~A\">~%"
+                (model:get-ext-ent-decl-name dtd-item)
+                (model:get-ext-ent-decl-system-id dtd-item)))
+          (t (format
+              out-stream "<!ENTITY ~A PUBLIC ~A \"~A\">~%"
+              (model:get-ext-ent-decl-name dtd-item)
+              (model:get-ext-ent-decl-public-id dtd-item)
+              (model:get-ext-ent-decl-system-id dtd-item)))))
+       (:parameter
+        (case (model:get-ext-ent-decl-public-id dtd-item)
+          (nil (format
+                out-stream "<!ENTITY % ~A SYSTEM \"~A\">~%"
+                (model:get-ext-ent-decl-name dtd-item)
+                (model:get-ext-ent-decl-system-id dtd-item)))
+          (t (format
+              out-stream "<!ENTITY % ~A PUBLIC ~A \"~A\">~%"
+              (model:get-ext-ent-decl-name dtd-item)
+              (model:get-ext-ent-decl-public-id dtd-item)
+              (model:get-ext-ent-decl-system-id dtd-item)))))))
+    (model:unp-ent-decl
+     (if (model:get-unp-ent-decl-public-id dtd-item)
+         (format out-stream
+                 "<!ENTITY ~A PUBLIC \"~A\" \"~A\" NDATA ~A>~%"
+                 (model:get-unp-ent-decl-name dtd-item)
+                 (model:get-unp-ent-decl-public-id dtd-item)
+                 (model:get-unp-ent-decl-system-id dtd-item)
+                 (model:get-unp-ent-decl-nota-name dtd-item))
+         (format out-stream
+                 "<!ENTITY ~A SYSTEM \"~A\" NDATA ~A>~%"
+                 name sys not
+                 (model:get-unp-ent-decl-name dtd-item)
+                 (model:get-unp-ent-decl-system-id dtd-item)
+                 (model:get-unp-ent-decl-nota-name dtd-item))))
+    (model:unp-int-subs
+     (format out-stream "[~A]" (model:get-unp-int-subs-content dtd-item)))))
 
 
 (defun serialize-doc-dtd (doc-dtd out-stream)

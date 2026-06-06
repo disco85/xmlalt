@@ -76,6 +76,8 @@
            #:create-xml-decl
            #:get-xml-decl-content
 
+           #:dtd-item
+
            #:elem-decl
            #:create-elem-decl
            #:get-elem-decl-name
