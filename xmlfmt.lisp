@@ -504,13 +504,35 @@ so we save them first here, then add to an element, also they are scoped")
           (t
            (format out-stream "<!DOCTYPE ~A>~%"
                    (model:get-dtd-name doc-dtd))))
-    (format t "!!!!!!!!!!! ~A~%" (model:get-dtd-items doc-dtd))
     (dolist (dtd-item (model:get-dtd-items doc-dtd))
-      (serialize-dtd-item dtd-item out-stream))
-    nil))  ;; TODO
+      (serialize-dtd-item dtd-item out-stream))))
+
+
+(defun serialize-elem (elem out-stream)
+  (check-type elem (model:elem))
+  (etypecase elem
+    (model:text (format out-stream "~A~%"
+                        (model:get-cdata-content elem)))
+    (model:pinstr (format out-stream "~A~A~@[ ~A~]~A~%"
+                          (model:get-elem-open-by elem)
+                          (model:get-pinstr-target elem)
+                          (model:get-pinstr-data elem)
+                          (model:get-elem-close-by elem)))
+    (model:cdata (when (string/= (model:get-cdata-content elem) "")
+                   (format out-stream "~A~A~A~%"
+                           (model:get-elem-open-by elem)
+                           (model:get-cdata-content elem)
+                           (model:get-elem-close-by elem))))
+    (model:comment (when (string/= (model:get-comment-content elem) "")
+                     (format out-stream "~A~A~A~%"
+                             (model:get-elem-open-by elem)
+                             (model:get-comment-content elem)
+                             (model:get-elem-close-by elem))))
+    (model:elem _)))
 
 
 (defun serialize (doc out-stream)
+  (check-type doc model:doc)
   (let* ((xml-decl (model:get-doc-xml-decl doc))
          (doc-dtd (model:get-doc-dtd doc)))
     (serialize-xml-decl xml-decl out-stream)
