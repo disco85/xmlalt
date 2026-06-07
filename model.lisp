@@ -100,7 +100,7 @@
 
 
 (defstruct (ext-ent-decl (:include dtd-item))
-  (kind "" :type string) ;; TODO :type (member :general :parameter)
+  (kind "" :type (member :general :parameter))
   (name "" :type string)
   (public-id nil :type (or null string))
   (system-id nil :type (or null string)))
@@ -677,7 +677,7 @@ integer IDX to STRING"
   (assert (or (null public-id) (non-empty-string-p public-id)))
   (assert (or (null system-id) (non-empty-string-p system-id)))
   (assert (or public-id-p system-id-p))
-  (make-ext-ent-decl :kind (try-as-string kind)
+  (make-ext-ent-decl :kind kind
                      :name name
                      :public-id public-id
                      :system-id system-id))
@@ -790,7 +790,7 @@ integer IDX to STRING"
 
 (defun get-dtd-items (dtd)
   (check-type dtd dtd)
-  (dtd-items dtd))
+  (reverse (dtd-items dtd)))
 
 
 (defun get-dtd-name (dtd)

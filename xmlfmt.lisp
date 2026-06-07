@@ -114,7 +114,7 @@ so we save them first here, then add to an element, also they are scoped")
                                                  :public-id public-id
                                                  :system-id system-id)))
     (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) ext-ent-decl)
-    (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~A NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
+    (format t "EXTERNAL-ENTITY-DECLARATION! KIND: ~S NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%"
             kind name public-id system-id)))
 
 
@@ -447,7 +447,7 @@ so we save them first here, then add to an element, also they are scoped")
              (model:get-int-ent-decl-value dtd-item)))
     (model:ext-ent-decl
      (ecase (model:get-ext-ent-decl-kind dtd-item)
-       (:general
+       (:general ;; FIXME "GENERAL"
         (case (model:get-ext-ent-decl-public-id dtd-item)
           (nil (format
                 out-stream "<!ENTITY ~A SYSTEM \"~A\">~%"
@@ -479,8 +479,7 @@ so we save them first here, then add to an element, also they are scoped")
                  (model:get-unp-ent-decl-nota-name dtd-item))
          (format out-stream
                  "<!ENTITY ~A SYSTEM \"~A\" NDATA ~A>~%"
-                 name sys not
-                 (model:get-unp-ent-decl-name dtd-item)
+                     (model:get-unp-ent-decl-name dtd-item)
                  (model:get-unp-ent-decl-system-id dtd-item)
                  (model:get-unp-ent-decl-nota-name dtd-item))))
     (model:unp-int-subs
@@ -490,6 +489,21 @@ so we save them first here, then add to an element, also they are scoped")
 (defun serialize-doc-dtd (doc-dtd out-stream)
   (check-type doc-dtd (or null model:dtd))
   (when doc-dtd
+    (cond ((model:get-dtd-public-id doc-dtd)
+           (format out-stream "<!DOCTYPE ~A PUBLIC \"~A\" \"~A\">~%"
+                   (model:get-dtd-name doc-dtd)
+                   (model:get-dtd-public-id doc-dtd)
+                   (model:get-dtd-system-id doc-dtd)))
+          ((model:get-dtd-system-id doc-dtd)
+           (format out-stream "<!DOCTYPE ~A SYSTEM \"~A\">~%"
+                   (model:get-dtd-name doc-dtd)
+                   (model:get-dtd-system-id doc-dtd)))
+          (t
+           (format out-stream "<!DOCTYPE ~A>~%"
+                   (model:get-dtd-name doc-dtd))))
+    (format t "!!!!!!!!!!! ~A~%" (model:get-dtd-items doc-dtd))
+    (dolist (dtd-item (model:get-dtd-items doc-dtd))
+      (serialize-dtd-item dtd-item out-stream))
     nil)) ;; TODO
 
 
@@ -497,4 +511,5 @@ so we save them first here, then add to an element, also they are scoped")
   (let* ((xml-decl (model:get-doc-xml-decl doc))
          (doc-dtd (model:get-doc-dtd doc)))
     (serialize-xml-decl xml-decl out-stream)
+    (serialize-doc-dtd doc-dtd out-stream)
     (format t "NOT YET IMPLEMENTED~%")))
