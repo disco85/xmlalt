@@ -442,9 +442,17 @@ so we save them first here, then add to an element, also they are scoped")
              (model:get-nota-decl-public-id dtd-item)
              (model:get-nota-decl-system-id dtd-item)))
     (model:int-ent-decl
-     (format out-stream "<!ENTITY ~A \"~A\">~%"
-             (model:get-int-ent-decl-name dtd-item)
-             (model:get-int-ent-decl-value dtd-item)))
+     (ecase (model:get-int-ent-decl-kind dtd-item)
+       (:general
+        (format out-stream
+                "<!ENTITY ~A \"~A\">~%"
+                (model:get-int-ent-decl-name dtd-item)
+                (model:get-int-ent-decl-value dtd-item)))
+       (:parameter
+        (format out-stream
+                "<!ENTITY % ~A \"~A\">~%"
+                (model:get-int-ent-decl-name dtd-item)
+                (model:get-int-ent-decl-value dtd-item)))))
     (model:ext-ent-decl
      (ecase (model:get-ext-ent-decl-kind dtd-item)
        (:general ;; FIXME "GENERAL"

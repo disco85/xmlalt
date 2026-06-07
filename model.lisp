@@ -94,7 +94,7 @@
 
 
 (defstruct (int-ent-decl (:include dtd-item))
-  (kind "" :type string)
+  (kind :general :type (member :general :parameter))
   (name "" :type string)
   (value "" :type string))
 
@@ -640,7 +640,7 @@ integer IDX to STRING"
               (non-empty-string-p kind)))
   (assert (non-empty-string-p name))
   (assert (non-empty-string-p value))
-  (make-int-ent-decl :kind (try-as-string kind)
+  (make-int-ent-decl :kind kind
                      :name name
                      :value value))
 
