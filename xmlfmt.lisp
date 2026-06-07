@@ -448,38 +448,33 @@ so we save them first here, then add to an element, also they are scoped")
     (model:ext-ent-decl
      (ecase (model:get-ext-ent-decl-kind dtd-item)
        (:general ;; FIXME "GENERAL"
-        (case (model:get-ext-ent-decl-public-id dtd-item)
-          (nil (format
-                out-stream "<!ENTITY ~A SYSTEM \"~A\">~%"
-                (model:get-ext-ent-decl-name dtd-item)
-                (model:get-ext-ent-decl-system-id dtd-item)))
-          (t (format
-              out-stream "<!ENTITY ~A PUBLIC ~A \"~A\">~%"
-              (model:get-ext-ent-decl-name dtd-item)
-              (model:get-ext-ent-decl-public-id dtd-item)
-              (model:get-ext-ent-decl-system-id dtd-item)))))
+        (if (model:get-ext-ent-decl-public-id dtd-item)
+            (format out-stream "<!ENTITY ~A PUBLIC ~A \"~A\">~%"
+                    (model:get-ext-ent-decl-name dtd-item)
+                    (model:get-ext-ent-decl-public-id dtd-item)
+                    (model:get-ext-ent-decl-system-id dtd-item))
+            (format out-stream "<!ENTITY ~A SYSTEM \"~A\">~%"
+                    (model:get-ext-ent-decl-name dtd-item)
+                    (model:get-ext-ent-decl-system-id dtd-item))))
        (:parameter
-        (case (model:get-ext-ent-decl-public-id dtd-item)
-          (nil (format
-                out-stream "<!ENTITY % ~A SYSTEM \"~A\">~%"
-                (model:get-ext-ent-decl-name dtd-item)
-                (model:get-ext-ent-decl-system-id dtd-item)))
-          (t (format
-              out-stream "<!ENTITY % ~A PUBLIC ~A \"~A\">~%"
-              (model:get-ext-ent-decl-name dtd-item)
-              (model:get-ext-ent-decl-public-id dtd-item)
-              (model:get-ext-ent-decl-system-id dtd-item)))))))
+        (if (model:get-ext-ent-decl-public-id dtd-item)
+            (format out-stream "<!ENTITY % ~A PUBLIC ~A \"~A\">~%"
+                    (model:get-ext-ent-decl-name dtd-item)
+                    (model:get-ext-ent-decl-public-id dtd-item)
+                    (model:get-ext-ent-decl-system-id dtd-item))
+            (format
+             out-stream "<!ENTITY % ~A SYSTEM \"~A\">~%"
+             (model:get-ext-ent-decl-name dtd-item)
+             (model:get-ext-ent-decl-system-id dtd-item))))))
     (model:unp-ent-decl
      (if (model:get-unp-ent-decl-public-id dtd-item)
-         (format out-stream
-                 "<!ENTITY ~A PUBLIC \"~A\" \"~A\" NDATA ~A>~%"
+         (format out-stream "<!ENTITY ~A PUBLIC \"~A\" \"~A\" NDATA ~A>~%"
                  (model:get-unp-ent-decl-name dtd-item)
                  (model:get-unp-ent-decl-public-id dtd-item)
                  (model:get-unp-ent-decl-system-id dtd-item)
                  (model:get-unp-ent-decl-nota-name dtd-item))
-         (format out-stream
-                 "<!ENTITY ~A SYSTEM \"~A\" NDATA ~A>~%"
-                     (model:get-unp-ent-decl-name dtd-item)
+         (format out-stream "<!ENTITY ~A SYSTEM \"~A\" NDATA ~A>~%"
+                 (model:get-unp-ent-decl-name dtd-item)
                  (model:get-unp-ent-decl-system-id dtd-item)
                  (model:get-unp-ent-decl-nota-name dtd-item))))
     (model:unp-int-subs
@@ -504,7 +499,7 @@ so we save them first here, then add to an element, also they are scoped")
     (format t "!!!!!!!!!!! ~A~%" (model:get-dtd-items doc-dtd))
     (dolist (dtd-item (model:get-dtd-items doc-dtd))
       (serialize-dtd-item dtd-item out-stream))
-    nil)) ;; TODO
+    nil))  ;; TODO
 
 
 (defun serialize (doc out-stream)

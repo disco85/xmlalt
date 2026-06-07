@@ -100,7 +100,7 @@
 
 
 (defstruct (ext-ent-decl (:include dtd-item))
-  (kind "" :type (member :general :parameter))
+  (kind :general :type (member :general :parameter))
   (name "" :type string)
   (public-id nil :type (or null string))
   (system-id nil :type (or null string)))
