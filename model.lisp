@@ -235,6 +235,24 @@ integer IDX to STRING"
     (when cur-elem (%add-child-node-to-elem child-node cur-elem))))
 
 
+
+(defun get-node-open-by (node)
+  (check-type node node)
+  (node-open-by node))
+
+
+
+(defun get-node-close-by (node)
+  (check-type node node)
+  (node-close-by node))
+
+
+
+(defun get-node-parent (node)
+  (check-type node node)
+  (node-parent node))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; ATTR API

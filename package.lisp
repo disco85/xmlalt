@@ -24,6 +24,9 @@
            #:set-node-idx
            #:calc-node-dir
            #:get-node-idx
+           #:get-node-open-by
+           #:get-node-close-by
+           #:get-node-parent
 
            #:attr
            #:create-attr

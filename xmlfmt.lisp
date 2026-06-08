@@ -306,123 +306,6 @@ so we save them first here, then add to an element, also they are scoped")
     (format out-stream (model:get-xml-decl-content xml-decl))))
 
 
-;; Here is a clean, structured breakdown of the four major kinds of **DTD entity declarations** you asked about — each mapped to the same four conceptual components you used for ATTLIST:
-
-;; - **entity name**
-;; - **entity type**
-;; - **entity value / system identifier**
-;; - **notation (only for unparsed)**
-
-;; I’ll also show how each one would map to a structure similar to your `attr-decl`, using fields like:
-
-;; - `entity-name`
-;; - `kind`
-;; - `value`
-;; - `notation`
-
-;; ---
-
-;; # 🧩 1. **Internal Parsed Entity**
-
-;; Example:
-
-;; ```xml
-;; <!ENTITY writer "John Doe">
-;; ```
-
-;; ### Components
-;; - **[entity name]** → `writer`
-;; - **[entity type]** → *internal parsed entity*
-;; - **[entity value]** → `"John Doe"`
-;; - **[notation]** → *none*
-
-;; ### Structure mapping
-;; - **entity-name**: `"writer"`
-;; - **kind**: `"internal-parsed"`
-;; - **value**: `"John Doe"`
-;; - **notation**: `""`
-
-;; ---
-
-;; # 🌐 2. **External Parsed Entity**
-
-;; Example:
-
-;; ```xml
-;; <!ENTITY chapter1 SYSTEM "chapter1.xml">
-;; ```
-
-;; ### Components
-;; - **[entity name]** → `chapter1`
-;; - **[entity type]** → *external parsed entity*
-;; - **[entity value]** → system identifier (`"chapter1.xml"`)
-;; - **[notation]** → *none*
-
-;; ### Structure mapping
-;; - **entity-name**: `"chapter1"`
-;; - **kind**: `"external-parsed"`
-;; - **value**: `"chapter1.xml"`
-;; - **notation**: `""`
-
-;; ---
-
-;; # 📦 3. **Unparsed External Entity**
-
-;; Example:
-
-;; ```xml
-;; <!ENTITY logo SYSTEM "logo.png" NDATA png>
-;; ```
-
-;; ### Components
-;; - **[entity name]** → `logo`
-;; - **[entity type]** → *external unparsed entity*
-;; - **[entity value]** → system identifier (`"logo.png"`)
-;; - **[notation]** → `png` (must match a declared NOTATION)
-
-;; ### Structure mapping
-;; - **entity-name**: `"logo"`
-;; - **kind**: `"external-unparsed"`
-;; - **value**: `"logo.png"`
-;; - **notation**: `"png"`
-
-;; ---
-
-;; # 🧱 4. **Internal Unparsed Entity**
-;; This one is tricky.
-
-;; **XML DTDs *do not allow* internal unparsed entities.**
-;; Unparsed entities **must** be external, because they represent non-XML data (binary, images, etc.) and require a system identifier.
-
-;; So:
-
-;; ### ❌ **Internal unparsed entity does not exist in XML.**
-
-;; If you want to represent it in your system anyway (for completeness), you could define:
-
-;; - **entity-name**: `"..."`
-;; - **kind**: `"internal-unparsed"`
-;; - **value**: `""`
-;; - **notation**: `"..."`
-
-;; But this would be **non‑standard**.
-
-;; ---
-
-;; # ✔ Suggested `defstruct` for entities
-
-;; If you want a parallel to your `attr-decl`, a good structure would be:
-
-;; ```lisp
-;; (defstruct (entity-decl (:include dtd-item))
-;;   (entity-name "" :type string)
-;;   (kind "" :type string)          ; internal-parsed, external-parsed, external-unparsed
-;;   (value "" :type string)         ; literal or system/public identifier
-;;   (notation "" :type string))     ; only for unparsed
-;; ```
-
-
-
 (defun serialize-dtd-item (dtd-item out-stream)
   (check-type dtd-item model:dtd-item)
   (etypecase dtd-item
@@ -508,27 +391,52 @@ so we save them first here, then add to an element, also they are scoped")
       (serialize-dtd-item dtd-item out-stream))))
 
 
-(defun serialize-elem (elem out-stream)
-  (check-type elem (model:elem))
-  (etypecase elem
+(defun serialize-node (node out-stream)
+  (check-type node model:node)
+  (etypecase node
     (model:text (format out-stream "~A~%"
-                        (model:get-cdata-content elem)))
+                        (model:get-cdata-content node)))
     (model:pinstr (format out-stream "~A~A~@[ ~A~]~A~%"
-                          (model:get-elem-open-by elem)
-                          (model:get-pinstr-target elem)
-                          (model:get-pinstr-data elem)
-                          (model:get-elem-close-by elem)))
-    (model:cdata (when (string/= (model:get-cdata-content elem) "")
+                          (model:get-node-open-by node)
+                          (model:get-pinstr-target node)
+                          (model:get-pinstr-data node)
+                          (model:get-node-close-by node)))
+    (model:cdata (when (string/= (model:get-cdata-content node) "")
                    (format out-stream "~A~A~A~%"
-                           (model:get-elem-open-by elem)
-                           (model:get-cdata-content elem)
-                           (model:get-elem-close-by elem))))
-    (model:comment (when (string/= (model:get-comment-content elem) "")
+                           (model:get-node-open-by node)
+                           (model:get-cdata-content node)
+                           (model:get-node-close-by node))))
+    (model:comment (when (string/= (model:get-comment-content node) "")
                      (format out-stream "~A~A~A~%"
-                             (model:get-elem-open-by elem)
-                             (model:get-comment-content elem)
-                             (model:get-elem-close-by elem))))
-    (model:elem _)))
+                             (model:get-node-open-by node)
+                             (model:get-comment-content node)
+                             (model:get-node-close-by node))))
+    (model:elem (serialize-elem node out-stream))))
+
+
+
+(defun serialize-elem (elem out-stream)
+  (check-type elem model:elem)
+  (format out-stream "<~A" (model:get-elem-qname elem))
+  (model:over-prefix-mappings
+   (model:get-elem-prefix-mappings elem)
+   :do #'(lambda (pmi) ;; arg is a CONS
+           (destructuring-bind (prefix . uri) pmi
+             (if (string= prefix "")
+                 (format out-stream " xmlns=\"~A\"" uri)
+                 (format out-stream " xmlns:~A=\"~A\"" prefix uri)))))
+  (format out-stream " ~A" (model:get-elem-namespace-uri elem))
+  (if (= 0 (model:get-elem-children-num elem))
+      (format out-stream "/>~%")
+      (format out-stream ">~%"))
+  ;; attributes
+  ;; TODO
+  ;; (model:over-elem-children
+  ;;  elem
+  ;;  :do #'(lambda (child-node)
+  ;;          (serialize-node child-node out-stream)))
+  (format out-stream "</~A>~%" (model:get-elem-qname elem)))
+
 
 
 (defun serialize (doc out-stream)
@@ -537,4 +445,5 @@ so we save them first here, then add to an element, also they are scoped")
          (doc-dtd (model:get-doc-dtd doc)))
     (serialize-xml-decl xml-decl out-stream)
     (serialize-doc-dtd doc-dtd out-stream)
+    (serialize-node (model:get-doc-root doc) out-stream)
     (format t "NOT YET IMPLEMENTED~%")))
