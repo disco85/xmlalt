@@ -338,7 +338,7 @@ so we save them first here, then add to an element, also they are scoped")
                 (model:get-int-ent-decl-value dtd-item)))))
     (model:ext-ent-decl
      (ecase (model:get-ext-ent-decl-kind dtd-item)
-       (:general ;; FIXME "GENERAL"
+       (:general
         (if (model:get-ext-ent-decl-public-id dtd-item)
             (format out-stream "<!ENTITY ~A PUBLIC ~A \"~A\">~%"
                     (model:get-ext-ent-decl-name dtd-item)
@@ -395,7 +395,7 @@ so we save them first here, then add to an element, also they are scoped")
   (check-type node model:node)
   (etypecase node
     (model:text (format out-stream "~A~%"
-                        (model:get-cdata-content node)))
+                        (model:get-text-content node)))
     (model:pinstr (format out-stream "~A~A~@[ ~A~]~A~%"
                           (model:get-node-open-by node)
                           (model:get-pinstr-target node)
@@ -429,12 +429,10 @@ so we save them first here, then add to an element, also they are scoped")
   (if (= 0 (model:get-elem-children-num elem))
       (format out-stream "/>~%")
       (format out-stream ">~%"))
-  ;; attributes
-  ;; TODO
-  ;; (model:over-elem-children
-  ;;  elem
-  ;;  :do #'(lambda (child-node)
-  ;;          (serialize-node child-node out-stream)))
+  ;; attributes  TODO
+  (model:over-elem-children
+   elem
+   :do #'(lambda (child-node) (serialize-node child-node out-stream)))
   (format out-stream "</~A>~%" (model:get-elem-qname elem)))
 
 

@@ -28,7 +28,9 @@
 
 (defstruct (text (:include node
                   (open-by "")
-                  (close-by "")))
+                  (close-by ""))
+                 ;; XXX to avoid cyclic print due to PARENT/CHILDREN:
+                 (:print-function print-text))
   (content "" :type string))
 
 
@@ -55,7 +57,9 @@
   (items nil :type list))
 
 
-(defstruct (elem (:include node))
+(defstruct (elem (:include node)
+                 ;; XXX to avoid cyclic print due to PARENT/CHILDREN:
+                 (:print-function print-elem))
   (namespace-uri nil :type (or null uri))
   (local-name nil :type (or null string))
   (qname nil :type (or null string))
@@ -312,6 +316,13 @@ integer IDX to STRING"
   (make-text :content content))
 
 
+(defun print-text (obj stream depth)
+  (declare (ignore depth))
+  (format stream "#<TEXT ~S>"
+          (text-content obj)))
+
+
+
 (defun get-text-content (text)
   (check-type text text)
   (text-content text))
@@ -424,6 +435,13 @@ integer IDX to STRING"
              :prefix-mappings prefix-mappings
              :attributes attributes
              :children children))
+
+
+(defun print-elem (obj stream depth)
+  (declare (ignore depth))
+  (format stream "#<ELEM ~A>"
+          (elem-qname obj)))
+
 
 
 (defun get-elem-children-num (elem)
