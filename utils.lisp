@@ -81,7 +81,7 @@
 ; Posted by Svante, modified by community. See post 'Timeline' for change history
 ; Retrieved 2026-05-18, License - CC BY-SA 4.0:
 (defun subs (string part replacement &key (test #'char=))
-  "Returns a new STRING in which all the occurences of the PART
+  "Returns a new STRING in which all the occurences of the PART substring
 is replaced with REPLACEMENT"
   (with-output-to-string (out)
     (loop with part-length = (length part)

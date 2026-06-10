@@ -415,6 +415,27 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 
+(defun escape-unsafe-xml-text (string)
+  (check-type string string)
+  (dolist (rule '(("&" "&amp;")
+                  ("<" "&lt;")
+                  (">" "&gt;")
+                  ("\"" "&quot;"))
+                string)
+    (setf string (subs string (first rule) (second rule)))))
+
+
+
+(defun serialize-attr (attr out-stream)
+  (check-type attr model:attr)
+  (format out-stream " ~A=\"~A\""
+          (or (model:get-attr-qname attr)
+              (model:get-attr-local-name attr))
+          (escape-unsafe-xml-text
+           (model:get-attr-value attr))))
+
+
+
 (defun serialize-elem (elem out-stream)
   (check-type elem model:elem)
   (format out-stream "<~A" (model:get-elem-qname elem))
@@ -429,7 +450,8 @@ so we save them first here, then add to an element, also they are scoped")
   (if (= 0 (model:get-elem-children-num elem))
       (format out-stream "/>~%")
       (format out-stream ">~%"))
-  ;; attributes  TODO
+  (dolist (attr (model:get-elem-attributes elem))
+    (serialize-attr attr out-stream))
   (model:over-elem-children
    elem
    :do #'(lambda (child-node) (serialize-node child-node out-stream)))
