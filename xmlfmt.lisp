@@ -447,11 +447,11 @@ so we save them first here, then add to an element, also they are scoped")
                  (format out-stream " xmlns=\"~A\"" uri)
                  (format out-stream " xmlns:~A=\"~A\"" prefix uri)))))
   (format out-stream " ~A" (model:get-elem-namespace-uri elem))
+  (dolist (attr (model:get-elem-attributes elem))
+    (serialize-attr attr out-stream))
   (if (= 0 (model:get-elem-children-num elem))
       (format out-stream "/>~%")
       (format out-stream ">~%"))
-  (dolist (attr (model:get-elem-attributes elem))
-    (serialize-attr attr out-stream))
   (model:over-elem-children
    elem
    :do #'(lambda (child-node) (serialize-node child-node out-stream)))
