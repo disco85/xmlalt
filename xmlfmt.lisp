@@ -443,9 +443,9 @@ so we save them first here, then add to an element, also they are scoped")
    (model:get-elem-prefix-mappings elem)
    :do #'(lambda (pmi) ;; arg is a CONS
            (destructuring-bind (prefix . uri) pmi
-             (if (string= prefix "")
-                 (format out-stream " xmlns=\"~A\"" uri)
-                 (format out-stream " xmlns:~A=\"~A\"" prefix uri)))))
+             (if (non-empty-string-p prefix)
+                 (format out-stream " xmlns:~A=\"~A\"" prefix uri)
+                 (format out-stream " xmlns=\"~A\"" uri)))))
   (format out-stream " ~A" (model:get-elem-namespace-uri elem))
   (dolist (attr (model:get-elem-attributes elem))
     (serialize-attr attr out-stream))
