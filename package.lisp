@@ -69,6 +69,7 @@
            #:get-elem-local-name
            #:get-elem-qname
            #:get-elem-prefix-mappings
+           #:get-elem-uniq-prefix-mappings
            #:get-elem-attributes
            #:get-elem-children
 

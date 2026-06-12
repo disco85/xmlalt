@@ -440,13 +440,13 @@ so we save them first here, then add to an element, also they are scoped")
   (check-type elem model:elem)
   (format out-stream "<~A" (model:get-elem-qname elem))
   (model:over-prefix-mappings
-   (model:get-elem-prefix-mappings elem)
+   (model:get-elem-uniq-prefix-mappings elem)
    :do #'(lambda (pmi) ;; arg is a CONS
            (destructuring-bind (prefix . uri) pmi
              (if (non-empty-string-p prefix)
                  (format out-stream " xmlns:~A=\"~A\"" prefix uri)
                  (format out-stream " xmlns=\"~A\"" uri)))))
-  (format out-stream " ~A" (model:get-elem-namespace-uri elem))
+  ;;(format out-stream " ~A" (model:get-elem-namespace-uri elem))
   (dolist (attr (model:get-elem-attributes elem))
     (serialize-attr attr out-stream))
   (if (= 0 (model:get-elem-children-num elem))

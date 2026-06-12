@@ -401,13 +401,15 @@ integer IDX to STRING"
 
 (defun over-prefix-mappings (prefix-mappings
                              &key (collect nil collect-p) (do nil do-p))
-  (check-type prefix-mappings prefix-mappings)
+  (check-type prefix-mappings (or null prefix-mappings))
   (assert (not (and collect-p do-p)))
-  (cond (collect-p (mapcar collect
-                           (prefix-mappings-items prefix-mappings)))
-        (do-p      (dolist (pm (prefix-mappings-items prefix-mappings))
-                     (funcall do pm)))
-        (t (error "Pass either :COLLECT or :DO"))))
+  (let ((prefix-mappings-items (when prefix-mappings
+                                 (prefix-mappings-items prefix-mappings))))
+    (cond (collect-p (mapcar collect prefix-mappings-items))
+          (do-p      (dolist (pm prefix-mappings-items)
+                       (funcall do pm)))
+          (t (error "Pass either :COLLECT or :DO")))))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -528,6 +530,22 @@ integer IDX to STRING"
 (defun get-elem-prefix-mappings (elem)
   (check-type elem elem)
   (elem-prefix-mappings elem))
+
+
+(defun get-elem-uniq-prefix-mappings (elem)
+  "Returns PREFIX-MAPPINGS of ELEM without PREFIX-MAPPINGS of ELEM's PARENT"
+  (let* ((elem-parent (get-node-parent elem))
+         (elem-parent-prefix-mappings (when elem-parent
+                                        (get-elem-prefix-mappings elem-parent)))
+         (elem-parent-prefix-mappings-items (when elem-parent-prefix-mappings
+                                              (prefix-mappings-items elem-parent-prefix-mappings)))
+         (elem-prefix-mappings (get-elem-prefix-mappings elem))
+         (elem-prefix-mappings-items (when elem-prefix-mappings
+                                       (prefix-mappings-items elem-prefix-mappings)))
+         (uniq-elem-prefix-mappings (set-difference
+                                     elem-prefix-mappings-items
+                                     elem-parent-prefix-mappings-items
+                                     :test #'equal)))))
 
 
 (defun get-elem-attributes (elem)
