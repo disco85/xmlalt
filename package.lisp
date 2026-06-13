@@ -138,6 +138,7 @@
            #:get-doc-root
            #:get-doc-dtd
            #:get-doc-xml-decl
+           #:set-doc-xml-decl
            ))
 
 (defpackage #:cmdfmt

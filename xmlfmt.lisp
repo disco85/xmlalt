@@ -290,6 +290,34 @@ so we save them first here, then add to an element, also they are scoped")
   (format t "UNESCAPED! DATA: ~A~%~%" data))
 
 
+(defun decode-ascii-silently (byte-vector)
+  (with-output-to-string (out)
+    (loop for b across byte-vector
+          when (< b 128)               ; ASCII only
+            do (write-char (code-char b) out))))
+
+
+(defun extract-xml-decl (buf)
+  "Extracts <?xml ...?> from string buffer BUF. Can returns NIL if it is missing"
+  (let ((start (search "<?xml" buf)))
+    (when start
+      (let ((end (search "?>" buf :start2 start)))
+        (when end
+          (subseq buf start (+ end 2)))))))
+
+
+(defun read-xml-decl (stream)
+  (let* ((bin-buf (make-array 256 :element-type '(unsigned-byte 8)))
+         (read-num (read-sequence bin-buf stream :start 0 :end 256))
+         (buf (decode-ascii-silently bin-buf))
+         (read-buf (subseq buf 0 read-num))
+         (xml-decl (extract-xml-decl read-buf))
+         (restored-stream (make-concatenated-stream
+                           ;; XXX like (make-string-input-stream read-buf) but for bytes:
+                           (flexi-streams:make-in-memory-input-stream bin-buf)
+                           stream)))
+    (values xml-decl restored-stream)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; DESERIALIZE
@@ -298,9 +326,19 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defun deserialize (in-stream)
   "PATH can be NIL, - or a valid path"
-  (let ((mysax (make-instance 'mysax)))
+  (let ((mysax (make-instance 'mysax))
+        (xml-decl-content nil)
+        (in-stream1 in-stream))
     (handler-case
-        (progn (cxml:parse in-stream mysax)
+        (progn (multiple-value-setq
+                   (xml-decl-content in-stream1)
+                 (read-xml-decl in-stream))
+               (format t "!!!!!!!!!!!!!!!!!! ~A~%" xml-decl-content)
+               (if xml-decl-content
+                   (model:set-doc-xml-decl (mysax-doc mysax) (model:create-xml-decl xml-decl-content))
+                   (model:set-doc-xml-decl (mysax-doc mysax) (model:create-xml-decl "<?xml version=\"1.0\"?>")))
+               ;(format t "                   READ ~A~%" (read-line in-stream1))
+               (cxml:parse in-stream1 mysax)
                (cons :ok (mysax-doc mysax)))
       (error (x) (cons :fail (format nil "Parsing of input XML failed: ~A" x))))))
 
@@ -314,7 +352,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defun serialize-xml-decl (xml-decl out-stream)
   (check-type xml-decl (or null model:xml-decl))
   (when xml-decl
-    (format out-stream (model:get-xml-decl-content xml-decl))))
+    (format out-stream "~A~%" (model:get-xml-decl-content xml-decl))))
 
 
 (defun serialize-dtd-item (dtd-item out-stream)
@@ -476,5 +514,4 @@ so we save them first here, then add to an element, also they are scoped")
          (doc-dtd (model:get-doc-dtd doc)))
     (serialize-xml-decl xml-decl out-stream)
     (serialize-doc-dtd doc-dtd out-stream)
-    (serialize-node (model:get-doc-root doc) out-stream)
-    (format t "NOT YET IMPLEMENTED~%")))
+    (serialize-node (model:get-doc-root doc) out-stream)))

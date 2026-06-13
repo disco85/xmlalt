@@ -891,6 +891,12 @@ integer IDX to STRING"
   (doc-dtd doc))
 
 
+(defun set-doc-xml-decl (doc xml-decl)
+  (check-type doc doc)
+  (check-type xml-decl xml-decl)
+  (setf (doc-xml-decl doc) xml-decl))
+
+
 (defun get-doc-xml-decl (doc)
   (check-type doc doc)
   (doc-xml-decl doc))

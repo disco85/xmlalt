@@ -28,7 +28,11 @@
                      :element-type
                      ,(ecase mode
                         (:binary ''(unsigned-byte 8))
-                        (:text ''character)))
+                        (:text ''character))
+                     :external-format
+                     ,(ecase mode
+                        (:binary :default)
+                        (:text :utf-8)))
              ,@body)))))
 
 

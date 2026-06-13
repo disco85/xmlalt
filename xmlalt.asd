@@ -8,7 +8,7 @@
   :license "GPL-3.0-or-later"
   :version "0.0.1"
   :serial t
-  :depends-on (:clingon :cxml)
+  :depends-on (:clingon :cxml :flexi-streams)
   :components ((:file "package")
                (:file "utils")
                (:file "model")
