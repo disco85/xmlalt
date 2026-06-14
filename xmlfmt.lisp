@@ -71,6 +71,15 @@ so we save them first here, then add to an element, also they are scoped")
     (and (stringp accumulated) (string/= accumulated ""))))
 
 
+(defun end-accumulated-characters-with-text-node (mysax)
+  "Adds text node to MYSAX if there are any accumulated characters and resets them"
+  (when (accumulated-characters-exist mysax)
+    (let* ((characters (string-trim '(#\Space #\Tab #\Newline) (mysax-characters mysax)))
+           (text (model:create-text characters)))
+      (model:add-child-node-to-current-elem text (mysax-doc mysax))
+      (reset-characters-accumulation mysax))))
+
+
 (defmethod sax:start-document ((mysax mysax))
   (format t "START-DOCUMENT!~%~%"))
 
@@ -199,9 +208,9 @@ so we save them first here, then add to an element, also they are scoped")
                                  :prefix-mappings (car (mysax-prefix-mappings mysax))
                                  :attributes (mapcar #'adapt-attr attributes))))
     ;; (set-node-dir elem mysax)
+    (end-accumulated-characters-with-text-node mysax)
     (model:add-child-node-to-current-elem elem (mysax-doc mysax))
     (model:enter-elem elem (mysax-doc mysax))
-    (reset-characters-accumulation mysax)
     (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
             namespace-uri local-name qname attributes)))
 
@@ -211,8 +220,8 @@ so we save them first here, then add to an element, also they are scoped")
   ;;   (let ((text (model:create-text (mysax-characters mysax))))
   ;;     ;; (set-node-dir text mysax)
   ;;     (model:add-child-node-to-current-elem text (mysax-doc mysax))))
+  (end-accumulated-characters-with-text-node mysax)
   (model:exit-from-elem (mysax-doc mysax))
-  (reset-characters-accumulation mysax)
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
           namespace-uri local-name qname))
 
@@ -511,7 +520,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defun serialize (doc out-stream)
   (check-type doc model:doc)
-  (inspect doc)
+  ;; (inspect doc)
   (let* ((xml-decl (model:get-doc-xml-decl doc))
          (doc-dtd (model:get-doc-dtd doc)))
     (serialize-xml-decl xml-decl out-stream)
