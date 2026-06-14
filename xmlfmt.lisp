@@ -522,6 +522,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defun serialize (doc out-stream)
   (check-type doc model:doc)
+  (inspect doc)
   (let* ((xml-decl (model:get-doc-xml-decl doc))
          (doc-dtd (model:get-doc-dtd doc)))
     (serialize-xml-decl xml-decl out-stream)
