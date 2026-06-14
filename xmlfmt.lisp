@@ -218,10 +218,10 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:end-element ((mysax mysax) namespace-uri local-name qname)
-  (when (accumulated-characters-exist mysax)
-    (let ((text (model:create-text (mysax-characters mysax))))
-      ;; (set-node-dir text mysax)
-      (model:add-child-node-to-current-elem text (mysax-doc mysax))))
+  ;; (when (accumulated-characters-exist mysax)
+  ;;   (let ((text (model:create-text (mysax-characters mysax))))
+  ;;     ;; (set-node-dir text mysax)
+  ;;     (model:add-child-node-to-current-elem text (mysax-doc mysax))))
   (model:exit-from-elem (mysax-doc mysax))
   (end-accumulated-characters-with-text-node mysax)
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
@@ -250,7 +250,7 @@ so we save them first here, then add to an element, also they are scoped")
   (when (accumulated-characters-exist mysax)
     (let ((cdata (model:create-cdata (mysax-characters mysax))))
       (model:add-child-node-to-current-elem cdata (mysax-doc mysax)))
-    (end-accumulated-characters-with-text-node mysax)
+    (reset-characters-accumulation mysax)
     (format t "END-CDATA!~%~%")))
   ;; (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
   ;;                   (cur-elem (car elems-stack))
@@ -444,7 +444,8 @@ so we save them first here, then add to an element, also they are scoped")
   (check-type node model:node)
   (etypecase node
     (model:text (format out-stream "~A~%"
-                        (model:get-text-content node)))
+                        (escape-unsafe-xml-text
+                         (model:get-text-content node))))
     (model:pinstr (format out-stream "~A~A~@[ ~A~]~A~%"
                           (model:get-node-open-by node)
                           (model:get-pinstr-target node)
@@ -463,16 +464,20 @@ so we save them first here, then add to an element, also they are scoped")
     (model:elem (serialize-elem node out-stream))))
 
 
-
 (defun escape-unsafe-xml-text (string)
   (check-type string string)
-  (dolist (rule '(("&" "&amp;")
-                  ("<" "&lt;")
-                  (">" "&gt;")
-                  ("\"" "&quot;"))
-                string)
-    (setf string (subs string (first rule) (second rule)))))
-
+  (flet ((escape-char (ch)
+           (cond
+             ((char= ch #\&) "&amp;")
+             ((char= ch #\<) "&lt;")
+             ((char= ch #\>) "&gt;")
+             ((char= ch #\") "&quot;")
+             ((> (char-code ch) 127)
+              (format nil "&#x~X;" (char-code ch)))
+             (t (string ch)))))
+    (with-output-to-string (safe-string)
+      (loop for ch across string
+            do (write-string (escape-char ch) safe-string)))))
 
 
 (defun serialize-attr (attr out-stream)
