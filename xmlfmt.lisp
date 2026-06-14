@@ -500,11 +500,12 @@ so we save them first here, then add to an element, also they are scoped")
     (serialize-attr attr out-stream))
   (if (= 0 (model:get-elem-children-num elem))
       (format out-stream "/>~%")
-      (format out-stream ">~%"))
-  (model:over-elem-children
-   elem
-   :do #'(lambda (child-node) (serialize-node child-node out-stream)))
-  (format out-stream "</~A>~%" (model:get-elem-qname elem)))
+      (progn
+        (format out-stream ">~%")
+        (model:over-elem-children
+         elem
+         :do #'(lambda (child-node) (serialize-node child-node out-stream)))
+        (format out-stream "</~A>~%" (model:get-elem-qname elem)))))
 
 
 
