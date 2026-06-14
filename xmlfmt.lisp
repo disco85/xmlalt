@@ -207,7 +207,6 @@ so we save them first here, then add to an element, also they are scoped")
                                  :qname qname
                                  :prefix-mappings (car (mysax-prefix-mappings mysax))
                                  :attributes (mapcar #'adapt-attr attributes))))
-    ;; (set-node-dir elem mysax)
     (end-accumulated-characters-with-text-node mysax)
     (model:add-child-node-to-current-elem elem (mysax-doc mysax))
     (model:enter-elem elem (mysax-doc mysax))
@@ -229,13 +228,15 @@ so we save them first here, then add to an element, also they are scoped")
 (defmethod sax:comment ((mysax mysax) data)
   (let ((comment (model:create-comment data)))
     ;; (set-node-dir comment mysax) ;; TODO remove all set-node-dir ?
+    (end-accumulated-characters-with-text-node mysax)
     (model:add-child-node-to-current-elem comment (mysax-doc mysax))
-    (reset-characters-accumulation mysax)
+    ;; (reset-characters-accumulation mysax)
     (format t "COMMENT! DATA: ~A~%~%" data)))
 
 
 (defmethod sax:start-cdata ((mysax mysax))
-  (reset-characters-accumulation mysax)
+  ;; (reset-characters-accumulation mysax)
+  (end-accumulated-characters-with-text-node mysax)
   (format t "START-CDATA!~%~%"))
   ;; (let ((cdata (model:create-cdata)))
   ;;   (set-node-dir cdata mysax)
@@ -271,8 +272,9 @@ so we save them first here, then add to an element, also they are scoped")
 (defmethod sax:processing-instruction ((mysax mysax) target data)
   (let ((pinstr (model:create-pinstr :target target :data data)))
     ;; (set-node-dir pinstr mysax)  ;; TODO maybe to unite these 2 calls?
+    (end-accumulated-characters-with-text-node mysax)
     (model:add-child-node-to-current-elem pinstr (mysax-doc mysax))
-    (reset-characters-accumulation mysax)
+    ;; (reset-characters-accumulation mysax)
     (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data)))
 
 
