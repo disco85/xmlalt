@@ -369,10 +369,16 @@ so we save them first here, then add to an element, also they are scoped")
              (model:get-attr-decl-type dtd-item)
              (model:get-attr-decl-default dtd-item)))
     (model:nota-decl
-     (format out-stream "<!NOTATION ~A ~A \"~A\">~%"
-             (model:get-nota-decl-name dtd-item)
-             (model:get-nota-decl-public-id dtd-item)
-             (model:get-nota-decl-system-id dtd-item)))
+     (if (model:get-nota-decl-public-id dtd-item)
+         (format out-stream
+                 "<!NOTATION ~A PUBLIC \"~A\" \"~A\">~%"
+                 (model:get-nota-decl-name dtd-item)
+                 (model:get-nota-decl-public-id dtd-item)
+                 (model:get-nota-decl-system-id dtd-item))
+         (format out-stream
+                 "<!NOTATION ~A SYSTEM \"~A\">~%"
+                 (model:get-nota-decl-name dtd-item)
+                 (model:get-nota-decl-system-id dtd-item))))
     (model:int-ent-decl
      (ecase (model:get-int-ent-decl-kind dtd-item)
        (:general
