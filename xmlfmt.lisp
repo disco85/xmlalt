@@ -353,18 +353,21 @@ so we save them first here, then add to an element, also they are scoped")
   (cond
     ((stringp model)
      (write-string model out-stream))
-    ((eq model :pcdata)
+    ((eq model :PCDATA)
      (write-string "#PCDATA" out-stream))
     ((consp model)
      (case (car model)
        (OR
-        (write-char #\( out-stream)
+        (write-char #\( out-stream) ;; first (
+        ;; over ITEM in the tail of MODEL, set FIRST to T in the first step, then to NIL
+        ;; and do on every step: if not FIRST, write " | ", ie it produces:
+        ;; item1 | item2 | ...  (serializing itemN recursively):
         (loop for item in (cdr model)
               for first = t then nil
               do (unless first
                    (write-string " | " out-stream))
                  (serialize-elem-decl-model item out-stream))
-        (write-char #\) out-stream))
+        (write-char #\) out-stream)) ;; closing )
        (SEQ
         (write-char #\( out-stream)
         (loop for item in (cdr model)
