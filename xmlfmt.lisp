@@ -431,20 +431,23 @@ so we save them first here, then add to an element, also they are scoped")
   (check-type doc-dtd (or null model:dtd))
   (when doc-dtd
     (cond ((model:get-dtd-public-id doc-dtd)
-           (format out-stream "<!DOCTYPE ~A PUBLIC \"~A\" \"~A\">~%"
+           (format out-stream "<!DOCTYPE ~A PUBLIC \"~A\" \"~A\""
                    (model:get-dtd-name doc-dtd)
                    (model:get-dtd-public-id doc-dtd)
                    (model:get-dtd-system-id doc-dtd)))
           ((model:get-dtd-system-id doc-dtd)
-           (format out-stream "<!DOCTYPE ~A SYSTEM \"~A\">~%"
+           (format out-stream "<!DOCTYPE ~A SYSTEM \"~A\""
                    (model:get-dtd-name doc-dtd)
                    (model:get-dtd-system-id doc-dtd)))
           (t
-           (format out-stream "<!DOCTYPE ~A [~%"
+           (format out-stream "<!DOCTYPE ~A"
                    (model:get-dtd-name doc-dtd))))
-    (dolist (dtd-item (model:get-dtd-items doc-dtd))
-      (serialize-dtd-item dtd-item out-stream))
-    (format out-stream "]>~%")))
+    (if (model:get-dtd-items doc-dtd)
+        (progn (format out-stream " [~%")
+               (dolist (item (model:get-dtd-items doc-dtd))
+                 (serialize-dtd-item item out-stream))
+               (format out-stream "]>~%"))
+        (format out-stream ">~%"))))
 
 
 (defun serialize-node (node out-stream)
