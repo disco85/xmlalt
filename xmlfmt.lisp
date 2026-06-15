@@ -101,7 +101,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defmethod sax:element-declaration ((mysax mysax) name model)
   (let ((elem-decl (model:create-elem-decl :name name :model model)))
     (model:add-dtd-item (model:get-doc-dtd (mysax-doc mysax)) elem-decl)
-    (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~A~%~%" name model)))
+    (format t "ELEMENT-DECLARATION! NAME: ~A MODEL: ~S~%~%" name model)))
 
 
 (defmethod sax:notation-declaration ((mysax mysax) name public-id system-id)
@@ -349,6 +349,43 @@ so we save them first here, then add to an element, also they are scoped")
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun serialize-elem-decl-model (model out-stream)
+  (cond
+    ((stringp model)
+     (write-string model out-stream))
+    ((eq model :pcdata)
+     (write-string "#PCDATA" out-stream))
+    ((consp model)
+     (case (car model)
+       (OR
+        (write-char #\( out-stream)
+        (loop for item in (cdr model)
+              for first = t then nil
+              do (unless first
+                   (write-string " | " out-stream))
+                 (serialize-elem-decl-model item out-stream))
+        (write-char #\) out-stream))
+       (SEQ
+        (write-char #\( out-stream)
+        (loop for item in (cdr model)
+              for first = t then nil
+              do (unless first
+                   (write-string ", " out-stream))
+                 (serialize-elem-decl-model item out-stream))
+        (write-char #\) out-stream))
+       (*
+        (serialize-elem-decl-model (cadr model) out-stream)
+        (write-char #\* out-stream))
+       (+
+        (serialize-elem-decl-model (cadr model) out-stream)
+        (write-char #\+ out-stream))
+       (?
+        (serialize-elem-decl-model (cadr model) out-stream)
+        (write-char #\? out-stream))
+       (t
+        (error "Unknown content model operator: ~S" (car model)))))))
+
+
 (defun serialize-xml-decl (xml-decl out-stream)
   (check-type xml-decl (or null model:xml-decl))
   (when xml-decl
@@ -359,9 +396,10 @@ so we save them first here, then add to an element, also they are scoped")
   (check-type dtd-item model:dtd-item)
   (etypecase dtd-item
     (model:elem-decl
-     (format out-stream "<!ELEMENT ~A ~A>~%"
-             (model:get-elem-decl-name dtd-item)
-             (model:get-elem-decl-model dtd-item)))
+     (format out-stream "<!ELEMENT ~A "
+             (model:get-elem-decl-name dtd-item))
+     (serialize-elem-decl-model (model:get-elem-decl-model dtd-item) out-stream)
+     (format out-stream ">~%"))
     (model:attr-decl
      (format out-stream "<!ATTLIST ~A ~A ~A ~A>~%"
              (model:get-attr-decl-elem-name dtd-item)

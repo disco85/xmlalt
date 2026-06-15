@@ -11,6 +11,10 @@
   (value "" :type string))
 
 
+(deftype elem-decl-model ()
+  '(or string keyword cons))
+
+
 (defstruct node
   (idx nil :type (or null (integer 0)))
   (open-by "<" :type string)
@@ -81,7 +85,7 @@
 
 (defstruct (elem-decl (:include dtd-item))
   (name "" :type string)
-  (model "" :type string))
+  (model nil :type elem-decl-model))
 
 
 (defstruct (attr-decl (:include dtd-item))
@@ -597,7 +601,7 @@ integer IDX to STRING"
               (keywordp model)
               (non-empty-string-p model)))
   (make-elem-decl :name name
-                  :model (try-as-string model)))
+                  :model model))
 
 
 (defun get-elem-decl-name (elem-decl)
