@@ -15,6 +15,22 @@
   '(or string keyword cons))
 
 
+(deftype attr-decl-type ()
+  '(or
+    (member :CDATA :ID :IDREF :IDREFS
+            :ENTITY :ENTITIES
+            :NMTOKEN :NMTOKENS)
+    (cons (member :NOTATION :ENUMERATION)
+     list)))
+
+
+(deftype attr-decl-default ()
+  '(or
+    (member :REQUIRED :IMPLIED)
+    (cons (member :FIXED :DEFAULT)
+     (cons string null))))
+
+
 (defstruct node
   (idx nil :type (or null (integer 0)))
   (open-by "<" :type string)
@@ -91,8 +107,8 @@
 (defstruct (attr-decl (:include dtd-item))
   (elem-name "" :type string)
   (attr-name "" :type string)
-  (type "" :type string)
-  (default "" :type string))
+  (type :CDATA :type attr-decl-type)
+  (default :IMPLIED :type attr-decl-default))
 
 
 (defstruct (nota-decl (:include dtd-item))
@@ -623,14 +639,12 @@ integer IDX to STRING"
 (defun create-attr-decl (&key elem-name attr-name type default)
   (assert (non-empty-string-p elem-name))
   (assert (non-empty-string-p attr-name))
-  (assert (or (keywordp type)
-              (non-empty-string-p type)))
-  (assert (or (keywordp default)
-              (non-empty-string-p default)))
+  (check-type type attr-decl-type)
+  (check-type default attr-decl-default)
   (make-attr-decl :elem-name elem-name
                   :attr-name attr-name
-                  :type (try-as-string type)
-                  :default (try-as-string default)))
+                  :type type
+                  :default default))
 
 
 (defun get-attr-decl-elem-name (attr-decl)

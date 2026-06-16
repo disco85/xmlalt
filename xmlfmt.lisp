@@ -323,6 +323,11 @@ so we save them first here, then add to an element, also they are scoped")
 ;; DESERIALIZE
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TODO for attribute in DTD:
+    ;; type        one of :CDATA, :ID, :IDREF, :IDREFS,
+    ;;             :ENTITY, :ENTITIES, :NMTOKEN, :NMTOKENS,
+    ;;             (:NOTATION <name>*), or (:ENUMERATION <name>*)
+    ;; default     :REQUIRED, :IMPLIED, (:FIXED content), or (:DEFAULT content)")
 
 (defun deserialize (in-stream)
   "PATH can be NIL, - or a valid path"
@@ -355,6 +360,8 @@ so we save them first here, then add to an element, also they are scoped")
      (write-string model out-stream))
     ((eq model :PCDATA)
      (write-string "#PCDATA" out-stream))
+    ((eq model :EMPTY)
+     (write-string "EMPTY" out-stream))
     ((consp model)
      (case (car model)
        (OR
