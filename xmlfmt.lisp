@@ -81,7 +81,10 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:start-document ((mysax mysax))
-  (format t "START-DOCUMENT!~%~%"))
+  (let ((bogus-container (model:create-elem :local-name "-bogus-container")))
+    (model:add-child-node-to-current-elem bogus-container (mysax-doc mysax))
+    (model:enter-elem bogus-container (mysax-doc mysax))
+    (format t "START-DOCUMENT!~%~%")))
 
 
 (defmethod sax:start-dtd ((mysax mysax) name public-id system-id)
@@ -168,37 +171,6 @@ so we save them first here, then add to an element, also they are scoped")
                      :qname (sax:attribute-qname sax-standard-attribute)
                      :value (sax:attribute-value sax-standard-attribute)
                      :specified (sax:attribute-specified-p sax-standard-attribute)))
-
-
-;; (defun current-dir (mysax)
-;;   "Current DIR (path) using the current full path from the ELEMS-STACK"
-;;   (let* ((elems-stack ;; TODO use full name instead of elem-local-name or?
-;;            (reverse (model:doc-elems-stack (mysax-doc mysax))))
-;;          (elem-names (mapcar #'model:elem-local-name elems-stack)))
-;;     (format nil "~{~A~^/~}" elem-names)))
-
-
-;; (defun current-dir-with-elem (mysax elem)
-;;   "Forms DIR (path) of ELEM using also the current full path from the ELEMS-STACK"
-;;   (let* ((cd (current-dir mysax))
-;;          (fmt (if (string= cd "") "~*~A" "~A/~A"))) ;; form "a/b" or "b" but not "/b"
-;;     (format nil fmt cd (model:elem-local-name elem))))
-
-
-;; (defun set-node-dir (node mysax)
-;;   "Sets DIR of NODE using also ELEMS-STACK from MYSAX"
-;;   (let ((node-dir (if (typep node 'model:elem)
-;;                       (current-dir-with-elem mysax node)
-;;                       (current-dir mysax))))
-;;     (setf (model:node-dir node) node-dir)))
-
-
-
-
-;; (defun model:add-child-node-to-current-elem (node mysax)
-;;   (check-type node model:node)
-;;   (check-type mysax mysax)
-;;   (model:add-child-node-to-current-elem node (mysax-doc mysax)))
 
 
 (defmethod sax:start-element ((mysax mysax) namespace-uri local-name qname attributes)
@@ -555,7 +527,9 @@ so we save them first here, then add to an element, also they are scoped")
                              (model:get-node-open-by node)
                              (model:get-comment-content node)
                              (model:get-node-close-by node))))
-    (model:elem (serialize-elem node out-stream))))
+    (model:elem (serialize-elem node
+                                out-stream
+                                (null (model:get-node-parent node))))))
 
 
 (defun escape-unsafe-xml-text (string)
@@ -584,27 +558,31 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 
-(defun serialize-elem (elem out-stream)
+(defun serialize-elem (elem out-stream &optional bogus-container)
   (check-type elem model:elem)
-  (format out-stream "<~A" (model:get-elem-qname elem))
-  (model:over-prefix-mappings
-   (model:get-elem-uniq-prefix-mappings elem)
-   :do #'(lambda (pmi) ;; arg is a CONS
-           (destructuring-bind (prefix . uri) pmi
-             (if (non-empty-string-p prefix)
-                 (format out-stream " xmlns:~A=\"~A\"" prefix uri)
-                 (format out-stream " xmlns=\"~A\"" uri)))))
-  ;;(format out-stream " ~A" (model:get-elem-namespace-uri elem))
-  (dolist (attr (model:get-elem-attributes elem))
-    (serialize-attr attr out-stream))
+  (unless bogus-container
+    (format out-stream "<~A" (model:get-elem-qname elem))
+    (model:over-prefix-mappings
+     (model:get-elem-uniq-prefix-mappings elem)
+     :do #'(lambda (pmi) ;; arg is a CONS
+             (destructuring-bind (prefix . uri) pmi
+               (if (non-empty-string-p prefix)
+                   (format out-stream " xmlns:~A=\"~A\"" prefix uri)
+                   (format out-stream " xmlns=\"~A\"" uri)))))
+    ;;(format out-stream " ~A" (model:get-elem-namespace-uri elem))
+    (dolist (attr (model:get-elem-attributes elem))
+      (serialize-attr attr out-stream)))
   (if (= 0 (model:get-elem-children-num elem))
-      (format out-stream "/>~%")
+      (unless bogus-container
+        (format out-stream "/>~%"))
       (progn
-        (format out-stream ">~%")
+        (unless bogus-container
+          (format out-stream ">~%"))
         (model:over-elem-children
          elem
          :do #'(lambda (child-node) (serialize-node child-node out-stream)))
-        (format out-stream "</~A>~%" (model:get-elem-qname elem)))))
+        (unless bogus-container
+          (format out-stream "</~A>~%" (model:get-elem-qname elem))))))
 
 
 
