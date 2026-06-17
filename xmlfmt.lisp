@@ -402,6 +402,36 @@ so we save them first here, then add to an element, also they are scoped")
     (format out-stream "~A~%" (model:get-xml-decl-content xml-decl))))
 
 
+(defun serialize-attr-type (type stream)
+  (etypecase type
+    ((member :CDATA :ID :IDREF :IDREFS
+             :ENTITY :ENTITIES
+             :NMTOKEN :NMTOKENS)
+     (write-string (symbol-name type) stream))
+    (cons
+     (case (car type)
+       (:NOTATION
+        (format stream "NOTATION (~{~A~^ | ~})"
+                (cdr type)))
+       (:ENUMERATION
+        (format stream "(~{~A~^ | ~})"
+                (cdr type)))))))
+
+
+(defun serialize-attr-default (default stream)
+  (etypecase default
+    ((member :REQUIRED :IMPLIED)
+     (format stream "#~A" (symbol-name default)))
+    (cons
+     (case (car default)
+       (:FIXED
+        (format stream "#FIXED \"~A\""
+                (cadr default)))
+       (:DEFAULT
+        (format stream "\"~A\""
+                (cadr default)))))))
+
+
 (defun serialize-dtd-item (dtd-item out-stream)
   (check-type dtd-item model:dtd-item)
   (etypecase dtd-item
@@ -411,11 +441,17 @@ so we save them first here, then add to an element, also they are scoped")
      (serialize-elem-decl-model (model:get-elem-decl-model dtd-item) out-stream)
      (format out-stream ">~%"))
     (model:attr-decl
-     (format out-stream "<!ATTLIST ~A ~A ~A ~A>~%"
+     (format out-stream "<!ATTLIST ~A ~A "
              (model:get-attr-decl-elem-name dtd-item)
-             (model:get-attr-decl-attr-name dtd-item)
-             (model:get-attr-decl-type dtd-item)
-             (model:get-attr-decl-default dtd-item)))
+             (model:get-attr-decl-attr-name dtd-item))
+     (serialize-attr-type
+      (model:get-attr-decl-type dtd-item)
+      out-stream)
+     (write-char #\Space out-stream)
+     (serialize-attr-default
+      (model:get-attr-decl-default dtd-item)
+      out-stream)
+     (format out-stream ">~%"))
     (model:nota-decl
      (if (model:get-nota-decl-public-id dtd-item)
          (format out-stream
