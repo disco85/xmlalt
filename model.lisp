@@ -141,7 +141,10 @@
   (content "" :type string))
 
 
-(defstruct dtd
+;; TODO elems-stack must be list of elem|dtd|dtd-item??|?
+(defstruct (dtd (:include node
+                 (open-by "")
+                 (close-by "")))
   (items nil :type list)
   (name "" :type string)
   (public-id nil :type (or null string))

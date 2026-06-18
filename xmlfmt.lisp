@@ -88,9 +88,11 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:start-dtd ((mysax mysax) name public-id system-id)
-  (model:set-doc-dtd (mysax-doc mysax)
-                     (model:create-dtd :name name :public-id public-id :system-id system-id))
-  (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id))
+  (let ((dtd (model:create-dtd :name name :public-id public-id :system-id system-id)))
+    (end-accumulated-characters-with-text-node mysax)
+    (model:add-child-node-to-current-elem dtd (mysax-doc mysax))
+    (model:set-doc-dtd (mysax-doc mysax) dtd)
+    (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id)))
 
 
 (defmethod sax::dtd ((mysax mysax) dtd)  ;; dtd is internal and must be defined
@@ -509,6 +511,7 @@ so we save them first here, then add to an element, also they are scoped")
 (defun serialize-node (node out-stream)
   (check-type node model:node)
   (etypecase node
+    (model:dtd (serialize-doc-dtd node out-stream))
     (model:text (format out-stream "~A~%"
                         (escape-unsafe-xml-text
                          (model:get-text-content node))))
@@ -585,12 +588,25 @@ so we save them first here, then add to an element, also they are scoped")
           (format out-stream "</~A>~%" (model:get-elem-qname elem))))))
 
 
+;; TODO
+;; XML structure:
+;;   xml-declaration?
+;;   (misc-item)*
+;;   doctype?
+;;   (misc-item)*
+;;   root-element
+;;   (misc-item)*
+;;
+;; So, this is valid:
+;;   <?xml version="1.0"?>
+;;   <!-- comment -->
+;;   <?xml-stylesheet href="x.css" type="text/css"?>
+;;   <!DOCTYPE root SYSTEM "test.dtd">
+;;   <root/>
 
 (defun serialize (doc out-stream)
   (check-type doc model:doc)
   ;; (inspect doc)
-  (let* ((xml-decl (model:get-doc-xml-decl doc))
-         (doc-dtd (model:get-doc-dtd doc)))
+  (let* ((xml-decl (model:get-doc-xml-decl doc)))
     (serialize-xml-decl xml-decl out-stream)
-    (serialize-doc-dtd doc-dtd out-stream)
     (serialize-node (model:get-doc-root doc) out-stream)))
