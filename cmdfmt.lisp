@@ -5,13 +5,13 @@
 
 (defun serialize (doc stream)
   "Serializes MODEL:DOC object"
-  (serialize-dtd doc stream)
+  ;;(serialize-dtd doc stream)
   (with-truly root (model:get-doc-root doc)
     (serialize-nodes doc root stream)))
 
 
-(defun serialize-dtd (doc stream)
-  (with-truly dtd (model:get-doc-dtd doc)
+(defun serialize-dtd (doc dtd stream)
+  (when dtd
     (format stream ".DTD~%")
     (serialize-dtd-attrs doc dtd stream)
     (with-truly items (model:get-dtd-items dtd)
@@ -122,6 +122,7 @@
 (defun serialize-nodes (doc node stream)
   "Serializes XML node"
   (typecase node
+    (model:dtd (serialize-dtd doc node stream))
     (model:elem
      (format stream ".EL ~A ~A~%"
              (model:get-elem-children-num node)
