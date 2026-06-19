@@ -202,7 +202,7 @@
   (node-idx node))
 
 
-(defun calc-node-dir (node &key with-idx-as non-elem-name-as join-by)
+(defun calc-node-dir (node &key with-idx-as non-elem-name-as join-by without-root)
   "Collects DIR of a NODE (adding IDX, if WITH-IDX-AS was passed) of every
 ELEM en route and returns the result as a list of strings. But if
 JOIN-BY was passed as some STRING, then returns it as a STRING joining
@@ -215,10 +215,14 @@ integer IDX to STRING"
   (labels ((prep-join-fmt (delim)
              "Prepares FORMAT string able to join items by DELIM"
              (concatenate 'string "~{~A~^" delim "~}"))
+           (calc-node-idx (n)
+             (if without-root
+               (1- (node-idx n))
+               (node-idx n)))
            (cons-idx-if (n lst)
              "Adds IDX of a NODE N to the front of list LST if WITH-IDX"
-             (if (and with-idx-as (node-idx n))
-               (cons (funcall with-idx-as (node-idx n))
+             (if (and with-idx-as (calc-node-idx n))
+               (cons (funcall with-idx-as (calc-node-idx n))
                      lst)
                lst))
            (collect-dirs (n dirs)
@@ -237,7 +241,10 @@ integer IDX to STRING"
                                                         dirs)))
                        (collect-dirs (node-parent n) dirs)))
                (t dirs))))
-    (let ((dirs (collect-dirs node nil)))
+    (let* ((dirs0 (collect-dirs node nil))
+           (dirs (cond ((and without-root with-idx-as) (cddr dirs0))
+                       (without-root                   (cdr dirs0))
+                       (t                              dirs0))))
       (if join-by
         (format nil (prep-join-fmt join-by) dirs)
         dirs))))

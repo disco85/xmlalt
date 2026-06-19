@@ -133,7 +133,7 @@
        (unless bogus-container
          (format stream ".EL ~A ~A~%"
                  (model:get-elem-children-num node)
-                 (model:calc-node-dir node :join-by *dir-delim*))
+                 (model:calc-node-dir node :join-by *dir-delim* :without-root t))
          (with-truly namespace-uri (model:get-elem-namespace-uri node)
            (format stream ".EL.NS ~A~%" (model:write-uri namespace-uri)))
          (with-truly local-name (model:get-elem-local-name node)
@@ -150,7 +150,7 @@
            (serialize-nodes doc child stream nil)))
        (unless bogus-container
          (format stream ".ELE ~A~%"
-                 (model:calc-node-dir node :join-by *dir-delim*))))
+                 (model:calc-node-dir node :join-by *dir-delim* :without-root t))))
 
     (model:text
        (with-truly content (model:get-text-content node)
