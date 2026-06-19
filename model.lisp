@@ -218,28 +218,29 @@ integer IDX to STRING"
            (cons-idx-if (n lst)
              "Adds IDX of a NODE N to the front of list LST if WITH-IDX"
              (if (and with-idx-as (node-idx n))
-                 (cons (funcall with-idx-as (node-idx n))
-                       lst)
-                 lst))
-           (collect-dir (n dir)
+               (cons (funcall with-idx-as (node-idx n))
+                     lst)
+               lst))
+           (collect-dirs (n dirs)
              "Recursively collects DIR from a node N to the top parent"
+             (declare (type (or null (cons string *)) dirs))
              (typecase n
-               (null dir)
-               (elem (collect-dir (node-parent n)
-                                  (cons-idx-if n
-                                               (cons (elem-local-name n)
-                                                     dir))))
+               (null dirs)
+               (elem (collect-dirs (node-parent n)
+                                   (cons-idx-if n
+                                                (cons (elem-local-name n)
+                                                      dirs))))
                (node (if non-elem-name-as
-                         (collect-dir (node-parent n)
-                                      (cons-idx-if n
-                                                   (cons (funcall non-elem-name-as n)
-                                                         dir)))
-                         (collect-dir (node-parent n) dir)))
-               (t dir))))
-    (let ((dir (collect-dir node nil)))
+                       (collect-dirs (node-parent n)
+                                     (cons-idx-if n
+                                                  (cons (funcall non-elem-name-as n)
+                                                        dirs)))
+                       (collect-dirs (node-parent n) dirs)))
+               (t dirs))))
+    (let ((dirs (collect-dirs node nil)))
       (if join-by
-          (format nil (prep-join-fmt join-by) dir)
-          dir))))
+        (format nil (prep-join-fmt join-by) dirs)
+        dirs))))
 
 
 (defun %add-child-node-to-elem (child-node parent-elem)
