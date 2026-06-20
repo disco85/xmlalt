@@ -91,16 +91,14 @@ to get similar to ~A but with escaping"
 
 (defun serialize (doc stream)
   "Serializes MODEL:DOC object"
-  (serialize-dtd doc stream)
   (with-truly root (model:get-doc-root doc)
     (serialize-nodes doc root stream)))
 
 
-(defun serialize-dtd (doc stream)
-  (with-truly dtd (model:get-doc-dtd doc)
-    (serialize-dtd-attrs doc dtd stream)
-    (with-truly items (model:get-dtd-items dtd)
-      (serialize-dtd-items doc dtd items stream))))
+(defun serialize-dtd (doc dtd stream)
+  (serialize-dtd-attrs doc dtd stream)
+  (with-truly items (model:get-dtd-items dtd)
+    (serialize-dtd-items doc dtd items stream)))
 
 
 (defun serialize-dtd-attrs (doc dtd stream)
@@ -222,6 +220,8 @@ to get similar to ~A but with escaping"
 (defun serialize-nodes (doc node stream)
   "Serializes XML node"
   (typecase node
+    (model:dtd
+       (serialize-dtd doc (model:get-doc-dtd doc) stream))
     (model:elem
      (if (> (model:get-elem-children-num node) 0)
          (format stream *stdfmt*
@@ -229,11 +229,6 @@ to get similar to ~A but with escaping"
                        ;;(node-idx-to-str node)
                        "<children>")
                  (model:get-elem-children-num node)))
-     ;; (with-truly local-name (model:elem-local-name node)
-     ;;   (format stream *stdfmt*
-     ;;           (list (model:node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
-     ;;                 "<local-name>")
-     ;;           local-name))
      (with-truly namespace-uri (model:get-elem-namespace-uri node)
        (format stream *stdfmt*
                (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
