@@ -180,7 +180,7 @@ to get similar to ~A but with escaping"
   (declare (ignore doc))
   (dolist (attribute attributes)
     (format stream *stdfmt*
-            (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep*)
+            (list (model:calc-node-dir node :with-idx-as #'as-internal-str :join-by *sep* :without-root t)
                   ;;(node-idx-to-str node)
                   (concatenate 'string "@" (model:get-attr-qname attribute)))
             (model:get-attr-value attribute))

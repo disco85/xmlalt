@@ -20,7 +20,7 @@ if [[ "${RELEASE+x}" = x ]]; then
   SBCL_LISP_OPTS+=(--disable-debugger)
   SAVE_EXTRA=":purify t :compression t"
 else
-  SBCL_LISP_OPTS+=() #--debug 3)
+  SBCL_LISP_OPTS+=()  #--debug 3)
   SAVE_EXTRA=""
 fi
 

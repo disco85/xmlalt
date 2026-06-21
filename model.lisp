@@ -212,13 +212,15 @@ without it such dir component will be skipped. WITH-IDX-AS converts
 integer IDX to STRING"
   (check-type node node)
   (check-type join-by (or null string))
+  ;; (when without-root (break)) ;; TODO remove it
   (labels ((prep-join-fmt (delim)
              "Prepares FORMAT string able to join items by DELIM"
              (concatenate 'string "~{~A~^" delim "~}"))
            (calc-node-idx (n)
-             (if without-root
-               (1- (node-idx n))
-               (node-idx n)))
+             (let ((idx (node-idx n)))
+               (if (and without-root idx)
+                 (1- (node-idx n))
+                 idx)))
            (cons-idx-if (n lst)
              "Adds IDX of a NODE N to the front of list LST if WITH-IDX"
              (if (and with-idx-as (calc-node-idx n))
@@ -494,7 +496,6 @@ integer IDX to STRING"
                 (funcall do child)))
         (t (error "Pass either :COLLECT or :DO"))))
 
-
 (defun %numerate-elem-children (elem)
   "Refreshes NODE-IDX field of ....."
   (check-type elem elem)
@@ -511,17 +512,19 @@ integer IDX to STRING"
              (defer-child-update (child)
                (when (typep child 'node)
                  (let* ((child-id (calc-child-id child))
-                        (child-counter (assoc child-id counters :test #'equal))
-                        (child-num (or (cdr child-counter) 0)))
+                        (child-counter (cdr (assoc child-id counters :test #'equal)))
+                        (child-num (or child-counter 0)))
                    (push (cons child child-num) deferred-updates)
                    (if child-counter
-                       (incf (cdr child-counter))
+                       (incf child-counter)
                        (push (cons child-id 1) counters)))))
              (execute-deferred-update (deferred-update)
                (let* ((child (car deferred-update))
                       (child-num (cdr deferred-update))
                       (child-id (calc-child-id child)))
                  (when (> (cdr (assoc child-id counters :test #'equal)) 1)
+                   ;; Numerate similar elems only (like several <book> inside one <lib>).
+                   ;; If it is single elem like one only <capital> - its IDX will be NIL:
                    (set-node-idx child child-num)))))
       (over-elem-children elem :do #'defer-child-update)
       (dolist (deferred-update (reverse deferred-updates))
