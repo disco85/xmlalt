@@ -171,5 +171,20 @@
          (format stream ".PI~%~A~%.PIE~%" content)))))
 
 
+(defun deserialize-line (doc line)
+  (check-type doc model:doc)
+  (check-type line string)
+  (format t "deserialize-line: ~A  doc: ~S~%" line doc)
+  (if (or (null line) (eq line :eof))
+    doc
+    doc))
+
+
+
 (defun deserialize (in-stream)
-  (format t "NOT YET IMPLEMENTED~%"))
+  (do* ((doc (model:create-doc)
+             (deserialize-line doc line))
+        (line (read-line in-stream nil :eof)
+              (read-line in-stream nil :eof)))
+       ((eq line :eof) (cons :ok doc))
+    (format t "NOT YET IMPLEMENTED: ~S~%" doc)))

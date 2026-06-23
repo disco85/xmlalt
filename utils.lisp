@@ -14,26 +14,50 @@
 
 (defmacro with-input-stream ((var path &key (mode :binary))
                              &body body)
-  "VAR is the name of the STREAM variable to be used inside BODY"
-  (let ((p (gensym "PATH")))
+  (let ((p (gensym)))
     `(let ((,p ,path))
        (if (or (null ,p)
                (and (stringp ,p)
                     (string= ,p "-")))
-           (let ((,var *standard-input*))
-             ,@body)
-           (with-open-file
-               (,var ,p
-                     :direction :input
-                     :element-type
-                     ,(ecase mode
-                        (:binary ''(unsigned-byte 8))
-                        (:text ''character))
-                     :external-format
-                     ,(ecase mode
-                        (:binary :default)
-                        (:text :utf-8)))
-             ,@body)))))
+         (let ((,var *standard-input*))
+           ,@body)
+         (case ,mode
+           (:binary
+              (with-open-file (,var ,p
+                                    :direction :input
+                                    :element-type '(unsigned-byte 8))
+                ,@body))
+           (:text
+              (with-open-file (,var ,p
+                                    :direction :input
+                                    :element-type 'character
+                                    :external-format :utf-8)
+                ,@body))
+           (otherwise
+              (error "Unknown mode: ~S" ,mode)))))))
+
+;; (defmacro with-input-stream ((var path &key (mode :binary))
+;;                              &body body)
+;;   "VAR is the name of the STREAM variable to be used inside BODY"
+;;   (let ((p (gensym "PATH")))
+;;     `(let ((,p ,path))
+;;        (if (or (null ,p)
+;;                (and (stringp ,p)
+;;                     (string= ,p "-")))
+;;            (let ((,var *standard-input*))
+;;              ,@body)
+;;            (with-open-file
+;;                (,var ,p
+;;                      :direction :input
+;;                      :element-type
+;;                      ,(ecase mode
+;;                         (:binary ''(unsigned-byte 8))
+;;                         (:text ''character))
+;;                      :external-format
+;;                      ,(ecase mode
+;;                         (:binary :default)
+;;                         (:text :utf-8)))
+;;              ,@body)))))
 
 
 (defmacro with-output-stream ((stream path &key (mode :binary))

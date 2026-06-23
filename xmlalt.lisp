@@ -18,6 +18,14 @@
     (:xmlfmt #'xmlfmt:deserialize)))
 
 
+(defun format-deserialization-stream-mode (format)
+  "Returns mode for input stream for deserialization (CLXML SAX wants :BINARY)"
+  (ecase format
+    (:cmdfmt :text)
+    (:regfmt :text)
+    (:xmlfmt :binary)))
+
+
 (defun cli-kw-getopt (cmd key)
   "Allows to get a choice/enum option as a symbol in :keyword package ready for eq/getf/..."
   (intern (string-upcase (clingon:getopt cmd key)) :keyword))
@@ -29,12 +37,13 @@
          (out-path (clingon:getopt cmd :out))
          (from-format (cli-kw-getopt cmd :from))
          (to-format (cli-kw-getopt cmd :to))
+         (in-stream-mode (format-deserialization-stream-mode from-format))
          (parsed nil)
          (dir-delim (clingon:getopt cmd :dir-delim)))
     (when dir-delim
       (setf cmdfmt:*dir-delim* dir-delim))
     ;; (format t "RUN: ~A ~A ~A ~A~%" in out from to)
-    (with-input-stream (in-stream in-path)
+    (with-input-stream (in-stream in-path :mode in-stream-mode)
       (setf parsed (funcall (format-deserialize-func from-format)
                             in-stream)))
     (ecase (car parsed)
