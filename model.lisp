@@ -254,6 +254,18 @@
   (doc-state-characters doc-state))
 
 
+(defun end-accumulated-characters-with-text-node (doc doc-state)
+  "Adds text node to DOC if there are any accumulated characters and resets them in DOC-STATE"
+  (check-type doc doc)
+  (check-type doc-state doc-state)
+  (when (accumulated-characters-exist doc-state)
+    (let* ((characters (string-trim '(#\Space #\Tab #\Newline)
+                                    (get-accumulated-characters doc-state)))
+           (text (create-text characters)))
+      (add-child-node-to-current-elem text doc)
+      (reset-characters-accumulation doc-state))))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; NODE API

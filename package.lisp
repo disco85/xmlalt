@@ -149,6 +149,7 @@
            #:accumulate-characters
            #:accumulated-characters-exist
            #:get-accumulated-characters
+           #:end-accumulated-characters-with-text-node
            ))
 
 (defpackage #:cmdfmt

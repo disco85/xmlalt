@@ -182,7 +182,8 @@
 
 
 (defun deserialize (in-stream)
-  (do* ((doc (model:create-doc)
+  (do* ((doc-state (model:create-doc-state))
+        (doc (model:create-doc)
              (deserialize-line doc line))
         (line (read-line in-stream nil :eof)
               (read-line in-stream nil :eof)))

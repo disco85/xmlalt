@@ -66,14 +66,14 @@
 ;;     (and (stringp accumulated) (string/= accumulated ""))))
 
 
-(defun end-accumulated-characters-with-text-node (mysax)
-  "Adds text node to MYSAX if there are any accumulated characters and resets them"
-  (when (model:accumulated-characters-exist (mysax-doc-state mysax))
-    (let* ((characters (string-trim '(#\Space #\Tab #\Newline)
-                                    (model:get-accumulated-characters (mysax-doc-state mysax))))
-           (text (model:create-text characters)))
-      (model:add-child-node-to-current-elem text (mysax-doc mysax))
-      (model:reset-characters-accumulation (mysax-doc-state mysax)))))
+;; (defun end-accumulated-characters-with-text-node (mysax)
+;;   "Adds text node to MYSAX if there are any accumulated characters and resets them"
+;;   (when (model:accumulated-characters-exist (mysax-doc-state mysax))
+;;     (let* ((characters (string-trim '(#\Space #\Tab #\Newline)
+;;                                     (model:get-accumulated-characters (mysax-doc-state mysax))))
+;;            (text (model:create-text characters)))
+;;       (model:add-child-node-to-current-elem text (mysax-doc mysax))
+;;       (model:reset-characters-accumulation (mysax-doc-state mysax)))))
 
 
 (defmethod sax:start-document ((mysax mysax))
@@ -85,7 +85,7 @@
 
 (defmethod sax:start-dtd ((mysax mysax) name public-id system-id)
   (let ((dtd (model:create-dtd :name name :public-id public-id :system-id system-id)))
-    (end-accumulated-characters-with-text-node mysax)
+    (model:end-accumulated-characters-with-text-node (mysax-doc mysax) (mysax-doc-state mysax))
     (model:add-child-node-to-current-elem dtd (mysax-doc mysax))
     (model:set-doc-dtd (mysax-doc mysax) dtd)
     (format t "START-DTD! NAME: ~A PUBLIC-ID: ~A SYSTEM-ID: ~A~%~%" name public-id system-id)))
@@ -178,7 +178,7 @@
                                  :prefix-mappings (car (model:get-remembered-prefix-mappings
                                                         (mysax-doc-state mysax)))
                                  :attributes (mapcar #'adapt-attr attributes))))
-    (end-accumulated-characters-with-text-node mysax)
+    (model:end-accumulated-characters-with-text-node (mysax-doc mysax) (mysax-doc-state mysax))
     (model:add-child-node-to-current-elem elem (mysax-doc mysax))
     (model:enter-elem elem (mysax-doc mysax))
     (format t "START-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A ATTRIBUTES: ~A~%~%"
@@ -190,7 +190,7 @@
   ;;   (let ((text (model:create-text (mysax-characters mysax))))
   ;;     ;; (set-node-dir text mysax)
   ;;     (model:add-child-node-to-current-elem text (mysax-doc mysax))))
-  (end-accumulated-characters-with-text-node mysax)
+  (model:end-accumulated-characters-with-text-node (mysax-doc mysax) (mysax-doc-state mysax))
   (model:exit-from-elem (mysax-doc mysax))
   (format t "END-ELEMENT! NAMESPACE-URI: ~A LOCAL-NAME: ~A QNAME: ~A~%~%"
           namespace-uri local-name qname))
@@ -199,7 +199,7 @@
 (defmethod sax:comment ((mysax mysax) data)
   (let ((comment (model:create-comment data)))
     ;; (set-node-dir comment mysax) ;; TODO remove all set-node-dir ?
-    (end-accumulated-characters-with-text-node mysax)
+    (model:end-accumulated-characters-with-text-node (mysax-doc mysax) (mysax-doc-state mysax))
     (model:add-child-node-to-current-elem comment (mysax-doc mysax))
     ;; (reset-characters-accumulation mysax)
     (format t "COMMENT! DATA: ~A~%~%" data)))
@@ -207,7 +207,7 @@
 
 (defmethod sax:start-cdata ((mysax mysax))
   ;; (reset-characters-accumulation mysax)
-  (end-accumulated-characters-with-text-node mysax)
+  (model:end-accumulated-characters-with-text-node (mysax-doc mysax) (mysax-doc-state mysax))
   (format t "START-CDATA!~%~%"))
   ;; (let ((cdata (model:create-cdata)))
   ;;   (set-node-dir cdata mysax)
@@ -244,7 +244,7 @@
 (defmethod sax:processing-instruction ((mysax mysax) target data)
   (let ((pinstr (model:create-pinstr :target target :data data)))
     ;; (set-node-dir pinstr mysax)  ;; TODO maybe to unite these 2 calls?
-    (end-accumulated-characters-with-text-node mysax)
+    (model:end-accumulated-characters-with-text-node (mysax-doc mysax) (mysax-doc-state mysax))
     (model:add-child-node-to-current-elem pinstr (mysax-doc mysax))
     ;; (reset-characters-accumulation mysax)
     (format t "PROCESSING-INSTRUCTION! TARGET: ~A DATA: ~A~%~%" target data)))
