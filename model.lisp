@@ -157,6 +157,15 @@
   (elems-stack nil :type list))
 
 
+;; State while we pollute DOC
+(defstruct doc-state
+  ;; Current list of PREFIX-MAPPINGS. Their events are fired before their element,
+  ;; so we save them first here, then add to an element, also they are scoped:
+  (prefix-mappings nil :type list)
+  ;; Buffer to accumulate fragments of characters
+  (characters "" :type string))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; API
@@ -179,6 +188,70 @@
 (defun write-uri (uri &optional stream)
   (check-type uri uri)
   (format stream "~A" (uri-value uri)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; DOC-STATE API
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun create-doc-state ()
+  (make-doc-state))
+
+
+(defun remember-prefix-mapping (doc-state prefix uri)
+  "Adds to current prefix mappings yet another mapping"
+  (check-type doc-state doc-state)
+  (unless (doc-state-prefix-mappings doc-state)
+    (push (create-prefix-mappings)
+          (doc-state-prefix-mappings doc-state)))
+  (add-prefix-mappings (car (doc-state-prefix-mappings doc-state))
+                       (cons prefix uri)))
+
+
+(defun forget-prefix-mappings (doc-state)
+  "Drops current prefix mappins"
+  (check-type doc-state doc-state)
+  (pop (doc-state-prefix-mappings doc-state)))
+
+
+(defun reset-characters-accumulation (doc-state)
+  "Resets accumulation of characters so to be able to start from beginning"
+  ;; When characters are related to another XML construct, we should
+  ;; reset accumulated characters to "". In SAX we do it in:
+  ;;   * START-ELEMENT
+  ;;   * END-ELEMENT
+  ;;   * START-CDATA
+  ;;   * END-CDATA
+  ;;   * PROCESSING-INSTRUCTION
+  ;;   * COMMENT
+  ;;   * START-DOCUMENT (INITIAL RESET)
+  ;;   * END-DOCUMENT (FINAL FLUSH)
+  (check-type doc-state doc-state)
+  (setf (doc-state-characters doc-state) ""))
+
+
+(defun get-remembered-prefix-mappings (doc-state)
+  (check-type doc-state doc-state)
+  (doc-state-prefix-mappings doc-state))
+
+
+(defun accumulate-characters (doc-state new-characters)
+  (check-type doc-state doc-state)
+  (setf (doc-state-characters doc-state)
+        (concatenate 'string (doc-state-characters doc-state) new-characters)))
+
+
+(defun accumulated-characters-exist (doc-state)
+  (check-type doc-state doc-state)
+  (let ((accumulated (doc-state-characters doc-state)))
+    (and (stringp accumulated) (string/= accumulated ""))))
+
+
+(defun get-accumulated-characters (doc-state)
+  (check-type doc-state doc-state)
+  (doc-state-characters doc-state))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -11,29 +11,24 @@
         :documentation ""
         :initform (model:create-doc)
         :accessor mysax-doc)
-   (prefix-mappings :type list
-                    :initform nil
-                    :accessor mysax-prefix-mappings
-                    :documentation "Current list of PREFIX-MAPPINGS. Their events are fired before their element,
-so we save them first here, then add to an element, also they are scoped")
-   (characters :type string
-               :initform ""
-               :accessor mysax-characters
-               :documentation "Buffer to accumulate fragments of characters")))
+   (doc-state :type model:doc-state
+              :documentation ""
+              :initform (model:create-doc-state)
+              :accessor mysax-doc-state)))
 
 
-(defun remember-prefix-mapping (mysax prefix uri)
-  "Adds to current prefix mappings yet another mapping"
-  (unless (mysax-prefix-mappings mysax)
-    (push (model:create-prefix-mappings)
-          (mysax-prefix-mappings mysax)))
-  (model:add-prefix-mappings (car (mysax-prefix-mappings mysax))
-                             (cons prefix uri)))
+;; (defun remember-prefix-mapping (mysax prefix uri)
+;;   "Adds to current prefix mappings yet another mapping"
+;;   (unless (mysax-prefix-mappings mysax)
+;;     (push (model:create-prefix-mappings)
+;;           (mysax-prefix-mappings mysax)))
+;;   (model:add-prefix-mappings (car (mysax-prefix-mappings mysax))
+;;                              (cons prefix uri)))
 
 
-(defun forget-prefix-mappings (mysax)
-  "Drops current prefix mappins"
-  (pop (mysax-prefix-mappings mysax)))
+;; (defun forget-prefix-mappings (mysax)
+;;   "Drops current prefix mappins"
+;;   (pop (mysax-prefix-mappings mysax)))
 
 
 (defmethod sax:attribute-declaration ((mysax mysax) element-name attribute-name type default)
@@ -46,38 +41,39 @@ so we save them first here, then add to an element, also they are scoped")
             element-name attribute-name type default)))
 
 
-(defun reset-characters-accumulation (mysax)
-  "Resets accumulation of characters so to be able to start from beginning"
-  ;; When characters are related to another XML construct, we should
-  ;; reset accumulated characters to "". We do it in:
-  ;;   * START-ELEMENT
-  ;;   * END-ELEMENT
-  ;;   * START-CDATA
-  ;;   * END-CDATA
-  ;;   * PROCESSING-INSTRUCTION
-  ;;   * COMMENT
-  ;;   * START-DOCUMENT (INITIAL RESET)
-  ;;   * END-DOCUMENT (FINAL FLUSH)
-  (setf (mysax-characters mysax) ""))
+;; (defun reset-characters-accumulation (mysax)
+;;   "Resets accumulation of characters so to be able to start from beginning"
+;;   ;; When characters are related to another XML construct, we should
+;;   ;; reset accumulated characters to "". We do it in:
+;;   ;;   * START-ELEMENT
+;;   ;;   * END-ELEMENT
+;;   ;;   * START-CDATA
+;;   ;;   * END-CDATA
+;;   ;;   * PROCESSING-INSTRUCTION
+;;   ;;   * COMMENT
+;;   ;;   * START-DOCUMENT (INITIAL RESET)
+;;   ;;   * END-DOCUMENT (FINAL FLUSH)
+;;   (setf (mysax-characters mysax) ""))
 
 
-(defun accumulate-characters (mysax new-characters)
-  (setf (mysax-characters mysax)
-        (concatenate 'string (mysax-characters mysax) new-characters)))
+;; (defun accumulate-characters (mysax new-characters)
+;;   (setf (mysax-characters mysax)
+;;         (concatenate 'string (mysax-characters mysax) new-characters)))
 
 
-(defun accumulated-characters-exist (mysax)
-  (let ((accumulated (mysax-characters mysax)))
-    (and (stringp accumulated) (string/= accumulated ""))))
+;; (defun accumulated-characters-exist (mysax)
+;;   (let ((accumulated (mysax-characters mysax)))
+;;     (and (stringp accumulated) (string/= accumulated ""))))
 
 
 (defun end-accumulated-characters-with-text-node (mysax)
   "Adds text node to MYSAX if there are any accumulated characters and resets them"
-  (when (accumulated-characters-exist mysax)
-    (let* ((characters (string-trim '(#\Space #\Tab #\Newline) (mysax-characters mysax)))
+  (when (model:accumulated-characters-exist (mysax-doc-state mysax))
+    (let* ((characters (string-trim '(#\Space #\Tab #\Newline)
+                                    (model:get-accumulated-characters (mysax-doc-state mysax))))
            (text (model:create-text characters)))
       (model:add-child-node-to-current-elem text (mysax-doc mysax))
-      (reset-characters-accumulation mysax))))
+      (model:reset-characters-accumulation (mysax-doc-state mysax)))))
 
 
 (defmethod sax:start-document ((mysax mysax))
@@ -157,12 +153,12 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:start-prefix-mapping ((mysax mysax) prefix uri)
-  (remember-prefix-mapping mysax prefix uri)
+  (model:remember-prefix-mapping (mysax-doc-state mysax) prefix uri)
   (format t "START-PREFIX-MAPPING! PREFIX: ~A URI: ~A~%~%" prefix uri))
 
 
 (defmethod sax:end-prefix-mapping ((mysax mysax) prefix)
-  (forget-prefix-mappings mysax)
+  (model:forget-prefix-mappings (mysax-doc-state mysax))
   (format t "END-PREFIX-MAPPING! PREFIX: ~A~%~%" prefix))
 
 
@@ -179,7 +175,8 @@ so we save them first here, then add to an element, also they are scoped")
   (let ((elem (model:create-elem :namespace-uri namespace-uri
                                  :local-name local-name
                                  :qname qname
-                                 :prefix-mappings (car (mysax-prefix-mappings mysax))
+                                 :prefix-mappings (car (model:get-remembered-prefix-mappings
+                                                        (mysax-doc-state mysax)))
                                  :attributes (mapcar #'adapt-attr attributes))))
     (end-accumulated-characters-with-text-node mysax)
     (model:add-child-node-to-current-elem elem (mysax-doc mysax))
@@ -220,10 +217,11 @@ so we save them first here, then add to an element, also they are scoped")
 
 
 (defmethod sax:end-cdata ((mysax mysax))
-  (when (accumulated-characters-exist mysax)
-    (let ((cdata (model:create-cdata (mysax-characters mysax))))
+  (when (model:accumulated-characters-exist (mysax-doc-state mysax))
+    (let ((cdata (model:create-cdata (model:get-accumulated-characters
+                                      (mysax-doc-state mysax)))))
       (model:add-child-node-to-current-elem cdata (mysax-doc mysax)))
-    (reset-characters-accumulation mysax)
+    (model:reset-characters-accumulation (mysax-doc-state mysax))
     (format t "END-CDATA!~%~%")))
   ;; (symbol-macrolet ((elems-stack (model:doc-elems-stack (mysax-doc mysax)))
   ;;                   (cur-elem (car elems-stack))
@@ -239,7 +237,7 @@ so we save them first here, then add to an element, also they are scoped")
 
 (defmethod sax:characters ((mysax mysax) data)
   (unless (every #'whitespace-char-p data)
-    (accumulate-characters mysax data))
+    (model:accumulate-characters (mysax-doc-state mysax) data))
   (format t "CHARACTERS! DATA: ~A~%~%" data))
 
 

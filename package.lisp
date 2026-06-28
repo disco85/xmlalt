@@ -139,6 +139,16 @@
            #:get-doc-dtd
            #:get-doc-xml-decl
            #:set-doc-xml-decl
+
+           #:doc-state
+           #:create-doc-state
+           #:remember-prefix-mapping
+           #:get-remembered-prefix-mappings
+           #:forget-prefix-mappings
+           #:reset-characters-accumulation
+           #:accumulate-characters
+           #:accumulated-characters-exist
+           #:get-accumulated-characters
            ))
 
 (defpackage #:cmdfmt
